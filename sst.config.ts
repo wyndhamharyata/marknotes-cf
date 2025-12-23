@@ -5,11 +5,16 @@ export default $config({
       name: "marknotes-cf",
       removal: input?.stage === "production" ? "retain" : "remove",
       protect: ["production"].includes(input?.stage),
-      home: "aws",
+      home: "cloudflare",
       providers: { cloudflare: "6.11.0" },
     };
   },
   async run() {
-    new sst.aws.Astro("MyWeb");
+    new sst.cloudflare.x.Astro("Max", {
+      domain:
+        $app.stage === "production"
+          ? "read.mwyndham.dev"
+          : "devread.mwyndham.dev",
+    });
   },
 });
