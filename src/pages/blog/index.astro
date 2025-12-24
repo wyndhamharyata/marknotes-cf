@@ -19,36 +19,45 @@ const posts = (await getCollection('blog')).sort(
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 	</head>
-	<body>
+	<body class="font-sono min-h-screen flex flex-col">
+		<!-- Background layer -->
+		<div class="fixed inset-0 -z-10 bg-base-200 dark:bg-base-300">
+			<div class="absolute inset-0 grid-bg"></div>
+			<div class="absolute inset-0 bg-gradient-to-bl from-secondary/5 via-accent/5 to-transparent"></div>
+		</div>
+
 		<Header />
-		<main class="max-w-4xl">
-			<section>
-				<ul class="flex flex-wrap gap-8 list-none m-0 p-0">
-					{
-						posts.map((post, index) => (
-							<li class={`${index === 0 ? 'w-full mb-4 text-center' : 'w-full md:w-[calc(50%-1rem)]'}`}>
-								<a href={`/blog/${post.id}/`} class="block no-underline transition-all duration-200 group">
-									{post.data.heroImage && (
-										<Image
-											width={720}
-											height={360}
-											src={post.data.heroImage}
-											alt=""
-											class={`mb-2 rounded-xl group-hover:shadow-custom ${index === 0 ? 'w-full' : ''}`}
-										/>
-									)}
-									<h4 class={`m-0 text-black-custom leading-none group-hover:text-accent ${index === 0 ? 'text-4xl' : ''}`}>
-										{post.data.title}
-									</h4>
-									<p class="m-0 text-gray-custom group-hover:text-accent">
-										<FormattedDate date={post.data.pubDate} />
-									</p>
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
+		<main class="max-w-4xl mx-auto px-4 py-8 flex-1">
+			<div class="card bg-base-100 shadow-xl">
+				<div class="card-body">
+					<h1 class="text-3xl font-extrabold mb-6">Blog Posts</h1>
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2">
+						{
+							posts.map((post, index) => (
+								<article class={`py-4 ${index < posts.length - 1 ? 'border-b border-base-300 md:border-b-0' : ''}`}>
+									<a href={`/blog/${post.id}/`} class="group block">
+										{post.data.heroImage && (
+											<Image
+												width={720}
+												height={360}
+												src={post.data.heroImage}
+												alt=""
+												class="w-full h-32 object-cover rounded-box mb-3"
+											/>
+										)}
+										<h2 class="text-lg font-extrabold group-hover:text-primary transition-colors">
+											{post.data.title}
+										</h2>
+										<p class="text-base-content/70 text-sm mt-1">
+											<FormattedDate date={post.data.pubDate} />
+										</p>
+									</a>
+								</article>
+							))
+						}
+					</div>
+				</div>
+			</div>
 		</main>
 		<Footer />
 	</body>

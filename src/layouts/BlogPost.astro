@@ -16,29 +16,37 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		<BaseHead title={title} description={description} />
 	</head>
 
-	<body>
+	<body class="font-sono min-h-screen flex flex-col">
+		<!-- Background layer -->
+		<div class="fixed inset-0 -z-10 bg-base-200 dark:bg-base-300">
+			<div class="absolute inset-0 grid-bg"></div>
+			<div class="absolute inset-0 bg-gradient-to-bl from-secondary/5 via-accent/5 to-transparent"></div>
+		</div>
+
 		<Header />
-		<main class="w-[calc(100%-2em)] max-w-full m-0 py-0 px-0">
-			<article>
-				<div class="w-full">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" class="block mx-auto rounded-xl shadow-custom" />}
-				</div>
-				<div class="prose prose-lg max-w-3xl mx-auto p-4 text-gray-dark">
-					<div class="mb-4 py-4 text-center leading-none">
-						<div class="mb-2 text-gray-custom">
+		<main class="max-w-4xl mx-auto px-4 py-8 flex-1">
+			<article class="card bg-base-100 shadow-xl">
+				{heroImage && (
+					<figure>
+						<Image width={1020} height={510} src={heroImage} alt="" class="w-full max-h-64 object-cover" />
+					</figure>
+				)}
+				<div class="card-body">
+					<div class="text-center mb-6">
+						<p class="text-base-content/70 mb-2">
 							<FormattedDate date={pubDate} />
-							{
-								updatedDate && (
-									<div class="italic">
-										Last updated on <FormattedDate date={updatedDate} />
-									</div>
-								)
-							}
-						</div>
-						<h1 class="mb-2">{title}</h1>
-						<hr />
+							{updatedDate && (
+								<span class="italic">
+									{" "}| Updated: <FormattedDate date={updatedDate} />
+								</span>
+							)}
+						</p>
+						<h1 class="card-title text-3xl md:text-4xl font-extrabold justify-center">{title}</h1>
+						<div class="divider"></div>
 					</div>
-					<slot />
+					<div class="prose prose-lg max-w-none dark:prose-invert">
+						<slot />
+					</div>
 				</div>
 			</article>
 		</main>

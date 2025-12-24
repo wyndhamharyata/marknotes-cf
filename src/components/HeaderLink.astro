@@ -12,8 +12,8 @@ const isActive = href === pathname || href === '/' + (subpath?.[0] || '');
 <a
 	href={href}
 	class:list={[
-		"inline-block py-4 px-2 text-black-custom no-underline border-b-4 border-transparent",
-		{ "font-bold border-accent": isActive },
+		"font-sono text-base px-4 py-2",
+		{ "btn btn-accent": isActive },
 		className
 	]}
 	{...props}
