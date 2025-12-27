@@ -173,14 +173,21 @@ async function publishAndRebuild(postId: string, content: PostContent) {
 ### Required Environment Variables
 
 ```bash
-# .env (local development)
+# .env (local development / SST deploy)
+CLOUDFLARE_DEFAULT_ACCOUNT_ID=your-cloudflare-account-id
+LIBSQL_URL=libsql://your-db.turso.io
+LIBSQL_AUTH_TOKEN=your-turso-token
+
+# For CMS (server-side only - created after Pages project exists)
 CLOUDFLARE_DEPLOY_HOOK=https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/xxx
 ```
 
 ### SST Configuration
 
+Uses `cloudflare.PagesProject` (Pulumi) with release branch pattern:
+
 ```typescript
-// sst.config.ts
+// sst.config.ts - see actual file for full implementation
 export default $config({
   app(input) {
     return {
@@ -190,28 +197,78 @@ export default $config({
     };
   },
   async run() {
-    const site = new sst.cloudflare.Astro("Max", {
-      domain: $app.stage === "production"
-        ? "read.mwyndham.dev"
-        : "devread.mwyndham.dev",
-      environment: {
-        LIBSQL_URL: process.env.LIBSQL_URL,
-        LIBSQL_AUTH_TOKEN: process.env.LIBSQL_AUTH_TOKEN,
-        // Don't expose deploy hook to client - keep server-side only
+    const site = new cloudflare.PagesProject("Max", {
+      accountId: process.env.CLOUDFLARE_DEFAULT_ACCOUNT_ID!,
+      name: `marknotes-${$app.stage}`,
+      productionBranch: "release-production",
+      source: {
+        type: "github",
+        config: {
+          owner: "wyndhamharyata",
+          repoName: "marknotes-cf",
+          productionBranch: "release-production",
+          productionDeploymentsEnabled: true,
+          previewBranchIncludes: ["release-*"],
+        },
+      },
+      buildConfig: {
+        buildCommand: "npm run build",
+        destinationDir: "dist",
+      },
+      deploymentConfigs: {
+        production: {
+          envVars: {
+            LIBSQL_URL: { type: "plain_text", value: process.env.LIBSQL_URL! },
+            LIBSQL_AUTH_TOKEN: { type: "plain_text", value: process.env.LIBSQL_AUTH_TOKEN! },
+          },
+        },
       },
     });
 
-    return { url: site.url };
+    const domain = new cloudflare.PagesDomain("MaxDomain", {
+      accountId: process.env.CLOUDFLARE_DEFAULT_ACCOUNT_ID!,
+      projectName: site.name,
+      name: $app.stage === "production"
+        ? "read.mwyndham.dev"
+        : "devread.mwyndham.dev",
+    });
+
+    return { url: domain.name, projectName: site.name };
   },
 });
+```
+
+### Release Branch Workflow
+
+```bash
+# Development happens on main (no auto-deploy)
+git checkout main
+git commit -m "new feature"
+git push origin main
+
+# Deploy to production by pushing to release branch
+git checkout release-production
+git merge main
+git push origin release-production  # Triggers Cloudflare Pages build
 ```
 
 ---
 
 ## Implementation Checklist
 
-- [ ] Create deploy hook in Cloudflare Pages dashboard
-- [ ] Store webhook URL as environment variable (server-side only)
+### Infrastructure Setup
+- [ ] Add `CLOUDFLARE_DEFAULT_ACCOUNT_ID` to local `.env`
+- [ ] Run `sst deploy` to create the Pages project
+- [ ] Create `release-production` branch and push to origin
+- [ ] Verify Cloudflare Pages dashboard shows the connected repo
+
+### Deploy Hook Setup
+- [ ] Go to Cloudflare Dashboard → Pages → marknotes-{stage}
+- [ ] Navigate to Settings → Builds & Deployments → Deploy Hooks
+- [ ] Create hook named "CMS Publish"
+- [ ] Store webhook URL as `CLOUDFLARE_DEPLOY_HOOK` env var (server-side only)
+
+### CMS Integration
 - [ ] Implement publish function that saves to DB then triggers hook
 - [ ] Add error handling for failed rebuild triggers
 - [ ] Show user feedback about rebuild status
