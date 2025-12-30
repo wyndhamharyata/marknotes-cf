@@ -1,0 +1,132 @@
+---
+title: "Neovim Presets are Bad for Beginners, Sincerely from a Fellow Beginner"
+description: "A rant-turned-guide about learning Neovim the hard way - why starting from scratch beats using NVChad or LazyVim for absolute beginners."
+pubDate: 'Oct 14 2023'
+heroImage: '../../assets/hero-neovim-presets-are-bad-for-beginner-sincerely-from.png'
+---
+
+First  thing first, pardon me for being very ranty in this article. As I will  unload my frustration learning NeoVim for the first time ever.  There is  something (very) good by the end of this though: ***I ended up loving Neovim***. So if you're interested, please keep reading.
+
+## TL;DR
+
+If you're absolute noob in Neovim, this is the advice from fellow noobs:
+
+- Don't immediately use neovim.
+- Use vim motion bindings in your existing IDE. familiarize yourself with it first.
+- **Starts Neovim from scratch.** Don't use presets like  NVChad, LazyVim or LunarVim. It is not about bragging rights, it is  actually easier just start from scratch, just a bit tedious.
+- Understands how configurations, plugins, packages works by doing it yourself.
+- Only then you can retry using presets, with the understanding of how customizations works.
+
+If you don't know where to start, just follow ThePrimeagen [0 to LSP Tutorial](https://youtu.be/w7i4amO_zaE?si=hP-6mExIL5UBJHW6).  There will be some breaking changes for some of the plugins used in  that video, but it is easily solvable and by that time you should be  comfortable dealing with Lua.
+
+## Motivation
+
+I have been, frustrated, to say the least, with my experience with  VSCode. At first, I felt it simple, fast(er) than my usual IDE (I am  still Android Dev at that time) which is Android Studio, and has nice  default keybinding that I can get used to very easily.
+
+I move to VSCode after getting comfortable with my career-switch into  Android-turned-Backend-turned-Fullstack roles that I am now. My stack  is Golang, and during the switch, I use GoLand as my IDE, then to  VSCode. I move away from GoLand simply because it's expensive and if I  can get equally good experience elsewhere for free, I'll take that money  back.
+
+Long story short, I ended up hating it. Why? well:
+
+- The more I add extensions, the worst it gets. And workspace setting is cumbersome yet useless.
+- Global search in the sidebar? come on.
+- When does it opens in the new tab and when will it open in the current tab? no one knows…
+- It does not have default key binding for `go to implementation`. Crazy for an IDE not have this by default.
+- It only allows create new file if you right click on a folder and not on a file. I usually ended up use `cat` or `echo` instead.
+- Sometimes it's communication with `gopls` gets funky and my imports throws error everywhere.
+- And the most important part: ***It has default, uneditable, UI Type Face***.  I'm not talking about editor font, I'm talking about that UI font. It's  bland, uninspiring, and urrgghh I want to vomit for how "corporatey" it  is. I know it's minor thing but every time I opens VSCode I reel back  for a minute seeing that default type face. I hate it so much.
+
+And I finally gave up after I have to learn Ruby on Rails (which I  regret, btw) for my work, and VSCode just decided to just give up on me  and everything just break. I had to go back to my IntelliJ subscription  for the sake of not going insane. RubyMine is amazing, but it's  expensive.
+
+## How The Adventure (Wrongly) Started
+
+I've known vim for a long time. I also have bad experience with it  when trying to use it not knowing about vim motion at all. Then I heard  about Neovim from Dreams of Code's video on the [perfect setup for Go in Neovim](https://youtu.be/i04sSQjd-qo?si=VoZfyQfgBVZ3K2-r).  I'm intrigued, why does people keep swear by vim being a good editor?  hell, even IDE? I'm in the market of new IDE right know so anything  goes.
+
+Then I started to look around, and I found creators like ThePrimeagen  (which also start my Primeagen React binge addiction) that also endorse  Neovim. Okay, seems like at least it's doable to learn Neovim properly.
+
+This is where I got wrong.
+
+I came in with the wrong mindset. I am looking for IDE replacement  immediately. While I'm not averse to learn the nitty gritty (including  vim motion), I want one ready to use setup that I can just *learn*. You know, the readymade stuff that has decent default stuff and I can modify it later kind of thing. Just like VSCode.
+
+I started by followings the video I mentioned above, following the setup step by step, and got frustrated.
+
+Before I explain my failings, let me explain what the setup entails.  Mind you it is not bad setup, it just that I understand nothing as an  absolute Neovim noob.
+
+It uses NVChad, then for autocomplete it uses `gopls` and and `nvim-lspconfig`. For auto formatting it uses `null-ls` and it uses `dlv` as the debugger.
+
+## My Misfortune with Everything
+
+First, turns out NVChad does not have nice defaults. It does not attempt to have out of the box support for *any* language at all. You have to deal with lsp yourself which is very daunting for total noob.
+
+Secondly, I haven't familiarized myself with Vim Motion. So following  that tutorial is slow and painful, and I understand nothing. I don't  know how to make a new file and directory in Neovim, so I resort to use  the terminal instad using `mkdir` and `echo`. Sometimes I accidentally delete files, other times my file is suddenly full of letter `e` or `u`.
+
+Thirdly, I have zero understanding of `lua`  and how it interacts with neovim. I have general understanding as a  programmer, but I had zero understanding why the setup goes the way it  does in that video. Lua file here, add config there, but why?
+
+Then `mason`, man, mason. I very much  understand and appreciate mason now, but at that time I hate it so much.  It basically install it's own tooling for me, but then it causes issues  as most of that tools is already installed in my system.
+
+One of which, is `golangci-lint`. This tool introduce breaking changes in version `1.53`, which is known by me and the reason why I pin my local version to `1.52`. But when I setup NVChad with it, I ended up telling mason to install `golangci-lint` too, which, by default aims for the latest which is version `1.54`. And I don't realize that mason does this.
+
+It took me quite a while to find the reason why my linter broke  whenever I uses Neovim but fine whenever I use other editor. Turns out  whenever I use Neovim, it uses the `golangci-lint` installed by mason. I wasted a whole day solving this.
+
+Then I reset everything and started fresh again. I still assume that  NVChad is not my cup of tea. So I started again but this time using  LazyVim. It goes roughly the same. This time even worse, because it  "smart" installation process, I don't know whatever it is happening  behind the scene.
+
+LazyVim also has it's own keybinding on top of Neovim's own vim  motion. In the key binding guide section on it's web, it has foreign  keys such as `<leader>, <C>, <A>` etc.
+
+And whenever I look up what `<leader>` is, all answer I get is "it's up to you what `<leader>` key is". *Geez, I know*, but what I want to know is **WHAT IS THE DEFAULT LEADER KEY IS**.
+
+Turns out it spacebar.
+
+I just want to know that the leader key is a spacebar.
+
+God damn looking for that information alone frustrates me.
+
+Do you see the pattern by now?
+
+## Simple vs Easy
+
+A lot of presets makes assumption on how much you, the potential  users, already known about Vim. Usually, the assumption goes for  familiarity with vim motion, understands how Lua works with neovim, or  understanding the common key binding Vim has.
+
+This assumption is not good for total beginner. Which, by definition, not even know what to ask for.
+
+Presets tries to make someone familiar with Vim enjoys their new  installation. They installs things such as Telescope by default. It has  default, nice, File tree simulating VSCode, and it has mason integration  from the get go.
+
+But noobs does not understand nor need any of that. Yes it's good if  you're familiar with common IDE and coming to Neovim and having  "similar" interface. But the fundamental way to navigate Neovim itself  is not addressed.
+
+**For noob, the easiest way to learn using Neovim is to learn it from scratch**
+
+## How I Ended Up Loving Neovim
+
+Okay, I'm 1.5 months in and have nothing to show except using vim  mode in VSCode with a very dodgy result (Neovim extension in VSCode is  actually using the local machine Neovim, so any configuration there  would also affect the experience in the VSCode). I will rant about this  another time but alas, this is not the time to rant about VSCode again.
+
+Then, during a long weekend holiday, I finally I bit the bullet and  says "hey, you know what? I have nothing to lose so I should just start  everything from scratch and learn the damn thing".
+
+Then I opens up my watch later playlist and whip up [The Primeagen Video's on 0 to LSP](https://youtu.be/w7i4amO_zaE?si=hP-6mExIL5UBJHW6)  which I already put off watching for some time now. I follow it step by  step, first from just trying to put hello world in Lua, then followed  by setting up Packer, Mason, LSP from sratch using [lsp-zero](https://github.com/VonHeikemen/lsp-zero.nvim) and understanding what the hell actually is treesitter, lsp, and lsp config.
+
+I don't follow the tutorial to a T mind you, as the setup is around  Typescript, JavaScript and Rust. I set my environment to a Golang  instead by installing `gopls` LSP and `golangci-lint-lsp`  instead. But honestly, kudos to Prime for being such a good teacher, I  understand enough what actually happened to find my way around by  myself.
+
+By the end of the video, I have nice simple setup for Go development  in Neovim. I have linter and autocomplete working, syntax highlighting  working incredibly well, and find several life changing tools in it (man  harpoon is actual game changer, and hijacking Telescope to do grep  search is incredible).
+
+I also realize that many things coming by default in IDE is not  necessarily important.  File tree is actually not necessary if you have  quick and easy access to the whole directory via Explorer, along with  incredible tools such as Telescope. So I choose to omit file tree  alltogether.
+
+After 3 days using this setup to totally famliarize myself (and also  adding several plugins myself such as templ and tailwind css), I revisit  the Dream's of Code video above. And man, what a difference between  understanding the context and not.
+
+I now understand everything he said, every step of the way, and able  to adapt several of the plugins he shows during the video even if he's  not using packer and I use it. I still does not ended up using NVChad as  I already have good working setup and I don't want to start over again.  Plus, alot of things in NVChad honestly things that I does not need.
+
+I skipped several things such as `null-ls` due to it already in archive mode, but I install all other things including `delve` which is also finally completes the transformation of my Neovim setup into an IDE by having native debugger.
+
+## Where Am I Now
+
+As of the writing of this article, I've been using Neovim for 4  months, and I can only be more in love with it even more by the day.
+
+Vim motion is absolute godsend and I don't know how can I navigate  any other text document without it anymore, how vim prefer key combo  rather than simultaneous keypress is honestly makes me wonder why we  default to key combo nowadays. And the most important thing:
+
+> I love having to enact hadouken everytime I want to do debug session.
+
+I still doubting that Neovim makes me any more productive, faster or  anything resembling measurable difference in how I deliver my code, but I  appreciate it way more for being the more fun experience of coding.
+
+My conclusion still stands though. Neovim preset is absolutely not  the best way for any absolute Vim beginner to begin using Neovim.
+
+Thanks.
+
+P.S: I ended up never setting up Ruby on Rails stuff on Neovim due to  our company moving on from using Ruby to full-on Golang. Another bullet  dodged :)
+
+<u>**#Neovim**</u> <u>**#preset**</u> <u>**#lazyvim**</u> <u>**#rant**</u> <u>**#opinion**</u>

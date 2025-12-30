@@ -1,0 +1,101 @@
+---
+title: "Have Mac? Now You Can Run Free Copilot Alternative with TabbyML"
+description: "A tutorial on running TabbyML, a self-hosted AI coding assistant, locally on Apple Silicon Macs with VSCode, IntelliJ, and Neovim."
+pubDate: 'Mar 12 2024'
+heroImage: '../../assets/hero-have-mac-now-you-can-run-free-copilot.webp'
+---
+
+## What is This?
+
+The <u>**#tool**</u> I'm talking about is [TabbyML](https://tabby.tabbyml.com/). The headline on its site is:
+
+> Opensource, self-hosted AI coding assistant
+
+Which is nice, though I will explain the downsides later. But for now, I will explain what it offers and how to run it locally.
+
+## What It Can Do?
+
+Like <u>**#Copilot,**</u> it offers code completion on various <u>**#Programming**</u> Languages. It currently supports [11 Languages](https://tabby.tabbyml.com/docs/programming-languages) including **Rust, Golang, Javascript, Typescript,** and others.
+
+## What It Cannot Do?
+
+The code completion quality is honestly **not very good,** and if we're running things locally, the inference is **bearable** but often **slower** than just me writing it. But If you want to taste the AI autocomplete but don't want to spend $10/Month on a Copilot subscription. This may be for you.
+
+## How to Run It Locally
+
+I will only cover installation on Mac, but it is better if you can rent some sort of GPU or have another machine that has a good GPU to have fast inference time (meaning how long it is from you stop typing to the suggestion being shown).
+
+You will need to own at least a **Macbook Air M1** though as it runs on **Metal API.** Any **non-M** CPU Mac will not work.
+
+Next, what you need is [Homebrew](https://brew.sh/) installed, but if you're a developer I don't see you haven't installed Homebrew yet.
+
+After that, it is as simple as running the following `brew` command:
+
+```shell
+brew install tabbyml/tabby/tabby
+```
+
+And it will be installed in your local machine.
+
+**Next**, you will need to run the server locally. You will need to run this every time you want to use the autocomplete feature at all, the default is the following command:
+
+```shell
+tabby serve --device metal --model TabbyML/StarCoder-1B
+```
+
+If it's the first time you run the server, it will **download the AI model** first, which will be around **1GB**. Make sure you have the internet ready!
+
+Once the model is downloaded, it will automatically run on the `localhost:8080` server, which you can connect via an editor extension of your choice later.
+
+Next, we will dive into the specific editor you'll want to use. I will detail the installation on **VSCode, IntelliJ** (Including Android Studio) **and NeoVim.**
+
+### VSCode
+
+It's simple, install the Tabby VSCode extension (see image below) then run the command **Tabby: Specify API Endpoint of Tabby** in the command palette ( `Cmd + Shift + P` ) :
+
+![TabbyML on Vscode Extension Store](https://resource.mwyndham.dev/0-0-0-0-0-1-20240409071700-20240419014800-20240421074310-20240421095204.webp)Then enter `http://localhost:8080` in the dialog to start connecting the extension with the server *(please do this while the server is running!).*
+
+![TabbyML Server Setting on VSCode](https://resource.mwyndham.dev/0-0-0-0-0-0-2-20240409071716-20240411010831-20240419014845-20240421074406-20240421095229.webp)That's it!
+
+### IntelliJ
+
+Similar to VSCode, you should install the extension from the marketplace. But unlike VSCode, that's the only step that matters.
+
+![TabbyML on IntelliJ Plugin Marketplace](https://resource.mwyndham.dev/0-0-0-0-0-0-3-20240409071734-20240411010915-20240419014912-20240421074433-20240421095256.webp)By default, the extension will have the default port to `http://localhost:8080` so unless you're using custom config and run it in either remotely or a different port, you can skip all the steps there are.
+
+![TabbyML on IntelliJ Status Bar](https://resource.mwyndham.dev/0-0-0-0-0-0-4-20240409071749-20240411010943-20240419014937-20240421074456-20240421095316.webp)Just make sure that in the bottom status bar, you see the menu `Tabby` with a checkmark icon in front of it.
+
+### NeoVim
+
+If you're a Vim user, don't be weak! [RTFM yourself here!](https://tabby.tabbyml.com/docs/extensions/installation/vim)
+
+## Selecting The Model
+
+Now we'll be talking about nuance a little bit. Currently, there are [7 AI Models ](https://tabby.tabbyml.com/docs/models/)available to choose from, but our only choice for running locally with M1 Mac is 3: **StarCoder-1B, StarCoder-3B,** and **DeepseekCoder-1.3B**.
+
+In the tutorial above, I chose the **StarCoder-1B** as it is the lightest option of the bunch. But to be honest the suggestion is not very good.
+
+The best option so far when it comes to suggestions is **DeepseekCoder-1.3B** but the inference is pretty slow. Though not as slow as **StarCoder-3B**. \
+\
+To change models, you can just change the start-server command above:
+
+```shell
+## for StartCoder-1B
+tabby serve --device metal --model TabbyML/StarCoder-1B
+
+## for StartCoder-3B
+tabby serve --device metal --model TabbyML/StarCoder-3B
+
+## for DeepseekCoder-1.3B
+tabby serve --device metal --model TabbyML/DeepseekCoder-1.3B
+```
+
+Each time you first time run the specific model, **it will download the model first.** The number in front of B is pretty representative of the model size, so **3B** would pretty much sized around **3GB.**
+
+Go ahead and find yourself the best option for you. I run the **DeepseekCoder-1.3B** on my laptop, but your mileage may vary.
+
+## Final Words
+
+That's the end of the article and tutorial. I hope you find it useful to taste the usefulness of AI Coding Assistant. For me, this is more useful than Chat-based AI like ChatGPT as most of the time, it is more of a time sink than just googling it yourself.
+
+**Thanks for reading!**

@@ -1,0 +1,18 @@
+---
+title: "This Blog is Made Without JavaScript (Sort of)"
+description: "A brief introduction to my blog built with HTMX, Golang, and Tailwind CSS - featuring a real-time markdown parser behind the scenes."
+pubDate: 'Sep 01 2023'
+heroImage: '../../assets/hero-this-blog-is-made-without-javascript-sort-of.png'
+---
+
+<u>**#Golang**</u> <u>**#Htmx**</u> <u>**#Hello World**</u> <u>**#Javascript**</u> <u>**#Tailwind Css**</u> <u>**#Markdown**</u>
+
+# Hello world!
+
+This blog is 100% made without javascript code (sort of).
+
+I made it using **HTMX + Golang + Tailwind CSS**, including this very blogpost. Behind locked door, there is pretty fancy markdown parser done in the backend in real time. You won't see it though, which is a shame :')
+
+See you in other articles in this blog!
+
+### Thank you!

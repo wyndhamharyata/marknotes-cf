@@ -1,0 +1,113 @@
+---
+title: "My Pitch for the Design Engineer Position at Tailwind Labs"
+description: "A public pitch letter for the Design Engineer role at Tailwind Labs, showcasing my passion for frontend development and my personal blog project."
+pubDate: 'Mar 30 2024'
+heroImage: '../../assets/hero-my-pitch-for-the-design-engineer-position-at.webp'
+---
+
+Hi Hiring Managers, Engineers, or People from Tailwind Labs!
+
+I hope this pitch finds you well!
+
+### Introduction!
+
+My name is **Wyndham**, a Software Engineer with 6 Years of Experience in Android Development, Backend, and lately for the web. And I'm going to try to pitch myself for the **Design Engineer** position at Tailwind Labs with this article.
+
+To be very honest, I'm barely qualified for the position. But I'm going to try anyway and see whether my luck will guide me here or not.
+
+---
+
+### Why You Need to Hire Me?
+
+#### Passion? Deep Dive?
+
+I'm incredibly passionate about learning new stuff, and making stuff from the things I just learn. This very blog where you read this pitch is an example of such.
+
+I'm very proud of this very site that you read this pitch on, <https://mwyndham.dev>, for many reasons.
+
+![mwyndham.dev homepage](https://resource.mwyndham.dev/0-0-Screenshot_2024-04-09_at_14.48.50-20240409074857-20240421095812.webp)First, it's the first full project where I dove right into Frontend Dev and saw it to its "ends". Even more so because my day job does not involve Frontends, it's purely a passion project of mine.
+
+I use many of the "first-time" techs here to reach the product that it is. You can see the full demo on the GitHub page [here](https://github.com/muhwyndhamhp/marknotes), but the gist of it is I'm using many seemingly haphazard techs to achieve the interactivity that it has, such as *HTMX, Golang, Turso DB, Hyperscript, Tailwind, ESBuild,* and many others.
+
+And notably, I don't use Framework at all!
+
+![](https://resource.mwyndham.dev/0-sddssa-20240409075223.gif)It has fancy features such as a **WYSIWYG text editor** with both rich text and **markdown** shortcut keybinding, real-time rendering to static files, Social Auth, **20+ Themes** *(with free Dark Mode!)*, and many others.
+
+And of course, I made it from scratch.
+
+Hell, from it, I managed to spin off a separate project which is also open source called [gotes-mx](https://github.com/muhwyndhamhp/gotes-mx) which is a very simple template for Fullstack Golang Apps that has **31 Github stars and 4 forks.**
+
+#### Detail-oriented
+
+I'm someone with very keen eyes on detail and I get hung over little intricacies that don't work well. I spent several weekends just so that the editor for this blog is good enough that I can **write, draft, and publish** my articles directly here. It's *dogfooding* at its finest.
+
+I am also very meticulous about **how the stuff I make looks**. I remember how I was down to create various custom views and directly render via Canvas when working on the Native Android Apps that have custom interaction.
+
+It also extends to this website. I'm very particular with design and this site has had many, many redesigns throughout its lifetime.
+
+#### Someone that Proud of Their Work
+
+I am also incredibly proud of what I have achieved in my current employment. My current company, **Gravel Technology**, has helped me to realize what I want to be as a Software Engineer by allowing me to grow out of my role as an Android Dev.
+
+![All 3 of Gravel Apps: Gravel, Dulur, Salam](https://resource.mwyndham.dev/0-0-111-20240409082405-20240421095843.webp)One of my crown achievements is my contribution to [Gravel Dulur Apps](https://play.google.com/store/apps/details?id=com.graveltechnology.kernet&hl=id), of which I contributed to almost all aspects from Android Dev to Backend even down to DB and Infra.
+
+The app itself is a mix of Job Board + Salary Management & Disbursement + Attendance Tracker for Construction Workers in Indonesia, which poses a significant challenge in its features and design.
+
+And feature-rich it is. It has some fancy functionality such as "Real-time" Location Tracking, Attendance Geofencing, Fraud Detection, Order Matching Algorithm (similar to Uber in concept), Automatic Money Disbursement, Loyalty System, and many others.
+
+**All of that works in a very low-resource environment**, as many construction workers in my country live below the poverty line and most likely use outdated devices.
+
+---
+
+### Why Applying for Tailwind Labs
+
+There are many, many reasons. But primarily? **I want to be remembered.**
+
+![Indonesia Map in Black and White](https://resource.mwyndham.dev/0-0-dsdsd-20240409083949-20240421095902.webp)I'm coming from **Indonesia,** basically a 3rd world country. *I'm effectively a nobody in a nobody land.* At best, people know us as "Something something related to Bali" *(okay, while I'm here, I want to elaborate that **Bali** is a **Province** in Indonesia, the country name is **Indonesia** and not **Bali**).*
+
+There is a thriving tech ecosystem here, just like any other growing economy out there. But I'm severely unsatisfied.
+
+The reason is simple:
+
+> people here are easily satisfied with being mediocre
+
+Most Software Engineering job here is the equivalent of Assembly Line worker who churns out codes to achieve nebulous values that are defined by the JIRA story point ticket.
+
+Even before I dive into frontends, I always hear the name of Tailwind, and how it revolutionized the whole CSS business.
+
+Its approach to utility-based class and the focus on Locality of Behavior is a breath of fresh air. **It's intuitive, and it works.** Tailwind is the missing piece for me when I for multiple times tried, *and failed*, to dive into frontend devs.
+
+I want to be part of that, I want to know how the sauce is made, and I want my life to reach a point where I can proudly say *"I'm part of the team that makes the web rocks!"*.
+
+---
+
+### Why Not To Hire Me
+
+I want to be candid for a second here. **I'm barely qualified** for the role. And there are many, many dealbreakers that I believe would be hard to swallow for any employer. Some of which as follows:
+
+- I don't live in the preferred time zone. I live in the Jakarta Time, around GMT+7.
+- I don't have formal Front End experience (But I do help with Front End stuff @ work).
+- I have not formally shipped any code in TypeScript.
+- I have very little knowledge of Web Accessibility. Though I do have a lot of it on the Native Android Dev side.
+- I don't have a Work VISA for either Canada or the US.
+- I don't have a CS degree, I'm fully self-taught.
+
+But, if my pitch somewhat interests you, I can guarantee that I will do everything I can to fulfill the role given to me.
+
+I can overcome the timezone difference with many things *(relocation, pay cut, async, even power through the timezone difference by working at odd hours)*. I just want to be given the chance to finally make something meaningful for a change.
+
+---
+
+### Final Words
+
+That's all of the pitch that I can think of. I hope that something sticks with you all and that you find any of it interesting.
+
+But if not, then will still hope for the best success possible for Tailwind Labs. I might want to at least get some rejection letter, or better yet specify what I'm lacking. But I will still be happy either way.
+
+You guys deserve it and I'm proud to ever be part of the process, even if it's just a footnote in some ATS system somewhere.
+
+**Thank you!**
+
+Best Regards,
+
+Wyndham

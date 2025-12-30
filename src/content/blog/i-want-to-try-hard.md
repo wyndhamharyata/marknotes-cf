@@ -1,0 +1,42 @@
+---
+title: "I Want to Try Hard"
+description: "A personal reflection on the struggles of trying hard with side projects, learning new things, and the value of effort even when goals seem unreachable."
+pubDate: 'Mar 22 2024'
+heroImage: '../../assets/hero-i-want-to-try-hard.png'
+---
+
+Hi, this one is going to be different for a moment. Most of the stuff I write is me trying to be just some sort of person who writes useful stuff. I'm trying not to put subjectivity and unproductive thought (in the context of software engineering) forward.
+
+But this blog post is going to be different.
+
+I am currently feeling not well, as a few months ago I've been trying hard, but there's nothing to be sown. I got some GitHub stars, some forks and some of my stories in medium getting seen and read. But that's it.
+
+Even this blog site, has not taken off at all.
+
+I even regressed and stopped streaming, I got zero progress there. Zero viewers, and I can't stream for that long.
+
+And even now, my dream of working at an international company with comparable salaries has yet to move any closer. I'm feeling stuck.
+
+Another year goes by, and zero offers are made.
+
+But I just read a great article this morning. I already forgot the title or even the link. But it's about the case of trying hard.
+
+And I want to cry.
+
+Knowing that I have made that effort, and ultimately, it was not for nothing.
+
+I learnt a lot of new things. I learn about managing infrastructure, trying new technologies, and making esoteric stuff like this very blog.
+
+I'm blessed with at least that. While not exactly reaching my goal, at least I got something out of it.
+
+This post is just that. I want to reiterate my vow:
+
+> I want to try hard
+
+### I want to try hard
+
+I will be trying hard again. I will learn a lot, make a lot, and share a lot. Don't care that nobody listens, don't care that I don't get any closer to my goal.
+
+## I will try harder
+
+<u>**#Personal**</u> <u>**#Thought**</u>

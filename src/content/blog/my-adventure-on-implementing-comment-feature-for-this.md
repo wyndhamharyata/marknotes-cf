@@ -1,0 +1,148 @@
+---
+title: "My Adventure on Implementing Comment Feature for This Blog"
+description: "A deep dive into building a comment system with anonymous persistent profiles, AI-powered moderation using Gemini, and manual review tools."
+pubDate: 'Jun 11 2025'
+heroImage: '../../assets/hero-my-adventure-on-implementing-comment-feature-for-this.webp'
+---
+
+I love this blog, it was my baby since it's inception and all of it's details were handmade. I made it from scratch during my adventure around HTMX + Golang and I fell in love with it since. It was my first and only "viral" site I have, and I've received many encouraging messages from readers along the years.
+
+It's been quite neglected in the past year though, as work that pays the bills piles up, then I'm on a diet *(its a big success! but story for another day)*, and I'm unable to spare time to deal with side projects, the site has stagnated from both from improvements but also articles.
+
+Though recently, sudden changes in personal life has allow me to spare more time around, and I was thinking what improvement I would like to add? First I've upgraded the DaisyUI version to v5 (really good by the way), then fix some outstanding bugs, refactor codebase to be more inline to my style nowadays, and so on... but then I keep moving in circle.
+
+Until, one day (okay just slightly more than a week ago), I received an email by someone named Luke. He mention that maybe comment feature is something we can bring on board?
+
+And suddenly, a spark came to me. *"Hey, the past 2 years AI have made really good strides, maybe it's time for me to add comment section!"*.
+
+## Why AI?
+
+Well, to state the obvious, the sole reason I haven't been holding myself accountable for adding comment to this site has been 1 thing: **Content Moderation**. I will not be able to 24/7 religiously open my blog and moderate comments, and I don't want my comment section filled with bot or some trolls around the internet while I'm away.
+
+Though, to be frankly fair, the traffic for the site is nothing. At best I've got like few thousands reads per month and it was a year ago, now it hovers around 300-400 per month at best, and IDK how much of that is AI. So maybe I could just moderate everything myself still, but as old wisdom goes:
+
+> *But what is Software Engineer if not bunch of people that design a Scalable System for ZERO user?*
+>
+>                                                                                                               *-Me*
+
+So, in the spirit of true Software Engineering, I present you my over-engineering effort to bring comment section to this site, ***applause please!***
+
+## The *Architecture~ ™️*
+
+### Product Requirement!
+
+Now, when it comes to comment system, the things that I really wanted to have from the get go is **Thread**, and **Persistent Profile**.
+
+Thread is pretty self explanatory, I wanted so that people could reply to another comment, and have visual cues to indicates what people are referring to when discussing. It encourages people to communicate and made the place *alive\**~*** (well, as alive as ghost town goes).
+
+![Thread](https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_19.29.08-20250611122928.webp)Persistent Profile means that when someone comments more than once, they'll have the same handle name / identity that tracks conversation, so it looks more natural and back and forth could happened without each commenter needs to clarify that they're the same person.
+
+### Cookies to the Rescue!
+
+But I don't want to deal with the hassle of securing Personal Info, I'm not a data hoarder! So what's the solution?
+
+Back to my best friend here, Luke. He mentioned that maybe we can start with just **Cookies**, and he's right!
+
+Next, I wanted to nail the looks. I remember the good old days of **Disqus**, and when every blog / news /  ~~pirated manga~~ site uses it. I have fond memories to how it looks, with profile picture, name, and body of the comment. Also have nested thread like Reddit, and people can reply with each other.
+
+![New Connections via Disqus. But Only If You Want To.](https://media.disquscdn.com/upvoted-comment-disqus.png)I wanted to have that, but having profile picture and name means I also needs to deal one highest blocker where user retention dropped: ***FORMS****.* I don't want to burden my happy reader to leave a comment with having to deal with names, let alone uploading a picture.
+
+Having image bank to pull randomly also doesn't sounds very nice, too much hassle for me, the one implementing it.
+
+### Adorable Diceware
+
+So what's the solution? Well, Randomization! Or more accurately, pseudo random. I've found 2 very nice library that I can just snatch and uses:
+
+- **Golang Diceware Generator:** <https://github.com/sethvargo/go-diceware>\
+  This library can be used to generate randomized passphrase using Diceware Method.
+- **Adorable Avatar from Go:** <https://github.com/ipsn/go-adorable>\
+  This library generates randomized avatar that we can use. One neat feature here is Pseudo Random mode where we can provide seed so we can always generate the same image given the same seed.
+
+Both libraries compliments each other very well! and with Cookies, now I can have anonymous persistent profile for our dear reader to start arguing in the comment section.
+
+### TL;DR
+
+Long story short, this is what I came up with:
+
+![Comment Flow](https://resource.mwyndham.dev/0-Comment_Flow\(1\)-20250611125739.webp)Pretty neat, right! with simple single cookie I can have both anonymous but also persistent profile that reader can uses to comments across the site. No more dealing with Personal Info, and no need to store image anywhere.
+
+Profile picture is generated on each comment render on the fly. But with the same seed, it'll be guaranteed to generate the exact same image. Pretty neat!
+
+Now that all the ingredients is here, let's cook things up and see what we got:
+
+![Sample of the Comment Feature](https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_20.09.37-20250611130956.webp)Not bad! We got all the basics right. It also has collapsible thread by cheating a little bit using DaisyUI's menu component. It has drawbacks such as text can't be selected and every click event will trigger annoying background blip. But overall it's looking pretty slick!
+
+Now you may notice the *"Comment deleted by Admin"* in the image above, and that's clue for the next section.
+
+### Moderation 🫠
+
+Ohh boy, here we go. Moderation took double the time for me to implement than the comment input itself, and still it's incomplete as of the writing of this article. *But I digress,* now let's focus on 2 aspect of moderation that we need to deal with.
+
+On every User Generated Content (UCG) processes, there's 2 place where we can apply moderation: at creation date, and sometimes in the future.
+
+#### Immediate Moderation
+
+At creation, we cannot take that much time as we need to deliver feedback to user as soon as possible. So complex moderation is a no go. What we can do instead, is doing simple pattern matching.
+
+Red flags we can capture during this part is strong language, spam, and other usual pattern of bot message. For this MVP (ayy) I decided that moderating strong language is enough, and let the LLM based moderation handles the others.
+
+For this, I call another library to the rescue, this time I uses go-away: [https://github.com/TwiN/go-away.](https://github.com/TwiN/go-away)
+
+This one is relatively simple, and for now I set the filter to be relatively lenient. So straight up curses is prohibited, but leetspeak is fine! (example: `b!tch`). For immediate moderation like this, providing user feedback is the way to go, so this checks will return errors in user input when you're submitting curses.![curses example](https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_20.57.58-20250611135808.webp)Neat! Other error messages will render the same as well, like say empty input, etc.
+
+#### Scheduled Moderation
+
+Now onto the fun part! But before that, we need to define some rules on how moderation should work.
+
+![moderation type](https://resource.mwyndham.dev/0-Moderation_Type-20250611142601.webp)I divided the moderation into 4 Status: **Unmoderated, OK, Warning** and **Dangerous.**
+
+- **Unmoderated** means that it's new comment, and has not been auto-moderated yet. It will be part of the scheduled moderation.
+- **OK** means ok! it's normal comment, regular discussion and even civil disagreement. Free speech is respected here!
+- **Warning** means some key characteristics of comment that needed manual intervention, but otherwise okay for other to see. This include comment with URL / link, strong language but in context (example `yeah implementing auth is fu$king sucks`). Why URL? well I can't really trust AI to understood the contains of any URL so manual moderation is necessary.
+- **Dangerous** means anything that immediately harmful. Personal attack, hate speech, spam, anything goes. This category of comment will be hidden from other user but the trace of it will be visible with text *Comment hidden by Auto Moderation* in place instead. ![auto moderation example](https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_21.36.49-20250611143700.webp)The image above shows how auto-moderated dangerous comment will look to end user! let me know what you think!
+
+Next, let's move on to how scheduled auto moderation will work. Just to make things simple for myself, I'll be using Gemini as my LLM of choice here: <https://ai.google.dev/gemini-api/docs>.
+
+I uses **Gemini Flash 2.5 Preview.** At free tier, I got **500 Requests Per Day** limit, which is quite a generous. I could probably use the 2.0 Flash and got a lot higher limit, but in my testing Flash 2.5 is significantly better at understanding nuances in text, so subtle mockery or sarcasm will be detected quite well.
+
+With that budget in mind, I set the scheduled run of comment moderation to be run **every 10 minutes (144 Requests Per Day).** It will check if there's any comment that has not been moderated yet, fetch the comments, and add it into the prompt.
+
+Below is the prompt I use to moderate the comment:
+
+```
+Imagine you are content moderator for a blog site revolving around technology and programming.
+Your task is to moderate following comments.
+
+'id' is an integer and should return the same id that supplied from the input.
+
+'message' is a string and should return the same message that supplied from the input.
+
+'moderation_status' is an integer, where 1 means "OK", 2 means "Warning", and 3 means "Dangerous".
+- OK means all comments that uses normal language, including disagreement and civil debates.
+- Warning means it may have strong language, implicit mockery, swearing in context, and any normal message that contains URL.
+- Dangerous should cover actual hate speech, slander, slur, ad hominem, straw man fallacy, and spam / unrelated content promotion including placeholder / lipsum texts.
+
+'moderation_reason' is a string that contains single sentence, no more than 15 words summarizing the
+reasoning for the moderation status.
+
+Comments will be provided in a JSON format of { "id": integer, "message": string }, and will be attached
+right after this message.
+```
+
+If you're curious how I do it, just go over to the repository for this blog, it's public on GitHub 😉: <https://github.com/muhwyndhamhp/marknotes/blob/main/internal/llm/client.go>
+
+#### Manual Moderation (Yes, Really)
+
+As good as any AI moderation goes, using it in moderation (heh) is important. I still needs to occasionally review things myself, and for that I need good interface. I use Vercel's [v0.dev](http://v0.dev) to do some design mocking for me, this is what it gives me after several iteration:![v0 moderation](https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_22.48.18-20250611154946.webp)Taking it as my inspiration, and some sensible design tweaking, I made it work surprisingly well! It's still unfinished, like missing filter, search, and overall statistics, but it's functional and I can do simple moderation work here. Take a look!
+
+![comment moderation](https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_22.50.53-20250611155212.webp)![comment moderation 2](https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_22.50.59-20250611155232.webp)If a comment is replying to other comment, we can see the snippets of the parent comment on the "Replying To" section. This helps a lot when I need to do some skimming. A simple colored bar to indicate moderation status to the left also present.
+
+![reply context](https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_22.57.25-20250611155740.webp)And if I need more information, I can always click onto the comment itself and shows the entire context: meaning the parent comment it replying to, and all immediate replies that this comment has.![detail dialog](https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_22.59.55-20250611160008.webp)If I were to click *"Mark as Safe"* it will change the moderation status to OK. And if I were to click delete, then it'll show the deleted by admin message you see few section ago!
+
+## Conclusion
+
+And that's conclude my ramblings about how I implement comment, auto-moderation, and manual review for my little blog here. What do you guys think? is it over-engineering it? let me know what you think down below!!
+
+Thanks!!
+
+<u>**#Golang**</u> <u>**#HTMX.**</u> <u>**#ShowAndTell**</u> <u>**#Comment**</u> <u>**#Moderation**</u>

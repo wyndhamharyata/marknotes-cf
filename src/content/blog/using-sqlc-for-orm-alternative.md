@@ -1,0 +1,274 @@
+---
+title: "Using SQLC for ORM Alternative in Golang, ft. Go-Migrate & PGX"
+description: "A comprehensive guide to setting up SQLC as an ORM alternative in Go, generating type-safe code from SQL queries."
+pubDate: 'Aug 27 2023'
+heroImage: '../../assets/hero-using-sqlc-for-orm-alternative.png'
+---
+
+<u>**#Orm**</u> <u>**#Sqlc**</u> <u>**#Sql**</u> <u>**#Golang**</u> <u>**#Database**</u> <u>**#Tutorial**</u> <u>**#How To**</u> <u>**#Impression**</u>
+
+This blogpost also posted in [Medium](https://medium.com/gravel-engineering/using-sqlc-for-orm-alternative-in-golang-ft-go-migrate-pgx-b9e35ec623b2) as a part of Gravel Engineering blog.
+
+## Why SQLC?
+
+For those who does not know what [SQLC](https://docs.sqlc.dev/en/latest/index.html) is, it is a Database tools to generate idiomatic type-safe go code that derived from our own SQL Queries.
+
+Why using [SQLC](https://docs.sqlc.dev/en/latest/index.html)  you may asked? because ORM only great if you have rather basic  relationships between models OR you basically omit any modern relational  DB feature for ease of use. Once you have the needs to modify models in  the non-basic ways, you're start to tangle the ORM code and may or may  not impact performance due to unoptimized queries.
+
+[SQLC](https://docs.sqlc.dev/en/latest/index.html) is here  for people that comfortable using SQL Queries but want the type safety  of Go, basically dealing with the uncomfortable part of actually using  Database in any programming language, but still allowing us to make  deep, optimized modification as any people with SQL know-how can relate.
+
+## Setting up SQLC
+
+SQLC comes in various flavour, you can embed it directly via `brew`:
+
+```
+brew install sqlc
+```
+
+Or via Go Instal (Go >=1.17):
+
+```bash
+go install github.com/kyleconroy/sqlc/cmd/sqlc@latest
+```
+
+Or via Go Get:
+
+```bash
+go get github.com/kyleconroy/sqlc/cmd/sqlc
+```
+
+It also has docker image for those that needed it in a pipeline somehow:
+
+```
+docker pull kjconroy/sqlc
+```
+
+After you install SQLC in any way, you should then afterward has access to it in terminal via `sqlc` command.
+
+## Using SQLC in Go Project
+
+After you Initiate a Golang project, you can start using SQLC by first creating it's configuration file in `sqlc.yaml`:
+
+```
+version: "2"
+sql:
+  - engine: "postgresql"
+    # queries refers to where our manually created queries located
+    queries: "query.sql" # will refer a file
+    # or
+    queries: "misc/queries" # will refer a directory
+    # schema refers to where our schema definitions located
+    schema: "schema.sql" # will refer a file
+    # or
+    schema: "misc/migrations" # will refer a directory
+    gen:
+      go:
+        package: "db"
+        sql_package: "pgx/v5"
+        out: "db"
+```
+
+This `YAML` specifies several things:
+
+- **Engine** -> What kind of DB you're using. In this example we're using `postgresql`
+- **Queries**-> File/Directory for where you store your SQL Queries. These queries is the source target for `SQLC` to generate type-safe Go code.
+- **Schema** -> FIle/Directory for where you store your schema logic. `SQLC` has support for `go-migrate` schema structure of `up.sql` and `down.sql` format. Else, you may want to just dump the schema in a single `schema.sql` file.
+- **Gen** -> specify the auto-generated parts of the `SQLC`, in this example it will generate `Go` specific implementation:
+  - **Package** -> specify the `package` name of the generated code.
+  - **Out** -> specify the `path` where the generated code will be put on.
+  - **SQL_Package** -> due to `go/pq` package is currently entering maintenance mode, we're encouraged to use `pgx` driver instead. This will specify the `pgx` version that `SQLC` will be basing on.
+
+## Using SQLC to generate Type-Safe Models from schema
+
+In this example, I will demonstrate how to use go-migrate as the  companion tools. After setting up Go-Migrate, we can create new  migration via:
+
+```bash
+migrate create -ext sql -dir misc/migrations CreateAuthor
+```
+
+It will create `xxxxxxx_CreateAuthor.up.sql`  and `xxxxxxx_CreateAuthor.down.sql` in `misc/migrations` (Remember that this is the path of `schema` in the `sqlc.yaml`).
+
+There we can define the migration up and the migration down of our codes. Then I will create a schema for `authors` table:
+
+```
+CREATE TABLE authors (
+	id BIGSERIAL PRIMARY KEY,
+	name text NOT NULL,
+	bio text
+);
+CREATE INDEX IF NOT EXISTS "idx_authors_id" ON "authors" ("id");
+```
+
+This will do 2 things:
+
+- tell `go-migrate` what migration needed to be executed
+- tell `sqlc` what is the schema for table `authors`
+
+Then after that, we can migrate our DB so our author table would be created. Migrate the authors table via :
+
+```
+migrate -database <Put your DSN here> -path=misc/migrations up all
+```
+
+After that we can generate the model for authors via:
+
+```
+sqlc generate
+```
+
+It will then create a new file called `db/models.go` that contains:
+
+```
+package db
+import (
+	"github.com/jackc/pgx/v5/pgtype"
+	typeext "github.com/muhwyndhamhp/material-go/utils/typeext"
+)
+
+type Author struct {
+	ID int64
+	Name string
+	Bio pgtype.Text
+}
+```
+
+## Using SQLC to generate Type-Safe Functions that execute DB Transactions
+
+Now that we have the model, we also want to create various  transactions. SQLC doesn't generate transaction for us, instead, we're  supposed to create our own transaction.
+
+First we should create new file called `authors.sql` inside `misc/queries` (Remember this is the `queries` path we define in the `sqlc.yaml` up above):
+
+```
+-- name: GetAuthor :one
+SELECT * FROM authors
+WHERE id = $1 LIMIT 1;
+
+-- name: ListAuthors :many
+SELECT * FROM authors
+ORDER BY name;
+
+-- name: CreateAuthor :one
+INSERT INTO authors (name, bio)
+VALUES ( $1, $2)
+RETURNING *;
+
+-- name: DeleteAuthor :exec
+DELETE FROM authors
+WHERE id = $1;
+
+-- name: UpdateAuthor :one
+UPDATE authors
+SET name = $2, bio = $3
+WHERE id = $1 RETURNING *;
+```
+
+Here, we're defining several queries that refers to various operations. `sqlc` will read the comment structure above the queries to define what the function is and what kind of return format it wants.
+
+```
+-- name: CreateAuthor :one
+INSERT ...
+```
+
+This comments means:
+
+- Name of the function is `CreateAuthor`
+- It should return exactly 1 schema of `authors`.
+
+Other than `:one`, it also support `:many` for returning more than 1 schema in a list, and `:exec` which means it won't return any schema (only executing the SQL).
+
+After that we can exec:
+
+```
+sqlc generate
+```
+
+again to both generate the model and the function. It will then create file `db/authors.sql.go`:
+
+```
+package db
+
+import (
+	"context"
+	"github.com/jackc/pgx/v5/pgtype"
+)
+
+const createAuthor = `-- name: CreateAuthor :one
+INSERT INTO authors (name, bio)
+VALUES ($1, $2)
+RETURNING id, name, bio
+`
+
+type CreateAuthorParams struct {
+	Name string
+	Bio pgtype.Text
+}
+
+func (q *Queries) CreateAuthor(ctx context.Context, arg CreateAuthorParams) (Author, error) {
+	row := q.db.QueryRow(ctx, createAuthor, arg.Name, arg.Bio)
+	var i Author
+	err := row.Scan(&i.ID, &i.Name, &i.Bio)
+	return i, err
+}
+
+// And many more below as you define your queries...
+```
+
+## Using SQLC generated function in a program
+
+One more thing that I haven't mentioned is that other than generating `models.go` and `authors.go` inside `db` path (or any path that you specify in `sqlc.yaml`), it will also generate `db.go` file which functions as the entry points for our queries.
+
+Before you can call queries tho, we need to do two things:
+
+##### 1. Create new DB instance
+
+You can put this anywhere you first time initiate your program. Or if  you have some sort of dependency injection, anywhere you initiate your  DB instance:
+
+```
+func GetDB() (*pgx.db,error) {
+   db, err := pgxpool.New(ctx, `user=postgres dbname=postgres_db sslmode=disable host=localhost port=5678`)
+
+   if err != nil {
+	   return nil, err
+   }
+   return db, nil
+}
+```
+
+##### 2. Initiate Query entry point
+
+After that, we should use the `db` instance up above to initiate entry points for our queries:
+
+```
+queries := db.New(db)
+```
+
+##### 3. Use our Query!
+
+Then you can immediately use `queries` to access our predefined queries above. For example:
+
+```go
+func insert() error {
+   insertedAuthor, err := queries.CreateAuthor(ctx, db.CreateAuthorParams{
+	   Name: "Brian Kernighan",
+	   Bio: pgtype.Text{
+		   String: "Co-author of The C Programming Language",
+		   Valid: true,
+	   },
+   })
+
+   if err != nil {
+	   return err
+   }
+
+   log.Println(insertedAuthor)
+   return nil
+}
+```
+
+That's it! 🎉
+
+## Further Notes
+
+This conclude the basic setups for SQLC in a Go project. But I  suppose there is more than that to a project. Further readings can be  found below:
+
+1. Using custom struct for JSONB Type in SQLC (Work in Progress)

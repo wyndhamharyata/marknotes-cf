@@ -1,0 +1,120 @@
+---
+title: "Banjarnegara: A City Frozen in Time, Eaten Alive"
+description: "A personal reflection on my hometown's economic stagnation, wealth inequality, and the uncomfortable truths behind a city that hasn't changed in decades."
+pubDate: 'May 19 2024'
+heroImage: '../../assets/hero-banjarnegara-a-city-frozen-in-time-eaten-alive.webp'
+---
+
+> Banjarnegara looks exactly the same in 1988 as it is in 2024
+
+Was the words spoken to me by my step-mom, yesterday morning as I sip a glass of warm tea at 6AM while my wife soundly asleep. And I have nothing but agreement to that.
+
+I left this city back in 2012 in pursue of better education, just after my middle-school graduation. And 12 years later, everything looks just about the same. New buildings here and there, some revitalized roads, new trees in the middle of city center, but that's about it.
+
+---
+
+## Steadfast In The Way It Is
+
+It's kinda jarring once I saw the bigger world, both in-country and abroad. Everywhere else where I managed to stay extended period of time with, people expectation are that things move fast, convenient, and things changed rather quickly.
+
+We're talking store closed down, new store is up, then the same store closed due to low traffic in the matter of months.
+
+And yet, the same drug store located at the intersection in the market of Banjarnegara, where people barely visit, still standing strong for all I've been alive and able to remember anything.
+
+![kebi apothecary](https://resource.mwyndham.dev/0-Screenshot_2024-05-19_at_18.30.59-20240519113114.webp)I assume it generates just enough revenue to go by, and all the thing that keep it alive is just *"that's how it always been".*
+
+And that's has been the mantra to be honest. Once people find a way of life, enough to go by, that's just what people been doing all the time.
+
+The same doctor that helps my delivery 26 years ago still there, operates like a clock.
+
+The same *angkot* driver that drives me to school during middle school day still there, still using the same old croaked car that I rode in the yesteryear.
+
+It's in a way is a good thing.
+
+But is that it? is there any catch?
+
+---
+
+## Stagnation
+
+The minimum wage here has been stucked at Rp2,038,005 or around $128 **per month.**
+
+You read that right, minimum wage per month is less than 2 hours worth of work for many developers, and around a day worth of money for this country developers.
+
+And it took a while to get there. Only by this year, 2024, that the minimum wage crosses the psychological value of 2 Million. And by that I mean it raises only by paltry **Rp.78,000** vs last year (and that is literall less than $5!). ![google exchange rate](https://resource.mwyndham.dev/0-Screenshot_2024-05-19_at_20.35.36-20240519133552.webp)But that's alright? I mean the cost of goods has been fine right across the year? people can do survive with this amount of money?
+
+*Well... Yes, but barely.*
+
+---
+
+## Dissonance
+
+As opposed to how little the money people made by the day, the cost of goods that wasn't strictly necessary goods (i.e. rice, some form of proteins, and veggies) were prohibitively out of touch.
+
+For example, the price of a cake can be north of Rp.200,000 for medium sized cake, that's 10% of the minimum wage. The price of single bag of bread can vary between Rp.10,000 to Rp.25,000. *Eat that once a day and 30% of your wage goes to that bag of bread.* And so on and so on...
+
+There's significant disconnect between the price of goods vs the amount of money people make. But why? isn't the function of free-market should move the needle towards the actual buying power of the population?
+
+---
+
+## The Safe Answer
+
+Oftentimes the one thing that people attributes to this weird dissonance is the fact that we're landlocked city and lives outside the range of inter-state highway.
+
+![google map banjarnegara](https://resource.mwyndham.dev/0-Screenshot_2024-05-19_at_20.40.06-20240519134017.webp)I mean, it made sense, when goods doesn't flow through here, then it simply takes a lot more effort to move things around, which in turns drove the price higher.
+
+A good enough answer for many, one that simply does not have clear solution beyond expensive mega-project to makes bringing logistic easier and cheaper. It's the default *"that's the way it is"*  answer.
+
+But is that it?
+
+---
+
+## The Uncomfortable Truth: Wealth Gap
+
+![The Gap between population vs Expenditure](https://resource.mwyndham.dev/0-Screenshot_2024-05-19_at_21.03.38-20240519140358.webp)The picture above shows how much a certain percentage of population on each group contribute to the montly expenditure per capita, and also shows everything wrong with this crestfalling city.
+
+It shows that **top 20%** of the population drives **44,65%** of the monthly expenditure for the whole city, all while the **bottom 40%** of the population only contributes to **18,74%** to the expenditure graph!
+
+Meaning that, almost half of the population drives less than a fifth of the spending for the whole city. The difference between the buying power of the top 20% vs the bottom 40% is around **1:5**.
+
+*The whole city only runs by the top 20% of the population, and this reason alone is the one that drives the cost of goods up.* The top 20% can afford spending more for goods, which in turns move the price needle closer to that particular demographic.
+
+> A pastry shop can simply only ever be afforded by 1/5th of the population and still turns profitable. And a  barbershop can charge 2.5% of a minimum wage salary per cut just because it's literal chump change for 1 out of 5 people in the area
+
+And honestly, I'm not the one to said this as me too quite literally at the same category as the ones I highlight this time. I am part of the blame, the top 20%. And my spending do justify the stat too.
+
+I just can't help that there's fundamental problem due to how the economy works around here that causes this issue.
+
+the same thing happened with land ownership.
+
+---
+
+## Rich Reserve
+
+For such a small city with small per-capita money, the price of properties is ones that even more mindbending.
+
+For the vast majority of the population, buying house is equal to lifetime imprisonment. It will cost them literal lifetime to paid back, and probably more. A lot of young adult here often carry the debt burden of their parents.
+
+![villa 2](https://resource.mwyndham.dev/0-villa-mahayana-20240519160553.webp)What causes this? well similarly to the topic above: Rich Spending.
+
+Due to how relatively cheaper it is to buy a plot of land here (local buying power notwithstanding), a lot of people that has spare capital to move around and have little space to invest in will spend on land ownership. ![vlla 1](https://resource.mwyndham.dev/0-524932799-20240519160525.webp)
+
+This happened steadily but consistently. A significant portion of the strategic land in areas that will develop in the future has mostly been taken in by people that can afford it in short term. Regularly pushing the price of property high even before the area starts to be developed.
+
+It's a common view here to see luxurious, standalone, detached Villa in the middle of nowhere.
+
+---
+
+## Going Strong
+
+Still, even with every problem under the sun, this little city is a thing that can do. The people steadily takes the day, focuses on what's in front of them.
+
+And honestly, I don't see them any less happier than me. So why do I judge.
+
+I saw people that crumbles with $100 debt, but still able to put up smile when we ask how do they do.
+
+Well, I guess that's life.
+
+---
+
+<u>**#Personal**</u> <u>**#Thought**</u> <u>**#Non-Tech**</u> <u>**#Observation**</u>

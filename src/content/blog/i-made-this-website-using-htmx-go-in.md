@@ -1,0 +1,302 @@
+---
+title: "I Made This Website Using HTMX + Go in One Month, Here's What I Learned"
+description: "An exploration of building a personal blog using HTMX, Go, TailwindCSS, and Go Templating as a backend developer diving into frontend development."
+pubDate: 'Sep 01 2023'
+heroImage: '../../assets/hero-i-made-this-website-using-htmx-go-in.webp'
+---
+
+<u>**#Golang**</u> <u>**#Go**</u> <u>**#Gorm**</u> <u>**#Htmx**</u> <u>**#Templating**</u> <u>**#Html/Template**</u> <u>**#Html**</u> <u>**#Tailwind Css**</u> <u>**#Tailwindcss**</u> <u>**#Tailwind**</u> <u>**#Impression**</u>
+
+## How it started
+
+One and a half months ago, I learned the existence of this new fancy  pants technology that was called HTMX. It tried to answer the  question *"What if JavaScript does not take over the world?"* and gives us another attempt to be the antidote in this *hyper-javascript-driven* web development that has reached fever-level insanity.
+
+I have always been on the sideline watching the front-end  web being reinvented every 6 months, as I was not a Web Dev. I  primarily was an Android Dev but only switched to the Backend in the past 2  years.
+
+I didn't particularly want to learn Web Dev due to how JavaScript is  1) mind-numbing, and 2) Contagious, as once you adopt JavaScript,  everything becomes JavaScript. But I kept wanting some part of those  Fullstack Pie. This is where HTMX intrigues me. I mean, side-stepping  JavaScript and bringing back old Web 1.0 development but "***M O D E R N***"? Hell yeah..?!
+
+Now, long story short, **I made myself a simple website that acts as a personal blog, this very place where you read this very story.**  I originally intended this to be just a one-off project, but I fell in  love with how it works and I kept going at it until I suddenly had  usable blogging tools.
+
+## Caveat
+
+Before we continue, I want you to put yourself in my shoes, so when I  either praise or woes about all of my stacks, you can see where I'm  coming from.
+
+First, **I don't have any proper front-end web experience ever**.  I have dabbled with HTML, CSS, and JS here and there and tried to work  with React (and React Native) to supplement my Android Dev background,  but it does not go far professionally.
+
+Secondly, I have Backend Dev experience. I've been personally working as  a Backend in the past 2 years both professionally and as a hobby. My  language of Choice is **Go** but I also have a pretty good understanding of Python and Ruby on Rails.
+
+Finally, My prior experiences are mostly in **Android Native Development**.  So I am very used to dealing with Markup Language to templates UI.  (Android uses XML to template its UI until very recently when we  switched to declarative syntax via Jetpack Compose).
+
+## Tech Stacks
+
+I made this website using **3 + 1** basic ingredients: **HTMX, Go, TailwindCSS + Go Templating**. I mostly use vanilla tools with some exceptions:
+
+- Labstack Echo as the HTTP Server
+- GORM as the ORM
+
+Everything else is vanilla, including Templating, Tailwind, and the Go setups. I use **PostgreSQL** as the DB and **Fly.io** as the service hosting.
+
+## What I've built
+
+<iframe class="mx-auto" width="560" height="315" src="https://www.youtube.com/embed/D3KGxmWXxb8?si=bimumpRdLr2Lnq5q" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+You can just look around this very web/blog to see what's there or see the demo video above. This web/blog has:
+
+- Infinite Scrolling of Posts
+- Server-side rendered Markdown to HTML in real-time. ([See this for older demo](https://youtu.be/kDZ9lASnqqM))
+- OAuth Login
+- Search that matches several fields (This is painful to do with ORM, I would probably remove GORM after this)
+- Cute Tagging system
+
+## TL;DR
+
+**I like it a lot!!**. I find it incredibly easy and  intuitive to do. I felt like my background in Android and Backend both take part in the process of understanding the development process. **But I also have lots of issues with it.**
+
+Now, Let's break it down
+
+## Pros
+
+### HTMX ❤️ Go Template
+
+HTMX goes very well with Go native templating. I can inject URLs,  IDs, and even HTMX Attributes on the fly as needed. I can add  declarative conditional UI state directly in the HTML like this:
+
+```html
+<div {{if .FormMeta.IsLastItem}}
+     hx-get="/posts?page={{.FormMeta.Page}}&pageSize=10"
+     hx-trigger="revealed"
+     hx-swap="afterend"
+     {{end}}>
+</div>
+```
+
+Where it will only have htmx attributes whenever the Item is marked as the last Item.
+
+### Go Template ❤️ Tailwind
+
+Golang templating is also very useful when abstracting common styles without the need to dabble with the CSS class. For example:
+
+```html
+{{define "style_common_width"}}
+xl:w-3/5 lg:w-4/5 sm:w-10/12 xs:w-11/12
+{{end}}
+```
+
+will give me instant sets of reusable  styles that I can just plop whenever I need these sets of CSS class  attributes, which I use like this:
+
+```html
+<div class="bg-slate-200 dark:bg-slate-900 rounded-md p-4
+         {{template "style_common_width"}}
+         self-center mx-auto px-auto my-4">
+         ...
+</div>
+```
+
+See that I also can just add more CSS classes as needed, so I am not constrained by the rules of CSS classes. I  even can compose styles to create even more elaborate components:
+
+```templ
+{{define "style_base"}} // the base implementation
+	focus:border-transparent
+	focus:outline-none
+	focus:outline-sky-600
+	border-transparent
+{{end}}
+{{define "style_button_primary"}}
+	{{template "style_base"}} // reusing the base implementation
+	bg-teal-800 p-2
+	my-3
+	drop-shadow-md
+	text-slate-100
+	px-8 text-lg
+	border-none
+{{end}}
+```
+
+### Zero Effort List
+
+In my Android Dev days, dealing with a list of items is always painful. You have the choice of `RecyclerView`, incredibly powerful yet very frustrating recycling list, or very rudimentary `ArrayList` that basically will chug every time you have more than 50 items to display.
+
+Dealing with pagination is also very hard to do as the [paging3 library has a complexity so high it became a meme](https://www.reddit.com/r/mAndroidDev/search/?q=paging%203&restrict_sr=1) and is very painful to deal with.
+
+On the contrary? this is how I implement an infinite scroll of items in HTMX + Template:
+
+```html
+<!--in the index.html-->
+<div id="post-list">
+	{{template "post_list" .Posts}}
+</div>
+
+<!--in the post_list.html-->
+{{define "post_list"}}
+    {{range .}}
+        {{template "post_item" .}}
+    {{end}}
+{{end}}
+
+<!--in the post_item.html-->
+{{define "post_item"}}
+<div {{if .FormMeta.IsLastItem}}
+     hx-get="/posts?page={{.FormMeta.Page}}&pageSize=10"
+     hx-trigger="revealed"
+     hx-swap="afterend"
+     {{end}}>
+    <div class="...{{template "style_common_width"}}">
+        <h2 class="text-start">
+            <a href="/posts/{{.ID}}">{{.Title}}</a>
+        </h2>
+        ...
+        {{template "tag_list" .Tags}}
+    </div>
+</div>
+{{end}}
+```
+
+These simple snippets of HTML handle the following behavior:
+
+- Please render me a list of `Posts`
+- Each `Post` in `Posts` renders:
+  - parent div with style `{{template "style_common_width"}}`
+  - clickable Title text which navigates to `/posts/:id`
+  - List of tags from `Post.Tags`
+  - Whenever it marked with `IsLastItem` please:
+    - Loads more by calling `GET /posts` with specified `page` and `pageSize`
+    - Do it whenever the Item is `revealed` on the screen
+    - Append the response `after` the `end` of this very item.
+
+And all of that is declaratively stated and infinitely reusable! Crazy!! 🤯🤯🤯
+
+### You do very little HTMX
+
+Contrary to how I make a big deal out of it, in actuality I use **very little of HTMX**.  In total, I only use htmx 12 times, and 6 of those are me eagerly using htmx for something that can be done by a simple anchor tag.
+
+> But wait, that's a good thing?
+
+Yes, actually! **great tools should be something that stops once their usefulness ends.** And HTMX is one hell of a great tool. I'm not forced to use it, but when I do, it solves real problems.
+
+I've only effectively used HTMX 6 times for the whole project. Yet  with only those 6 I solve major interaction issues that usually warrant  a framework / some JS codes. It is incredibly cheap to just use htmx.  Even just a little.
+
+## Cons
+
+### Mediocre Documentation
+
+The HTMX Documentation looks so simple and it deceptively looks  complete. But in reality, many unexplained contexts are lost  (at least on me) that are only solvable if you're somewhat already familiar  with HTML DOM and HTML Events.
+
+Given this use case:\
+ `I want to make a text input which triggers hx-post whenever I press either Cmd+Enter or Ctrl+Enter`
+
+Seems easy enough, but somehow it took me several hours digging  through docs, GitHub issues, and W3Schools to understand how to use `hx-trigger` with keyboard bindings. In the HTMX's example, they give us this:
+
+```html
+hx-trigger="click, keyup[altKey&&shiftKey&&key=='D'] from:body"
+```
+
+Which:
+
+1. Does not explain when to use `altKey` and when to compare `key` with value of  `'D'`
+2. Does not even work on Mac 🫠🫠
+
+Turns out, `hx-triggers` could be triggered by [HTML Keyboard Events](https://www.w3schools.com/jsref/obj_keyboardevent.asp). Where special keys such as `ctrl`, `shift`, and `Cmd` (`metaKey`???) are boolean attributes and common keyboard keys can be matched by any `char` value that the keyboard keys represent. hence `key=='D'` in the example above.
+
+So to solve the original use case, I can use the following `hx-trigger`:
+
+```html
+hx-trigger="keydown[metaKey&&key=='Enter'], keydown[ctrlKey&&key=='Enter'], tag"
+```
+
+Where `tag` is the target `id` of the HTML element.
+
+### HTML logic slippery slopes
+
+Having access to declarative logic in the HTML is nice and all, but **How far is too far**? At some point, I have an HTML template that looks like this:
+
+```html
+<div
+	  hx-get="/posts?page={{.FormMeta.Page}}&pageSize=10{{if .FormMeta.PublishedOnly}}&status=published{{end}}{{if .FormMeta.SortQuery}}&sortBy={{.FormMeta.SortQuery}}{{end}} {{if .FormMeta.Keyword}}&search={{.FormMeta.Keyword}}{{end}}"
+     hx-trigger="revealed"
+     hx-swap="afterend">
+     ...
+</div>
+```
+
+Which is very hard to read but also very  hard to debug. Templates do not throw error codes that are easy to  digest. You have to guess a lot of it.
+
+This can happen so easily and naturally, as you originally wanted to build simple `hx-get`to  fetch some item, but then you add 1 query param, and more query params,  and more and more. And suddenly, you have this unwieldy long  conditional statement that is very brittle.
+
+I have not even refactored the code above so you can see it in all of its glory in the GitHub repo of this very blog.
+
+### You cannot fully escape from JavaScript
+
+As you might guess from the demo video up above, I ultimately had  a little bit of JavaScript to help with some stuff, like Image Uploading and  Confirmation/Loading Dialog (I'm using SweetAlert for a quick and easy  solution right now).
+
+Though to be fair, I'm using Hyperscript as opposed to JavaScript on  several Dialog triggers (please spare me 🙇🏽‍♂️🙇🏽‍♂️🙇🏽‍♂️🙇🏽‍♂️).
+
+### ORM is Great, until suddenly it's the worst!
+
+I started this naively by thinking *"Surely, for a simple blog post with entity counts below 10 using ORM would be correct, no?"*, and the answer is "hell no" 🤣.
+
+Initially, it's fun and dandy when each model is unrelated and all I  need is simple CRUD. But once I started to join things together, it became  pretty messy. Let's take the worst example: ***article search.***
+
+I want my search to look for matching content not only in the title  and the content of the post but also in the tags related to the post.  The thing is, tags are located in different tables, and the relation between  the two is `many to many`(as 1 tag can be  related to multiple posts and a post can have multiple tags), To do  that I effectively need to join them together.
+
+I try to do it the "ORM" way where I'm supposed to not write any SQL myself. But GORM does not support `JOIN` followed by `Conditional Statement` (Evaluate the `JOIN` result). It only supports eager loading with conditions (Evaluate the value **before** `JOIN`), so I cannot just create a `FULL JOIN` of both.
+
+I then gave up and tried to do it the ORM way and just used ORM but with a bit of SQL. Then I came up with this:
+
+```go
+func search() error {
+   db.Table("posts").
+	   Select("distinct posts.id",
+		   "posts.title", "posts.created_at",
+		   "posts.status", "posts.updated_at",
+		   "posts.published_at").
+	   Joins("full join post_tags on posts.id = post_tags.post_id").
+	   Joins("left join tags on post_tags.tag_id = tags.id").
+	   Where("lower(posts.title) like ?", wrappedKeyword).
+	   Or("lower(posts.content) like ?", wrappedKeyword).
+	   Or("lower(tags.title) like ?", wrappedKeyword),
+	   Where("posts.status = ?", status)
+}
+```
+
+Which is suspiciously just looks like raw SQL but with syntactic sugar. And the best part? it does not do what I want.
+
+So, please watch the last part where I added `Where()` a condition that should filter out status. All `Where()` function is flattened, meaning all live in the same plane. The query above is equal to `WHERE...OR...AND...` instead of my goal which is `WHERE(...OR...)AND...`
+
+It took me quite a while to flip around GORM documentation. But it  turns out, you could just nest the "Where" statement to simulate `WHERE(..OR..)AND ...`. So I modified it into this:
+
+```go
+func search() error {
+   wrappedKeyword := fmt.Sprintf("%%%s%%", strings.ToLower(keyword))
+   dbs := db.Table("posts").
+	   Select("distinct posts.id",
+		   "posts.title", "posts.created_at",
+		   "posts.status", "posts.updated_at",
+		   "posts.published_at").
+	   Joins("full join post_tags on posts.id = post_tags.post_id").
+	   Joins("left join tags on post_tags.tag_id = tags.id")
+
+   dbs = dbs.
+	   Where(
+		   dbs.Where("lower(posts.title) like ?", wrappedKeyword).
+			   Or("lower(posts.content) like ?", wrappedKeyword).
+			   Or("lower(tags.title) like ?", wrappedKeyword),
+	   )
+
+   if status != values.None {
+	   dbs = dbs.Where("posts.status = ?", status)
+   }
+}
+```
+
+And finally, it worked! But at this point, I might as well use SQLC and write my own SQL, doesn't it?
+
+## Conclusion
+
+I love what HTMX provides for my use case. It strikes a very  nice balance for someone who has a background in Android and Backend  where a lot of the knowledge in each of those domains helped me create  an interpretation of how to work with front-end development *a la* hypermedia.
+
+It does, however, still have a lot of kinks to be ironed out, and needs strict and active discipline from the developer to not fall  into the traps of declarative hell that is HTML templating.
+
+There is no handholding really, as a lot of the best practices are  not defined and documented and people will need to draw the line  themselves where and how to do things.
+
+That's it! Please give me feedback in the form of an email or reply to  any repost I made. I'm sorry I haven't made a proper comment system yet  (and also sitemaps, RSS feeds, newsletters… urgh…).
+
+## Thanks!
