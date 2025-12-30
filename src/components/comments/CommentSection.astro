@@ -1,8 +1,7 @@
 ---
 import { getCommentsBySlug, buildCommentTree } from "../../lib/comments/repository";
 import { getOrCreateAlias } from "../../lib/comments/diceware";
-import CommentList from "./CommentList.astro";
-import CommentForm from "./CommentForm.astro";
+import CommentTree from "./CommentTree";
 
 interface Props {
   articleSlug: string;
@@ -16,6 +15,9 @@ const alias = getOrCreateAlias(Astro.cookies);
 // Fetch comments from database
 const comments = await getCommentsBySlug(articleSlug);
 const commentTree = buildCommentTree(comments);
+
+// Serialize dates to ISO strings for Preact
+const serializedTree = JSON.parse(JSON.stringify(commentTree));
 ---
 
 <section
@@ -24,9 +26,12 @@ const commentTree = buildCommentTree(comments);
 >
   <div class="card-body">
     <h2 class="card-title text-2xl mb-4">Comments</h2>
-    <CommentForm articleSlug={articleSlug} />
-    <div class="divider"></div>
-    <CommentList comments={commentTree} articleSlug={articleSlug} />
+    <CommentTree
+      client:load
+      comments={serializedTree}
+      articleSlug={articleSlug}
+      userAlias={alias}
+    />
   </div>
 </section>
 

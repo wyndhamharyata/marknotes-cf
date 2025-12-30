@@ -6,12 +6,12 @@ export async function getCommentsBySlug(articleSlug: string): Promise<Reply[]> {
 
   const result = await client.execute({
     sql: `
-      SELECT id, created_at, message, alias, parent_id, article_slug
+      SELECT id, created_at, message, alias, parent_id, article_slug,
+             moderation_status, hide_publicity
       FROM replies
       WHERE article_slug = ?
         AND deleted_at IS NULL
-        AND hide_publicity = 0
-      ORDER BY created_at ASC
+      ORDER BY created_at DESC
     `,
     args: [articleSlug],
   });
@@ -23,13 +23,15 @@ export async function getCommentsBySlug(articleSlug: string): Promise<Reply[]> {
     alias: row.alias as string,
     parentId: row.parent_id as number | null,
     articleSlug: row.article_slug as string,
+    moderationStatus: (row.moderation_status as number) ?? 0,
+    hidePublicity: Boolean(row.hide_publicity),
   }));
 }
 
-export async function createComment(input: CreateCommentInput): Promise<void> {
+export async function createComment(input: CreateCommentInput): Promise<number> {
   const client = getTursoClient();
 
-  await client.execute({
+  const result = await client.execute({
     sql: `
       INSERT INTO replies (
         created_at,
@@ -58,6 +60,8 @@ export async function createComment(input: CreateCommentInput): Promise<void> {
       input.parentId,
     ],
   });
+
+  return Number(result.lastInsertRowid);
 }
 
 export function buildCommentTree(comments: Reply[]): CommentNode[] {
