@@ -1,10 +1,8 @@
 ---
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
-import Header from '../../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 
 export const prerender = true;
@@ -14,51 +12,35 @@ const posts = (await getCollection('blog')).sort(
 );
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body class="font-sono min-h-screen flex flex-col">
-		<!-- Background layer -->
-		<div class="fixed inset-0 -z-10 bg-base-200 dark:bg-base-300">
-			<div class="absolute inset-0 grid-bg"></div>
-			<div class="absolute inset-0 bg-gradient-to-bl from-secondary/5 via-accent/5 to-transparent"></div>
-		</div>
-
-		<Header />
-		<main class="max-w-4xl mx-auto px-4 py-8 flex-1">
-			<div class="card bg-base-100 shadow-xl">
-				<div class="card-body">
-					<h1 class="text-3xl font-extrabold mb-6">Blog Posts</h1>
-					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2">
-						{
-							posts.map((post, index) => (
-								<article class={`py-4 ${index < posts.length - 1 ? 'border-b border-base-300 md:border-b-0' : ''}`}>
-									<a href={`/blog/${post.id}/`} class="group block">
-										{post.data.heroImage && (
-											<Image
-												width={720}
-												height={360}
-												src={post.data.heroImage}
-												alt=""
-												class="w-full h-32 object-cover rounded-box mb-3"
-											/>
-										)}
-										<h2 class="text-lg font-extrabold group-hover:text-primary transition-colors">
-											{post.data.title}
-										</h2>
-										<p class="text-base-content/70 text-sm mt-1">
-											<FormattedDate date={post.data.pubDate} />
-										</p>
-									</a>
-								</article>
-							))
-						}
-					</div>
-				</div>
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+	<div class="card bg-base-100 shadow-xl">
+		<div class="card-body">
+			<h1 class="text-3xl font-extrabold mb-6">Blog Posts</h1>
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2">
+				{
+					posts.map((post, index) => (
+						<article class={`py-4 ${index < posts.length - 1 ? 'border-b border-base-300 md:border-b-0' : ''}`}>
+							<a href={`/blog/${post.id}/`} class="group block">
+								{post.data.heroImage && (
+									<Image
+										width={720}
+										height={360}
+										src={post.data.heroImage}
+										alt=""
+										class="w-full h-32 object-cover rounded-box mb-3"
+									/>
+								)}
+								<h2 class="text-lg font-extrabold group-hover:text-primary transition-colors">
+									{post.data.title}
+								</h2>
+								<p class="text-base-content/70 text-sm mt-1">
+									<FormattedDate date={post.data.pubDate} />
+								</p>
+							</a>
+						</article>
+					))
+				}
 			</div>
-		</main>
-		<Footer />
-	</body>
-</html>
+		</div>
+	</div>
+</BaseLayout>

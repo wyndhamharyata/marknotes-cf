@@ -1,0 +1,57 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: ImageMetadata;
+}
+
+const { title, description, image } = Astro.props;
+
+// Detect htmx request via HX-Request header
+const isHtmxRequest = Astro.request.headers.get('HX-Request') === 'true';
+---
+
+{/* Partial response for htmx requests - just the main content */}
+{isHtmxRequest && (
+  <main id="main-content" class="max-w-4xl mx-auto px-4 py-8 flex-1">
+    <slot />
+  </main>
+)}
+
+{/* Full page for initial load or non-htmx navigation */}
+{!isHtmxRequest && (
+  <html lang="en">
+    <head>
+      <BaseHead title={title} description={description} image={image} />
+    </head>
+    <body
+      class="font-sono min-h-screen flex flex-col"
+      hx-boost="true"
+      hx-target="#main-content"
+      hx-swap="innerHTML"
+      hx-push-url="true"
+    >
+      {/* Background layer */}
+      <div class="fixed inset-0 -z-10 bg-base-200 dark:bg-base-300">
+        <div class="absolute inset-0 grid-bg"></div>
+        <div class="absolute inset-0 bg-gradient-to-bl from-secondary/5 via-accent/5 to-transparent"></div>
+      </div>
+
+      <Header />
+      <main id="main-content" class="max-w-4xl mx-auto px-4 py-8 flex-1">
+        <slot />
+      </main>
+      <Footer />
+
+      {/* Loading indicator */}
+      <div id="htmx-indicator" class="htmx-indicator fixed top-0 left-0 right-0 h-1 z-50">
+        <div class="h-full bg-primary"></div>
+      </div>
+    </body>
+  </html>
+)}

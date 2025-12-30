@@ -13,9 +13,9 @@ import MoonIcon from '../icons/moon.svg';
 				<MenuIcon class="h-5 w-5" />
 			</div>
 			<ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-				<li><a href="/">Home</a></li>
-				<li><a href="/blog">Blog</a></li>
-				<li><a href="/about">About</a></li>
+				<li><a href="/" data-nav-link>Home</a></li>
+				<li><a href="/blog" data-nav-link>Blog</a></li>
+				<li><a href="/about" data-nav-link>About</a></li>
 			</ul>
 		</div>
 	</div>
@@ -79,6 +79,6 @@ import MoonIcon from '../icons/moon.svg';
 	// Run on initial load
 	initTheme();
 
-	// Re-run on Astro page transitions
-	document.addEventListener('astro:after-swap', initTheme);
+	// Re-run on htmx page swaps
+	document.addEventListener('htmx:afterSettle', initTheme);
 </script>

@@ -77,3 +77,25 @@ html {
         border-color: var(--color-gray-200, currentcolor);
     }
 }
+
+/* htmx loading indicator */
+.htmx-indicator {
+    opacity: 0;
+    transition: opacity 200ms ease-in;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+    opacity: 1;
+}
+
+/* Progress bar animation */
+@keyframes htmx-progress {
+    0% { width: 0%; }
+    50% { width: 70%; }
+    100% { width: 100%; }
+}
+
+.htmx-request #htmx-indicator > div {
+    animation: htmx-progress 0.8s ease-out forwards;
+}
