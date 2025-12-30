@@ -9,15 +9,24 @@ interface Props {
 
 const { articleSlug } = Astro.props;
 
-// Get or create the user's alias (sets cookie if new)
-const alias = getOrCreateAlias(Astro.cookies);
+let alias = "anonymous";
+let serializedTree: any[] = [];
+let error: string | null = null;
 
-// Fetch comments from database
-const comments = await getCommentsBySlug(articleSlug);
-const commentTree = buildCommentTree(comments);
+try {
+  // Get or create the user's alias (sets cookie if new)
+  alias = getOrCreateAlias(Astro.cookies);
 
-// Serialize dates to ISO strings for Preact
-const serializedTree = JSON.parse(JSON.stringify(commentTree));
+  // Fetch comments from database
+  const comments = await getCommentsBySlug(articleSlug);
+  const commentTree = buildCommentTree(comments);
+
+  // Serialize dates to ISO strings for Preact
+  serializedTree = JSON.parse(JSON.stringify(commentTree));
+} catch (e) {
+  error = e instanceof Error ? e.message : String(e);
+  console.error("CommentSection error:", error);
+}
 ---
 
 <section
@@ -26,12 +35,18 @@ const serializedTree = JSON.parse(JSON.stringify(commentTree));
 >
   <div class="card-body">
     <h2 class="card-title text-2xl mb-4">Comments</h2>
-    <CommentTree
-      client:load
-      comments={serializedTree}
-      articleSlug={articleSlug}
-      userAlias={alias}
-    />
+    {error ? (
+      <div class="alert alert-error">
+        <span>Failed to load comments: {error}</span>
+      </div>
+    ) : (
+      <CommentTree
+        client:load
+        comments={serializedTree}
+        articleSlug={articleSlug}
+        userAlias={alias}
+      />
+    )}
   </div>
 </section>
 
