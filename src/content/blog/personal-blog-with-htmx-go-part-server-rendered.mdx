@@ -5,6 +5,8 @@ pubDate: 'Mar 11 2024'
 heroImage: '../../assets/hero-personal-blog-with-htmx-go-part-server-rendered.webp'
 ---
 
+import BlogImage from '../../components/BlogImage.astro';
+
 This article will cover part 3 of the <u>**#blogging**</u> Tutorial. This one is going to be long as we start deep-diving into making some interactive stuff with the help of <u>**#HTMX.**</u> If you need a refresher, you can read the [first](https://mwyndham.dev/articles/personal-blog-with-htmx-go-part-golang-templating.html) or the [previous](https://mwyndham.dev/articles/personal-blog-with-htmx-go-part-integrating-tailwindcss.html) part.
 
 ---
@@ -152,13 +154,17 @@ Now, if everything is according to plan, we should see a well-rendered markdown 
 
 Run the tailwind build command (`npx tailwindcss -i ...etc`) and then run the go server ( `go run .`) and open `localhost:4040` in our server:
 
-![gif of renderring markdown](https://resource.mwyndham.dev/0-example-1-20240411112756.gif)**Yeay!... or not?** While the Tailwind class we specified before is rendered correctly, the header looks the same... *what gives? Is the markdown rendering not working?*
+<BlogImage src="https://resource.mwyndham.dev/0-example-1-20240411112756.gif" alt="gif of renderring markdown" />
+
+**Yeay!... or not?** While the Tailwind class we specified before is rendered correctly, the header looks the same... *what gives? Is the markdown rendering not working?*
 
 Nope, it's working just fine.
 
 Press `F12` and open inspector, and see exactly that we have already rendered both `<h1>` and `<h2>` as per the standard rendering of Markdown to HTML:
 
-![Inspector on the Page to see if Markdown is renderred correctly](https://resource.mwyndham.dev/0-0-a-20240409031752-20240421100132.webp)*But it looks a bit..* *underwhelming* isn't it? you would think that a well-rendered markdown would be similar to what GitHub offering would look like. But let alone have nice styling, `<h1>` and `<h2>` does not render any differently.
+<BlogImage src="https://resource.mwyndham.dev/0-0-a-20240409031752-20240421100132.webp" alt="Inspector on the Page to see if Markdown is renderred correctly" />
+
+*But it looks a bit..* *underwhelming* isn't it? you would think that a well-rendered markdown would be similar to what GitHub offering would look like. But let alone have nice styling, `<h1>` and `<h2>` does not render any differently.
 
 ---
 
@@ -231,7 +237,9 @@ All other attributes are the same, but just applying it to other header sizes.
 
 Now if we're to run our code again, it should show something like this:
 
-![Tailwind Typography demo](https://resource.mwyndham.dev/0-0-s-20240409031802-20240421100206.webp)Looks great right? But you might be wondering why we got more than we bargained for. Like now it's centered horizontally and has a specific width applied to it. That's what `prose` class is used for. You can read  more [here](https://github.com/tailwindlabs/tailwindcss-typography). But the gist is it's just what Tailwind Typography does and it will help us build our simple blog faster.
+<BlogImage src="https://resource.mwyndham.dev/0-0-s-20240409031802-20240421100206.webp" alt="Tailwind Typography demo" />
+
+Looks great right? But you might be wondering why we got more than we bargained for. Like now it's centered horizontally and has a specific width applied to it. That's what `prose` class is used for. You can read  more [here](https://github.com/tailwindlabs/tailwindcss-typography). But the gist is it's just what Tailwind Typography does and it will help us build our simple blog faster.
 
 ---
 
@@ -292,7 +300,9 @@ What we're going to make is a split editor where you write your markdown on the 
 
 If done correctly, it should render to this:
 
-![Split Editor ](https://resource.mwyndham.dev/0-0-d-20240409032036-20240421100231.webp)Next, we're going to repurpose the `markdown.html` we had previously to display the content on the preview side. But first, we need to modify it:
+<BlogImage src="https://resource.mwyndham.dev/0-0-d-20240409032036-20240421100231.webp" alt="Split Editor" />
+
+Next, we're going to repurpose the `markdown.html` we had previously to display the content on the preview side. But first, we need to modify it:
 
 ```html
 <!-- before -->
@@ -334,7 +344,9 @@ If you run it and start typing in the text area, you will see that there's a new
 
 If you open the `Request` tab, you'll see the exact content of the text area in the form of data, like this:
 
-![Inspect on the Split Editor to se if htmx works](https://resource.mwyndham.dev/0-0-f-20240409032043-20240421100300.webp)Which is good! now we know that we can interactively send the text area content to the server, and the server will be able to render the HTML for us!
+<BlogImage src="https://resource.mwyndham.dev/0-0-f-20240409032043-20240421100300.webp" alt="Inspect on the Split Editor to se if htmx works" />
+
+Which is good! now we know that we can interactively send the text area content to the server, and the server will be able to render the HTML for us!
 
 ### Final Piece to The Magic
 
@@ -375,7 +387,9 @@ type RenderReq struct {
 
 Once we add the endpoint, and restart the deployment you should be able to do this:
 
-![](https://resource.mwyndham.dev/0-output-20240311033039.gif)And just like that, we have our server-rendered Markdown done. It's not that much code but we achieve quite a lot here!
+<BlogImage src="https://resource.mwyndham.dev/0-output-20240311033039.gif" alt="" />
+
+And just like that, we have our server-rendered Markdown done. It's not that much code but we achieve quite a lot here!
 
 ---
 

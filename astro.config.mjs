@@ -16,6 +16,9 @@ export default defineConfig({
 		},
 		imageService: 'cloudflare',
 	}),
+	image: {
+		domains: ['resource.mwyndham.dev'],
+	},
 	integrations: [mdx(), sitemap(), preact()],
 	vite: {
 		plugins: [tailwindcss()],

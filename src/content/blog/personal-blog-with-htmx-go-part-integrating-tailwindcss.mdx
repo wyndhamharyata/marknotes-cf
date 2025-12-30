@@ -5,6 +5,8 @@ pubDate: 'Oct 18 2023'
 heroImage: '../../assets/hero-personal-blog-with-htmx-go-part-integrating-tailwindcss.png'
 ---
 
+import BlogImage from '../../components/BlogImage.astro';
+
 This is the second part in my journey documenting my effort creating personal blog (which you can access [here](https://mwyndham.dev)). You can read the previous part [here](https://mwyndham.dev/articles/personal-blog-with-htmx-go-part-golang-templating) or the Medium version instead [here](https://mwyndham.medium.com/this-blogpost-also-posted-in-my-personal-blog-which-you-can-access-here-dd856c61001).
 
 ## Our Goal This Time
@@ -213,7 +215,9 @@ npx tailwindcss -i ./dist/main.css -o ./dist/tailwind.css
 
 Now let's run our code and we should have this as the output:
 
-![Image of web with tailwind applied](https://resource.mwyndham.dev/0-9-sddddd-20240405042910-20240411005630.png)Good!
+<BlogImage src="https://resource.mwyndham.dev/0-9-sddddd-20240405042910-20240411005630.png" alt="Image of web with tailwind applied" />
+
+Good!
 
 ## Wrapping Up, and What's Next
 
