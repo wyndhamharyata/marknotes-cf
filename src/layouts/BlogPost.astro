@@ -3,10 +3,11 @@ import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
+import CommentSection from '../components/comments/CommentSection.astro';
 
-type Props = CollectionEntry<'blog'>['data'];
+type Props = CollectionEntry<'blog'>['data'] & { slug: string };
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, slug } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} image={heroImage}>
@@ -34,4 +35,15 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			</div>
 		</div>
 	</article>
+
+	<!-- Comment Section with Server Island for lazy loading -->
+	<CommentSection server:defer articleSlug={slug}>
+		<div slot="fallback" class="mt-8 card bg-base-100 shadow-xl">
+			<div class="card-body">
+				<h2 class="card-title text-2xl mb-4">Comments</h2>
+				<div class="skeleton h-24 w-full"></div>
+				<div class="skeleton h-16 w-full mt-4"></div>
+			</div>
+		</div>
+	</CommentSection>
 </BaseLayout>

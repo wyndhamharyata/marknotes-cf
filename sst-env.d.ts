@@ -5,6 +5,14 @@
 
 declare module "sst" {
   export interface Resource {
+    "LibsqlAuthToken": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "LibsqlUrl": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "Max": {
       "type": "sst.cloudflare.Astro"
       "url": string

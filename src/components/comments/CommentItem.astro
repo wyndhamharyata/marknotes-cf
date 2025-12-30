@@ -1,0 +1,66 @@
+---
+import Avatar from "./Avatar.astro";
+import CommentForm from "./CommentForm.astro";
+import type { CommentNode } from "../../lib/comments/types";
+
+interface Props {
+  comment: CommentNode;
+  articleSlug: string;
+  depth?: number;
+}
+
+const { comment, articleSlug, depth = 0 } = Astro.props;
+const maxDepth = 3;
+const canReply = depth < maxDepth;
+
+// Format date
+const formattedDate = comment.createdAt.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+});
+---
+
+<div class="py-3">
+  <div class="flex gap-3">
+    <div class="flex-shrink-0">
+      <Avatar seed={comment.alias} size={40} />
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="font-semibold text-sm">{comment.alias}</span>
+        <span class="text-xs text-base-content/50">{formattedDate}</span>
+      </div>
+      <p class="text-base-content/80 break-words whitespace-pre-wrap text-sm">
+        {comment.message}
+      </p>
+      {
+        canReply && (
+          <details class="mt-2">
+            <summary class="btn btn-xs btn-ghost cursor-pointer">Reply</summary>
+            <CommentForm
+              articleSlug={articleSlug}
+              parentId={comment.id}
+              isReply={true}
+            />
+          </details>
+        )
+      }
+    </div>
+  </div>
+
+  {/* Nested replies */}
+  {
+    comment.children.length > 0 && (
+      <div class="ml-6 mt-2 border-l-2 border-base-200 pl-4">
+        {comment.children.map((child) => (
+          <Astro.self
+            comment={child}
+            articleSlug={articleSlug}
+            depth={depth + 1}
+          />
+        ))}
+      </div>
+    )
+  }
+</div>

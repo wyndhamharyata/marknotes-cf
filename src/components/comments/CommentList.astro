@@ -1,0 +1,25 @@
+---
+import CommentItem from "./CommentItem.astro";
+import type { CommentNode } from "../../lib/comments/types";
+
+interface Props {
+  comments: CommentNode[];
+  articleSlug: string;
+}
+
+const { comments, articleSlug } = Astro.props;
+---
+
+<div class="divide-y divide-base-200">
+  {
+    comments.length > 0 ? (
+      comments.map((comment) => (
+        <CommentItem comment={comment} articleSlug={articleSlug} />
+      ))
+    ) : (
+      <p class="py-4 text-base-content/50 text-center">
+        No comments yet. Be the first to comment!
+      </p>
+    )
+  }
+</div>

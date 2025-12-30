@@ -1,0 +1,32 @@
+---
+interface Props {
+  articleSlug: string;
+  parentId?: number;
+  isReply?: boolean;
+}
+
+const { articleSlug, parentId = 0, isReply = false } = Astro.props;
+---
+
+<form
+  method="POST"
+  action="/api/comments/create"
+  class={isReply ? "mt-3" : "mb-6"}
+>
+  <input type="hidden" name="articleSlug" value={articleSlug} />
+  <input type="hidden" name="parentId" value={parentId} />
+  <div class="form-control">
+    <textarea
+      name="replyBody"
+      class="textarea textarea-bordered w-full"
+      placeholder={isReply ? "Write a reply..." : "Write a comment..."}
+      rows={isReply ? 2 : 3}
+      required
+    ></textarea>
+  </div>
+  <div class="mt-2 flex justify-end">
+    <button type="submit" class={`btn btn-primary ${isReply ? "btn-sm" : ""}`}>
+      {isReply ? "Reply" : "Post Comment"}
+    </button>
+  </div>
+</form>

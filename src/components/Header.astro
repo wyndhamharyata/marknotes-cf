@@ -6,6 +6,12 @@ import MoonIcon from '../icons/moon.svg';
 ---
 
 <div class="navbar bg-base-100 shadow-xl md:rounded-field mx-auto md:max-w-2xl mt-4 md:mt-5 relative">
+	<!-- Identity display - hidden until comment section loads -->
+	<div id="identity-display" class="absolute left-2 hidden md:hidden items-center gap-2 text-xs text-base-content/70">
+		<span>Viewing as:</span>
+		<span id="identity-alias" class="font-semibold text-primary"></span>
+	</div>
+
 	<!-- Mobile hamburger menu - only on mobile -->
 	<div class="flex-none md:hidden">
 		<div class="dropdown">
@@ -81,4 +87,22 @@ import MoonIcon from '../icons/moon.svg';
 
 	// Re-run on htmx page swaps
 	document.addEventListener('htmx:afterSettle', initTheme);
+
+	// Listen for comment alias loaded event from CommentSection
+	function initIdentity() {
+		window.addEventListener('comment-alias-loaded', ((event: CustomEvent<{ alias: string }>) => {
+			const identityDisplay = document.getElementById('identity-display');
+			const identityAlias = document.getElementById('identity-alias');
+
+			if (identityDisplay && identityAlias && event.detail.alias) {
+				identityAlias.textContent = event.detail.alias;
+				identityDisplay.classList.remove('hidden');
+				identityDisplay.classList.add('flex');
+				identityDisplay.classList.remove('md:hidden');
+				identityDisplay.classList.add('md:flex');
+			}
+		}) as EventListener);
+	}
+
+	initIdentity();
 </script>

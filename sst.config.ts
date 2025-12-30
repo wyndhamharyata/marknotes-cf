@@ -10,11 +10,16 @@ export default $config({
     };
   },
   async run() {
+    // Turso database secrets
+    const libsqlUrl = new sst.Secret("LibsqlUrl");
+    const libsqlAuthToken = new sst.Secret("LibsqlAuthToken");
+
     new sst.cloudflare.x.Astro("Max", {
       domain:
         $app.stage === "production"
           ? "read.mwyndham.dev"
           : "devread.mwyndham.dev",
+      link: [libsqlUrl, libsqlAuthToken],
     });
   },
 });

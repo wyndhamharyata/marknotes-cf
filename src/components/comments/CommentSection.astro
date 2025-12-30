@@ -1,0 +1,46 @@
+---
+import { getCommentsBySlug, buildCommentTree } from "../../lib/comments/repository";
+import { getOrCreateAlias } from "../../lib/comments/diceware";
+import CommentList from "./CommentList.astro";
+import CommentForm from "./CommentForm.astro";
+
+interface Props {
+  articleSlug: string;
+}
+
+const { articleSlug } = Astro.props;
+
+// Get or create the user's alias (sets cookie if new)
+const alias = getOrCreateAlias(Astro.cookies);
+
+// Fetch comments from database
+const comments = await getCommentsBySlug(articleSlug);
+const commentTree = buildCommentTree(comments);
+---
+
+<section
+  class="mt-8 card bg-base-100 shadow-xl"
+  data-comment-alias={alias}
+>
+  <div class="card-body">
+    <h2 class="card-title text-2xl mb-4">Comments</h2>
+    <CommentForm articleSlug={articleSlug} />
+    <div class="divider"></div>
+    <CommentList comments={commentTree} articleSlug={articleSlug} />
+  </div>
+</section>
+
+<script>
+  // Emit custom event when comment section loads with the alias
+  document.addEventListener("DOMContentLoaded", () => {
+    const section = document.querySelector("[data-comment-alias]");
+    if (section) {
+      const alias = section.getAttribute("data-comment-alias");
+      if (alias) {
+        window.dispatchEvent(
+          new CustomEvent("comment-alias-loaded", { detail: { alias } })
+        );
+      }
+    }
+  });
+</script>
