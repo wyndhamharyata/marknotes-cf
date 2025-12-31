@@ -3,23 +3,34 @@
 /* eslint-disable */
 /* deno-fmt-ignore-file */
 
+import "sst"
 declare module "sst" {
   export interface Resource {
-    LibsqlAuthToken: {
-      type: "sst.sst.Secret";
-      value: string;
-    };
-    LibsqlUrl: {
-      type: "sst.sst.Secret";
-      value: string;
-    };
-    Max: {
-      type: "sst.cloudflare.Astro";
-      url: string;
-    };
+    "GeminiApiKey": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "LibsqlAuthToken": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "LibsqlUrl": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "Max": {
+      "type": "sst.cloudflare.Astro"
+      "url": string
+    }
   }
 }
-/// <reference path="sst-env.d.ts" />
+// cloudflare 
+import * as cloudflare from "@cloudflare/workers-types";
+declare module "sst" {
+  export interface Resource {
+    "ModerationCronHandler": cloudflare.Service
+  }
+}
 
-import "sst";
-export {};
+import "sst"
+export {}

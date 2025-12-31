@@ -1,5 +1,5 @@
 /// <reference types="@cloudflare/workers-types" />
-import { getUnmoderatedComments, updateModerationStatus } from "../lib/comments/repository";
+import { getUnmoderatedComments, updateModerationStatus } from "./repository";
 import { moderateComments } from "../lib/moderation/gemini-service";
 
 const handler: ExportedHandler = {

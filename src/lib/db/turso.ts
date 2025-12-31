@@ -1,28 +1,20 @@
 import { createClient, type Client } from "@libsql/client/web";
-import { Resource } from "sst";
-import { LIBSQL_URL, LIBSQL_AUTH_TOKEN } from "astro:env/server";
+
+export interface TursoCredentials {
+  url: string;
+  authToken: string;
+}
 
 let client: Client | null = null;
+let currentUrl: string | null = null;
 
-export function getTursoClient(): Client {
-  if (!client) {
-    let url: string;
-    let authToken: string;
-    try {
-      url = Resource.LibsqlUrl.value;
-      authToken = Resource.LibsqlAuthToken.value;
-    } catch {
-      if (!LIBSQL_URL || !LIBSQL_AUTH_TOKEN) {
-        throw new Error("Database credentials not configured");
-      }
-      url = LIBSQL_URL;
-      authToken = LIBSQL_AUTH_TOKEN;
-    }
-
+export function getTursoClient(credentials: TursoCredentials): Client {
+  if (!client || currentUrl !== credentials.url) {
     client = createClient({
-      url: url,
-      authToken: authToken,
+      url: credentials.url,
+      authToken: credentials.authToken,
     });
+    currentUrl = credentials.url;
   }
   return client;
 }

@@ -27,7 +27,6 @@ let aiClient: GoogleGenAI | null = null;
 
 function getGeminiClient(): GoogleGenAI {
   if (!aiClient) {
-    // @ts-expect-error - GeminiApiKey type will be available after running `sst secret set GeminiApiKey`
     const apiKey = Resource.GeminiApiKey.value;
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY not configured");
