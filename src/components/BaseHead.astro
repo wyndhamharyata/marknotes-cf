@@ -31,8 +31,8 @@ const { title, description, image = FallbackImage } = Astro.props;
 <meta name="generator" content={Astro.generator} />
 
 <!-- Font preloads -->
-<link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin />
-<link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin />
+<!-- <link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin /> -->
+<!-- <link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin /> -->
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
@@ -59,4 +59,10 @@ const { title, description, image = FallbackImage } = Astro.props;
 <!-- htmx -->
 <script>
 	import 'htmx.org';
+</script>
+
+<!-- Dynamic favicon from user identity -->
+<script>
+	const link = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
+	if (link) link.href = "/api/favicon.svg";
 </script>
