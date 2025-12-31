@@ -20,7 +20,7 @@ const posts = (await getCollection('blog')).sort(
 				{
 					posts.map((post, index) => (
 						<article class={`py-4 ${index < posts.length - 1 ? 'border-b border-base-300 md:border-b-0' : ''}`}>
-							<a href={`/articles/${post.id}/`} class="group block">
+							<a href={`/articles/${post.id}/`} class="group block p-3 -m-3 rounded-box hover:bg-accent/10 transition-colors">
 								{post.data.heroImage && (
 									<Image
 										width={720}

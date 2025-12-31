@@ -1,43 +1,75 @@
 ---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import FormattedDate from '../components/FormattedDate.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+export const prerender = true;
+
+const latestPosts = (await getCollection('blog'))
+	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+	.slice(0, 3);
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
-	<div class="text-center mb-12">
-		<h1 class="text-4xl md:text-5xl font-extrabold mb-4">
-			Hello, Astronaut!
-		</h1>
-		<p class="text-xl text-base-content/80">
-			Welcome to the official <a href="https://astro.build/" class="text-primary hover:underline">Astro</a> blog starter template.
+	<!-- Intro Section -->
+	<div class="text-center mb-12 prose prose-lg max-w-none mx-auto prose-strong:text-primary prose-a:text-accent prose-a:font-extrabold">
+		<p class="text-4xl">
+			Hello! 🖖 My name is <strong>Wyndham</strong>
+		</p>
+    <p>
+      Specializing in fullstack apps development on all platform, 
+      my stack mostly consist of <strong>Mobile Development</strong> (Kotlin, Swift, React Native),
+      <strong>Backend Development</strong> (Golang, Hono), and
+      <strong>Frontend Development</strong> (React, Solid, Astro, Remix).
+		</p>
+		<p>
+			More on my resume <a href="/articles/m-wyndham-haryata-permana-sr-full-stack-engineer">here</a>.
+		</p>
+		<p>
+			Hit me up via
+			<a href="https://x.com/muhwyndham">Twitter</a>,
+      <a href="https://github.com/wyndhamharyata">Github</a>,
+			<a href="https://linkedin.com/in/mwyndham">LinkedIn</a> or
+			<a href="mailto:business@mwyndham.dev">Email</a> whenever you need help or just want to have some chit-chat!
 		</p>
 	</div>
 
+	<!-- Latest Articles Section -->
 	<div class="card bg-base-100 shadow-xl">
 		<div class="card-body">
-			<p class="text-lg">
-				This template serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p class="text-lg">
-				This template comes with a few integrations already configured in your
-				<code class="bg-base-300 px-2 py-1 rounded">astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations" class="text-primary hover:underline">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p class="text-lg">Here are a few ideas on how to get started with the template:</p>
-			<ul class="list-disc list-inside space-y-2 text-lg ml-4">
-				<li>Edit this page in <code class="bg-base-300 px-2 py-1 rounded">src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code class="bg-base-300 px-2 py-1 rounded">src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code class="bg-base-300 px-2 py-1 rounded">src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code class="bg-base-300 px-2 py-1 rounded">src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code class="bg-base-300 px-2 py-1 rounded">src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p class="text-lg mt-4">
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/" class="text-primary hover:underline">read the docs</a>
-				or <a href="https://astro.build/chat" class="text-primary hover:underline">join us on Discord</a> to ask questions.
-			</p>
+			<h2 class="text-2xl font-extrabold mb-6">Latest Articles</h2>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+				{
+					latestPosts.map((post) => (
+						<article>
+							<a href={`/articles/${post.id}/`} class="group block p-3 -m-3 rounded-box hover:bg-accent/10 transition-colors">
+								{post.data.heroImage && (
+									<Image
+										width={720}
+										height={360}
+										src={post.data.heroImage}
+										alt=""
+										class="w-full h-32 object-cover rounded-box mb-3"
+									/>
+								)}
+								<h3 class="text-lg font-extrabold group-hover:text-primary transition-colors">
+									{post.data.title}
+								</h3>
+								<p class="text-base-content/70 text-sm mt-1">
+									<FormattedDate date={post.data.pubDate} />
+								</p>
+							</a>
+						</article>
+					))
+				}
+			</div>
+			<div class="mt-6 text-center">
+				<a href="/articles" class="text-primary hover:underline font-extrabold">
+					View all articles →
+				</a>
+			</div>
 		</div>
 	</div>
 </BaseLayout>

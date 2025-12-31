@@ -99,3 +99,4 @@ html {
 .htmx-request #htmx-indicator > div {
     animation: htmx-progress 0.8s ease-out forwards;
 }
+
