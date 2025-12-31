@@ -4,7 +4,7 @@ import sitemap from '@astrojs/sitemap';
 import cloudflare from '@astrojs/cloudflare';
 import preact from '@astrojs/preact';
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'astro/config';
+import { defineConfig, envField } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
@@ -23,4 +23,18 @@ export default defineConfig({
 	vite: {
 		plugins: [tailwindcss()],
 	},
+  env: {
+      schema: {
+        LIBSQL_URL: envField.string({
+          context: "server",
+          access: "secret",
+          optional: true,  // optional since SST is primary
+        }),
+        LIBSQL_AUTH_TOKEN: envField.string({
+          context: "server",
+          access: "secret",
+          optional: true,
+        }),
+      },
+    },
 });

@@ -20,6 +20,11 @@ export default $config({
           ? "read.mwyndham.dev"
           : "devread.mwyndham.dev",
       link: [libsqlUrl, libsqlAuthToken],
+      environment: {
+        LIBSQL_URL: libsqlUrl.value,
+        LIBSQL_AUTH_TOKEN: libsqlAuthToken.value
+      },
+      dev: false
     });
   },
 });
