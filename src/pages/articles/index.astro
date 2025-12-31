@@ -2,6 +2,7 @@
 import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import ArticleThumbnail from "../../components/articles/ArticleThumbnail.astro";
 import FormattedDate from "../../components/FormattedDate.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
 
@@ -19,30 +20,12 @@ const posts = (await getCollection("blog")).sort(
       <div class="grid grid-cols-1 gap-x-6 gap-y-2 md:grid-cols-2 lg:grid-cols-3">
         {
           posts.map((post, index) => (
-            <article
-              class={`py-4 ${index < posts.length - 1 ? "border-base-300 border-b md:border-b-0" : ""}`}
-            >
-              <a
-                href={`/articles/${post.id}/`}
-                class="group rounded-box hover:bg-accent/10 -m-3 block p-3 transition-colors"
-              >
-                {post.data.heroImage && (
-                  <Image
-                    width={720}
-                    height={360}
-                    src={post.data.heroImage}
-                    alt=""
-                    class="rounded-box mb-3 h-32 w-full object-cover"
-                  />
-                )}
-                <h2 class="group-hover:text-primary text-lg font-extrabold transition-colors">
-                  {post.data.title}
-                </h2>
-                <p class="text-base-content/70 mt-1 text-sm">
-                  <FormattedDate date={post.data.pubDate} />
-                </p>
-              </a>
-            </article>
+            <ArticleThumbnail
+              withVerticalGap={true}
+              post={post}
+              index={index}
+              totalPost={posts.length}
+            />
           ))
         }
       </div>

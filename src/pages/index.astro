@@ -2,7 +2,7 @@
 import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import FormattedDate from "../components/FormattedDate.astro";
+import ArticleThumbnail from "../components/articles/ArticleThumbnail.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 
 export const prerender = true;
@@ -47,30 +47,8 @@ const latestPosts = (await getCollection("blog"))
       <h2 class="mb-6 text-2xl font-extrabold">Latest Articles</h2>
       <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
         {
-          latestPosts.map((post) => (
-            <article>
-              <a
-                href={`/articles/${post.id}/`}
-                class="group rounded-box hover:bg-accent/10 -m-3 block p-3 transition-colors"
-              >
-                {post.data.heroImage && (
-                  <Image
-                    loading="eager"
-                    width={720}
-                    height={360}
-                    src={post.data.heroImage}
-                    alt=""
-                    class="rounded-box mb-3 h-32 w-full object-cover"
-                  />
-                )}
-                <h3 class="group-hover:text-primary text-lg font-extrabold transition-colors">
-                  {post.data.title}
-                </h3>
-                <p class="text-base-content/70 mt-1 text-sm">
-                  <FormattedDate date={post.data.pubDate} />
-                </p>
-              </a>
-            </article>
+          latestPosts.map((post, index) => (
+            <ArticleThumbnail post={post} index={index} totalPost={latestPosts.length} />
           ))
         }
       </div>
