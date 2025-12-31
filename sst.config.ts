@@ -26,6 +26,25 @@ export default $config({
         GEMINI_API_KEY: geminiApiKey.value,
       },
       dev: false,
+      transform: {
+        server(args, _opts, _name) {
+          args.transform = {
+            ...args.transform,
+            worker(args, _opts, _name) {
+              args.observability = {
+                enabled: false,
+                headSamplingRate: 1,
+                logs: {
+                  enabled: true,
+                  headSamplingRate: 1,
+                  persist: true,
+                  invocationLogs: true,
+                },
+              };
+            },
+          };
+        },
+      },
     });
 
     // Cron job for AI comment moderation (every 10 minutes)
