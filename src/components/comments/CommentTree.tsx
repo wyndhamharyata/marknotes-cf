@@ -32,6 +32,7 @@ export default function CommentTree({ comments: initialComments, articleSlug }: 
   const [collapsedIds, setCollapsedIds] = useState<Set<number>>(new Set());
   const [activeReplyId, setActiveReplyId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<{ parentId: number | null; message: string } | null>(null);
 
   const toggleCollapse = (id: number) => {
     setCollapsedIds((prev) => {
@@ -49,8 +50,9 @@ export default function CommentTree({ comments: initialComments, articleSlug }: 
     setActiveReplyId(id);
   };
 
-  const submitComment = async (message: string, parentId: number | null) => {
+  const submitComment = async (message: string, parentId: number | null): Promise<boolean> => {
     setIsSubmitting(true);
+    setFormError(null);
     try {
       const res = await fetch("/api/comments/create", {
         method: "POST",
@@ -75,21 +77,31 @@ export default function CommentTree({ comments: initialComments, articleSlug }: 
           setComments((prev) => addToParent(prev, parentId, newNode));
         }
         setActiveReplyId(null);
+        return true;
       } else {
         const errorData = await res.json();
-        alert(errorData.error || "Failed to post comment");
+        setFormError({ parentId, message: errorData.error || "Failed to post comment" });
+        return false;
       }
     } catch (err) {
       console.error("Failed to submit comment:", err);
-      alert("Failed to post comment. Please try again.");
+      setFormError({ parentId, message: "Failed to post comment. Please try again." });
+      return false;
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const clearFormError = () => setFormError(null);
+
   return (
     <div>
-      <CommentForm onSubmit={(msg) => submitComment(msg, null)} isSubmitting={isSubmitting} />
+      <CommentForm
+        onSubmit={(msg) => submitComment(msg, null)}
+        isSubmitting={isSubmitting}
+        error={formError?.parentId === null ? formError.message : undefined}
+        onMessageChange={clearFormError}
+      />
       <div class="divider"></div>
       {comments.length === 0 ? (
         <p class="text-base-content/50 py-4 text-center italic">No comments yet. Be the first!</p>
@@ -105,6 +117,8 @@ export default function CommentTree({ comments: initialComments, articleSlug }: 
             onOpenReply={openReplyForm}
             onSubmitReply={(msg, pid) => submitComment(msg, pid)}
             isSubmitting={isSubmitting}
+            formError={formError}
+            onClearError={clearFormError}
           />
         ))
       )}

@@ -9,8 +9,10 @@ interface CommentItemProps {
   activeReplyId: number | null;
   onToggleCollapse: (id: number) => void;
   onOpenReply: (id: number | null) => void;
-  onSubmitReply: (message: string, parentId: number) => void;
+  onSubmitReply: (message: string, parentId: number) => Promise<boolean>;
   isSubmitting: boolean;
+  formError: { parentId: number | null; message: string } | null;
+  onClearError: () => void;
 }
 
 function formatDate(dateStr: string): string {
@@ -45,6 +47,8 @@ export default function CommentItem({
   onOpenReply,
   onSubmitReply,
   isSubmitting,
+  formError,
+  onClearError,
 }: CommentItemProps) {
   const hasChildren = comment.children.length > 0;
   const isCollapsed = collapsedIds.has(comment.id);
@@ -96,6 +100,8 @@ export default function CommentItem({
               isSubmitting={isSubmitting}
               isReply={true}
               onCancel={() => onOpenReply(null)}
+              error={formError?.parentId === comment.id ? formError.message : undefined}
+              onMessageChange={onClearError}
             />
           )}
         </div>
@@ -114,6 +120,8 @@ export default function CommentItem({
               onOpenReply={onOpenReply}
               onSubmitReply={onSubmitReply}
               isSubmitting={isSubmitting}
+              formError={formError}
+              onClearError={onClearError}
             />
           ))}
         </div>

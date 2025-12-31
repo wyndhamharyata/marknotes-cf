@@ -22,9 +22,8 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   const trimmedMessage = replyBody.trim();
 
-  const moderationStatus = hasProfanity(trimmedMessage)
-    ? ModerationStatus.DANGEROUS
-    : ModerationStatus.UNVERIFIED;
+  // Profanity is now rejected in assertValidRequest, so all comments reaching here are clean
+  const moderationStatus = ModerationStatus.UNVERIFIED;
 
   const newId = await createCommentWithModeration(
     {
@@ -63,6 +62,10 @@ const assertValidRequest = (replyBody: string, articleSlug: string) => {
 
   if (!articleSlug) {
     err = "Article slug is required";
+  }
+
+  if (!err && hasProfanity(replyBody.trim())) {
+    err = "Your comment contains inappropriate language. Please revise and try again.";
   }
 
   if (!!err && err.trim() !== "") {

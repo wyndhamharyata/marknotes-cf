@@ -1,10 +1,12 @@
 import { useState } from "preact/hooks";
 
 interface CommentFormProps {
-  onSubmit: (message: string) => void;
+  onSubmit: (message: string) => Promise<boolean>;
   isSubmitting: boolean;
   isReply?: boolean;
   onCancel?: () => void;
+  error?: string;
+  onMessageChange?: () => void;
 }
 
 export default function CommentForm({
@@ -12,29 +14,39 @@ export default function CommentForm({
   isSubmitting,
   isReply = false,
   onCancel,
+  error,
+  onMessageChange,
 }: CommentFormProps) {
   const [message, setMessage] = useState("");
 
-  const handleSubmit = (e: Event) => {
+  const handleSubmit = async (e: Event) => {
     e.preventDefault();
     if (message.trim()) {
-      onSubmit(message.trim());
-      setMessage("");
+      const success = await onSubmit(message.trim());
+      if (success) {
+        setMessage("");
+      }
     }
+  };
+
+  const handleInput = (e: Event) => {
+    setMessage((e.target as HTMLTextAreaElement).value);
+    onMessageChange?.();
   };
 
   return (
     <form onSubmit={handleSubmit} class={isReply ? "mt-3" : "mb-2"}>
       <div class="form-control">
         <textarea
-          class="textarea textarea-bordered w-full"
+          class={`textarea textarea-bordered w-full ${error ? "textarea-error" : ""}`}
           placeholder={isReply ? "Write a reply..." : "Write a comment..."}
           rows={isReply ? 2 : 3}
           value={message}
-          onInput={(e) => setMessage((e.target as HTMLTextAreaElement).value)}
+          onInput={handleInput}
           required
           disabled={isSubmitting}
         />
+        {error && <p class="text-error text-sm mt-1">{error}</p>}
       </div>
       <div class="mt-2 flex justify-end gap-2">
         {isReply && onCancel && (
