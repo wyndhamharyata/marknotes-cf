@@ -6,10 +6,11 @@ interface Props {
 	alt: string;
 	width?: number;
 	height?: number;
-	caption?: string;
+  caption?: string;
+  loading?: 'lazy' | 'eager' | null | undefined;
 }
 
-const { src, alt, width = 800, height = 600, caption } = Astro.props;
+const { src, alt, width = 800, height = 600, caption, loading = 'lazy' } = Astro.props;
 ---
 
 <figure class="my-6">
@@ -19,7 +20,7 @@ const { src, alt, width = 800, height = 600, caption } = Astro.props;
 		width={width}
 		height={height}
 		class="rounded-lg shadow-md mx-auto"
-		loading="lazy"
+    loading={loading}
 	/>
 	{caption && (
 		<figcaption class="text-center text-sm text-base-content/70 mt-2 italic">

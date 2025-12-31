@@ -14,7 +14,7 @@ const { title, description, pubDate, updatedDate, heroImage, slug } = Astro.prop
 	<article class="card bg-base-100 shadow-xl">
 		{heroImage && (
 			<figure>
-				<Image width={1020} height={510} src={heroImage} alt="" class="w-full max-h-64 object-cover" />
+				<Image loading='eager' height={510} src={heroImage} alt="" class="w-full max-h-64 object-cover" />
 			</figure>
 		)}
 		<div class="card-body">
