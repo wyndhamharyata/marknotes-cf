@@ -1,6 +1,8 @@
 import type { APIRoute } from "astro";
-import { createComment } from "../../../lib/comments/repository";
+import { createCommentWithModeration } from "../../../lib/comments/repository";
 import { getOrCreateAlias } from "../../../lib/comments/diceware";
+import { ModerationStatus } from "../../../lib/comments/types";
+import { hasProfanity } from "../../../lib/moderation/profanity-filter";
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   const formData = await request.formData();
@@ -8,52 +10,65 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   const replyBody = formData.get("replyBody") as string;
   const parentIdStr = formData.get("parentId") as string;
 
-  // Validation
-  if (!replyBody?.trim()) {
-    return new Response(
-      JSON.stringify({ error: "Comment body cannot be empty" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
-    );
+  const assertionErr = assertValidRequest(replyBody, articleSlug);
+  if (!!assertionErr) {
+    return assertionErr;
   }
 
-  if (!articleSlug) {
-    return new Response(
-      JSON.stringify({ error: "Article slug is required" }),
-      { status: 400, headers: { "Content-Type": "application/json" } }
-    );
-  }
-
-  // Get or create alias from cookie
   const alias = getOrCreateAlias(cookies);
 
-  // Parse parentId
-  const parentId = parentIdStr && parentIdStr !== "0" && parentIdStr !== ""
-    ? parseInt(parentIdStr, 10)
-    : null;
+  const parentId =
+    parentIdStr && parentIdStr !== "0" && parentIdStr !== "" ? parseInt(parentIdStr, 10) : null;
 
-  // Create comment and get the new ID
-  const newId = await createComment({
-    articleSlug,
-    message: replyBody.trim(),
-    alias,
-    parentId,
-  });
+  const trimmedMessage = replyBody.trim();
 
-  // Return the new comment as JSON
+  const moderationStatus = hasProfanity(trimmedMessage)
+    ? ModerationStatus.DANGEROUS
+    : ModerationStatus.UNVERIFIED;
+
+  const newId = await createCommentWithModeration(
+    {
+      articleSlug,
+      message: trimmedMessage,
+      alias,
+      parentId,
+    },
+    moderationStatus
+  );
+
   return new Response(
     JSON.stringify({
       success: true,
       comment: {
         id: newId,
-        message: replyBody.trim(),
+        message: trimmedMessage,
         alias,
         parentId,
         articleSlug,
         createdAt: new Date().toISOString(),
-        moderationStatus: 0, // New comments are unverified
+        moderationStatus,
         hidePublicity: false,
       },
     }),
     { status: 201, headers: { "Content-Type": "application/json" } }
   );
+};
+
+const assertValidRequest = (replyBody: string, articleSlug: string) => {
+  let err: string | null = null;
+
+  if (!replyBody?.trim()) {
+    err = "Comment body cannot be empty";
+  }
+
+  if (!articleSlug) {
+    err = "Article slug is required";
+  }
+
+  if (!!err && err.trim() !== "") {
+    return new Response(JSON.stringify({ error: err }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 };

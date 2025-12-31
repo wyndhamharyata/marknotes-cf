@@ -71,6 +71,7 @@ A focused guide on how a CMS can trigger static site regeneration in Astro when 
 6. Copy the generated webhook URL
 
 The URL looks like:
+
 ```
 https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/xxxxxxxx
 ```
@@ -78,10 +79,12 @@ https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/xxxxxxxx
 ### Other Platforms
 
 **Vercel:**
+
 - Project Settings → Git → Deploy Hooks
 - URL format: `https://api.vercel.com/v1/integrations/deploy/prj_xxx/yyy`
 
 **Netlify:**
+
 - Site Settings → Build & deploy → Build hooks
 - URL format: `https://api.netlify.com/build_hooks/xxx`
 
@@ -111,7 +114,7 @@ async function onPublish(postId: string) {
 
   // 3. Return success
   return {
-    message: "Published! Site will update in ~2 minutes."
+    message: "Published! Site will update in ~2 minutes.",
   };
 }
 ```
@@ -228,9 +231,7 @@ export default $config({
     const domain = new cloudflare.PagesDomain("MaxDomain", {
       accountId: process.env.CLOUDFLARE_DEFAULT_ACCOUNT_ID!,
       projectName: site.name,
-      name: $app.stage === "production"
-        ? "read.mwyndham.dev"
-        : "devread.mwyndham.dev",
+      name: $app.stage === "production" ? "read.mwyndham.dev" : "devread.mwyndham.dev",
     });
 
     return { url: domain.name, projectName: site.name };
@@ -257,18 +258,21 @@ git push origin release-production  # Triggers Cloudflare Pages build
 ## Implementation Checklist
 
 ### Infrastructure Setup
+
 - [ ] Add `CLOUDFLARE_DEFAULT_ACCOUNT_ID` to local `.env`
 - [ ] Run `sst deploy` to create the Pages project
 - [ ] Create `release-production` branch and push to origin
 - [ ] Verify Cloudflare Pages dashboard shows the connected repo
 
 ### Deploy Hook Setup
+
 - [ ] Go to Cloudflare Dashboard → Pages → marknotes-{stage}
 - [ ] Navigate to Settings → Builds & Deployments → Deploy Hooks
 - [ ] Create hook named "CMS Publish"
 - [ ] Store webhook URL as `CLOUDFLARE_DEPLOY_HOOK` env var (server-side only)
 
 ### CMS Integration
+
 - [ ] Implement publish function that saves to DB then triggers hook
 - [ ] Add error handling for failed rebuild triggers
 - [ ] Show user feedback about rebuild status

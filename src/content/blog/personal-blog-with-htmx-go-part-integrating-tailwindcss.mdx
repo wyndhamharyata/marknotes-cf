@@ -1,17 +1,17 @@
 ---
 title: "Personal Blog with HTMX + Go: Part 2 - Integrating TailwindCSS"
 description: "A tutorial on integrating TailwindCSS into a Go + HTMX project, covering CLI setup, configuration, and serving CSS files."
-pubDate: 'Oct 18 2023'
-heroImage: '../../assets/hero-personal-blog-with-htmx-go-part-integrating-tailwindcss.png'
+pubDate: "Oct 18 2023"
+heroImage: "../../assets/hero-personal-blog-with-htmx-go-part-integrating-tailwindcss.png"
 ---
 
-import BlogImage from '../../components/BlogImage.astro';
+import BlogImage from "../../components/BlogImage.astro";
 
 This is the second part in my journey documenting my effort creating personal blog (which you can access [here](https://mwyndham.dev)). You can read the previous part [here](https://mwyndham.dev/articles/personal-blog-with-htmx-go-part-golang-templating) or the Medium version instead [here](https://mwyndham.medium.com/this-blogpost-also-posted-in-my-personal-blog-which-you-can-access-here-dd856c61001).
 
 ## Our Goal This Time
 
-Previously, we've manage to create a simple interactive elements with  HTMX, this time, as promised, I would start integrating TailwindCSS  into the processs. I will assume you have the code of the previous  blogpost so this will continues directly from that.
+Previously, we've manage to create a simple interactive elements with HTMX, this time, as promised, I would start integrating TailwindCSS into the processs. I will assume you have the code of the previous blogpost so this will continues directly from that.
 
 ## Short Intro on How Tailwind Works
 
@@ -26,13 +26,13 @@ The basics of how tailwind can work in a Go project consists of these elements:
 
 requires `npm` and `npx` in the development PC. It was not required during deployment though.
 
-This is how we mostly interact with tailwind. It's job is basically  to scan through the files that we dictates as the source, then tries to  find the predefined tailwindcss classes by using pattern matching.
+This is how we mostly interact with tailwind. It's job is basically to scan through the files that we dictates as the source, then tries to find the predefined tailwindcss classes by using pattern matching.
 
 Once it finds the matching classes, it will then adds the correct css class with all of it's properties into the output `.css` file we want. We then can just include this output css class into our HTML to render the css.
 
 ### tailwind.config.js
 
-This is the configuration file where we dictates how tailwind works  in the particular project we're in. Here we need to define the Path  & Pattern where we store our html files for tailwind to scan. More  on that Later.
+This is the configuration file where we dictates how tailwind works in the particular project we're in. Here we need to define the Path & Pattern where we store our html files for tailwind to scan. More on that Later.
 
 ## Setting up Tailwind Into Our Project
 
@@ -56,7 +56,7 @@ Next, we need to initiate tailwind in our project. To do this you only need to r
 npx tailwindcss init
 ```
 
-Just make sure that your terminal is currently lives in the project  directory you want to work on. Or else, it will just initiate wherever  your terminal currently running on.
+Just make sure that your terminal is currently lives in the project directory you want to work on. Or else, it will just initiate wherever your terminal currently running on.
 
 After running this terminal command, it will creates new file called `tailwind.config.js` that usually going to look like this:
 
@@ -82,7 +82,7 @@ The config as it is is alright, but we need to modify one thing. Let's assume yo
 	- main.go
 ```
 
-If we follow the structure above, we're saving our `*.html`  files in the public directory. So we need to tell tailwind that there  is the place it should look for files to parse the classes.
+If we follow the structure above, we're saving our `*.html` files in the public directory. So we need to tell tailwind that there is the place it should look for files to parse the classes.
 
 To do that, modify the `content` section in the config above into this:
 
@@ -95,7 +95,7 @@ module.exports = {
 ...
 ```
 
-Which is basically telling  tailwind to find every subdirectory of `/public` (hence the `/**`), and look for any file that has `.html` extension (`/*.html`).
+Which is basically telling tailwind to find every subdirectory of `/public` (hence the `/**`), and look for any file that has `.html` extension (`/*.html`).
 
 ### (Optional) Add VSCode Extensions
 
@@ -103,9 +103,9 @@ There are 2 extensions in VSCode that will makes our life better when dealing wi
 
 - [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)
 - [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)\
-   These 2 things are works in tandem, as TailwindCSS IntelliSense will  gives us the autocompletion things in tailwind which is very important  as the pre-defined classes in tailwind is a lot.
+   These 2 things are works in tandem, as TailwindCSS IntelliSense will gives us the autocompletion things in tailwind which is very important as the pre-defined classes in tailwind is a lot.
 
-Prettier on the other hand will automatically sort our css classes in  the order that is consistent with Tailwind's own class definition,  which makes bulk rename of classes easier if you have multiple elements  that has the same css class structure.
+Prettier on the other hand will automatically sort our css classes in the order that is consistent with Tailwind's own class definition, which makes bulk rename of classes easier if you have multiple elements that has the same css class structure.
 
 Both handles that by default so all you need to do is install it and you will immediately able to use it.
 
@@ -119,7 +119,7 @@ Alternatively, You can use [Diagnostic Language Server](https://github.com/iamcc
 
 ### Creates Our Primary CSS File
 
-While not required, we may want to have custom css classes our own to  handle several unique casses that tailwind may not able to solve  easily.
+While not required, we may want to have custom css classes our own to handle several unique casses that tailwind may not able to solve easily.
 
 To do that, first we create new directory, let say, `dist` where we would put our statically serveable files for our blog. After that, let's create a new `main.css` file:
 
@@ -139,7 +139,7 @@ Which then should creates a new `main.css` file that contains several informatio
 
 ### Compiling the Output
 
-After all of the configuration is done, now we need to test whether  our configurations will output the correct tailwind css output or not.  To compile, we can call this function:
+After all of the configuration is done, now we need to test whether our configurations will output the correct tailwind css output or not. To compile, we can call this function:
 
 ```
 npx tailwindcss -i ./dist/main.css -o ./dist/tailwind.css
@@ -148,7 +148,7 @@ npx tailwindcss -i ./dist/main.css -o ./dist/tailwind.css
 If you're familiar enough with any tools, it's pretty clear what happened here:
 
 - set the input file to be `main.css` in the `/dist` directory
-- set the output file to be `tailwind.css`  in the `/dist` directory
+- set the output file to be `tailwind.css` in the `/dist` directory
 
 If all things well, you will see a new `tailwind.css` file in the `/dist` directory, and roughly look like this at the top:
 
@@ -162,9 +162,9 @@ If all things well, you will see a new `tailwind.css` file in the `/dist` direct
 
 With this, all of the setup related to TailwindCSS is complete, we can start using it in our go project.
 
-*Note: For easier time in compiliing tailwind css, you may want to use* `--watch` flag to makes the tailwindcss cli keep alive and watching changes from our code.
+_Note: For easier time in compiliing tailwind css, you may want to use_ `--watch` flag to makes the tailwindcss cli keep alive and watching changes from our code.
 
-*I will revisit the whole build process in the later part, like  using auto hot reload tools and makes tailwind be part of that instead  of separate watcher.*
+_I will revisit the whole build process in the later part, like using auto hot reload tools and makes tailwind be part of that instead of separate watcher._
 
 ### Serving CSS Files
 
@@ -184,8 +184,8 @@ Next, we need to point to our css file in our html file. In this example I will 
 
 ```html
 <head>
-<link rel="stylesheet" href="/dist/tailwind.css" />
-<!-- other head elements here -->
+  <link rel="stylesheet" href="/dist/tailwind.css" />
+  <!-- other head elements here -->
 </head>
 ```
 
@@ -215,7 +215,10 @@ npx tailwindcss -i ./dist/main.css -o ./dist/tailwind.css
 
 Now let's run our code and we should have this as the output:
 
-<BlogImage src="https://resource.mwyndham.dev/0-9-sddddd-20240405042910-20240411005630.png" alt="Image of web with tailwind applied" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-9-sddddd-20240405042910-20240411005630.png"
+  alt="Image of web with tailwind applied"
+/>
 
 Good!
 
@@ -223,10 +226,11 @@ Good!
 
 With this, the setting up TailwindCSS is complete. We made it works pretty flawlessly with our `Go` template file and renders the output properly.
 
-In the next part, we will start to creates the whole thing about blogging in the first place: **Markdown Editor**.  It would not reusing existing WYSIWYG editors out there like `CkEditor` or any Javascript-based Markdown Editor.
+In the next part, we will start to creates the whole thing about blogging in the first place: **Markdown Editor**. It would not reusing existing WYSIWYG editors out there like `CkEditor` or any Javascript-based Markdown Editor.
 
-Instead, it will have fancy server side markdown rendering and has  realtime preview of our markdown codes. And this time, we will actually  uses HTMX to our advantage!
+Instead, it will have fancy server side markdown rendering and has realtime preview of our markdown codes. And this time, we will actually uses HTMX to our advantage!
 
 Seems exciting? please eagerly wait for the next part!
 
-<u>**#blogging**</u> <u>**#Golang**</u> <u>**#Tailwind Css**</u> <u>**#Htmx**</u> <u>**#static-site-renderring**</u> <u>**#series**</u>
+<u>**#blogging**</u> <u>**#Golang**</u> <u>**#Tailwind Css**</u> <u>**#Htmx**</u>
+<u>**#static-site-renderring**</u> <u>**#series**</u>

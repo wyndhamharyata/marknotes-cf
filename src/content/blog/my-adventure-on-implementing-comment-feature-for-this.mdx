@@ -1,21 +1,21 @@
 ---
 title: "My Adventure on Implementing Comment Feature for This Blog"
 description: "A deep dive into building a comment system with anonymous persistent profiles, AI-powered moderation using Gemini, and manual review tools."
-pubDate: 'Jun 11 2025'
-heroImage: '../../assets/hero-my-adventure-on-implementing-comment-feature-for-this.webp'
+pubDate: "Jun 11 2025"
+heroImage: "../../assets/hero-my-adventure-on-implementing-comment-feature-for-this.webp"
 ---
 
-import BlogImage from '../../components/BlogImage.astro';
+import BlogImage from "../../components/BlogImage.astro";
 
 I love this blog, it was my baby since it's inception and all of it's details were handmade. I made it from scratch during my adventure around HTMX + Golang and I fell in love with it since. It was my first and only "viral" site I have, and I've received many encouraging messages from readers along the years.
 
-It's been quite neglected in the past year though, as work that pays the bills piles up, then I'm on a diet *(its a big success! but story for another day)*, and I'm unable to spare time to deal with side projects, the site has stagnated from both from improvements but also articles.
+It's been quite neglected in the past year though, as work that pays the bills piles up, then I'm on a diet _(its a big success! but story for another day)_, and I'm unable to spare time to deal with side projects, the site has stagnated from both from improvements but also articles.
 
 Though recently, sudden changes in personal life has allow me to spare more time around, and I was thinking what improvement I would like to add? First I've upgraded the DaisyUI version to v5 (really good by the way), then fix some outstanding bugs, refactor codebase to be more inline to my style nowadays, and so on... but then I keep moving in circle.
 
 Until, one day (okay just slightly more than a week ago), I received an email by someone named Luke. He mention that maybe comment feature is something we can bring on board?
 
-And suddenly, a spark came to me. *"Hey, the past 2 years AI have made really good strides, maybe it's time for me to add comment section!"*.
+And suddenly, a spark came to me. _"Hey, the past 2 years AI have made really good strides, maybe it's time for me to add comment section!"_.
 
 ## Why AI?
 
@@ -23,21 +23,24 @@ Well, to state the obvious, the sole reason I haven't been holding myself accoun
 
 Though, to be frankly fair, the traffic for the site is nothing. At best I've got like few thousands reads per month and it was a year ago, now it hovers around 300-400 per month at best, and IDK how much of that is AI. So maybe I could just moderate everything myself still, but as old wisdom goes:
 
-> *But what is Software Engineer if not bunch of people that design a Scalable System for ZERO user?*
+> _But what is Software Engineer if not bunch of people that design a Scalable System for ZERO user?_
 >
 >                                                                                               *-Me*
 
-So, in the spirit of true Software Engineering, I present you my over-engineering effort to bring comment section to this site, ***applause please!***
+So, in the spirit of true Software Engineering, I present you my over-engineering effort to bring comment section to this site, **_applause please!_**
 
-## The *Architecture~ ™️*
+## The _Architecture~ ™️_
 
 ### Product Requirement!
 
 Now, when it comes to comment system, the things that I really wanted to have from the get go is **Thread**, and **Persistent Profile**.
 
-Thread is pretty self explanatory, I wanted so that people could reply to another comment, and have visual cues to indicates what people are referring to when discussing. It encourages people to communicate and made the place *alive\**~*** (well, as alive as ghost town goes).
+Thread is pretty self explanatory, I wanted so that people could reply to another comment, and have visual cues to indicates what people are referring to when discussing. It encourages people to communicate and made the place \*alive\*\*~\*\*\* (well, as alive as ghost town goes).
 
-<BlogImage src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_19.29.08-20250611122928.webp" alt="Thread" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_19.29.08-20250611122928.webp"
+  alt="Thread"
+/>
 
 Persistent Profile means that when someone comments more than once, they'll have the same handle name / identity that tracks conversation, so it looks more natural and back and forth could happened without each commenter needs to clarify that they're the same person.
 
@@ -47,13 +50,18 @@ But I don't want to deal with the hassle of securing Personal Info, I'm not a da
 
 Back to my best friend here, Luke. He mentioned that maybe we can start with just **Cookies**, and he's right!
 
-Next, I wanted to nail the looks. I remember the good old days of **Disqus**, and when every blog / news /  ~~pirated manga~~ site uses it. I have fond memories to how it looks, with profile picture, name, and body of the comment. Also have nested thread like Reddit, and people can reply with each other.
+Next, I wanted to nail the looks. I remember the good old days of **Disqus**, and when every blog / news / ~~pirated manga~~ site uses it. I have fond memories to how it looks, with profile picture, name, and body of the comment. Also have nested thread like Reddit, and people can reply with each other.
 
 <figure class="my-6">
-  <img src="https://media.disquscdn.com/upvoted-comment-disqus.png" alt="New Connections via Disqus. But Only If You Want To." class="rounded-lg shadow-md mx-auto" loading="lazy" />
+  <img
+    src="https://media.disquscdn.com/upvoted-comment-disqus.png"
+    alt="New Connections via Disqus. But Only If You Want To."
+    class="mx-auto rounded-lg shadow-md"
+    loading="lazy"
+  />
 </figure>
 
-I wanted to have that, but having profile picture and name means I also needs to deal one highest blocker where user retention dropped: ***FORMS****.* I don't want to burden my happy reader to leave a comment with having to deal with names, let alone uploading a picture.
+I wanted to have that, but having profile picture and name means I also needs to deal one highest blocker where user retention dropped: **\*FORMS\*\***.\* I don't want to burden my happy reader to leave a comment with having to deal with names, let alone uploading a picture.
 
 Having image bank to pull randomly also doesn't sounds very nice, too much hassle for me, the one implementing it.
 
@@ -72,7 +80,10 @@ Both libraries compliments each other very well! and with Cookies, now I can hav
 
 Long story short, this is what I came up with:
 
-<BlogImage src="https://resource.mwyndham.dev/0-Comment_Flow(1)-20250611125739.webp" alt="Comment Flow" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-Comment_Flow(1)-20250611125739.webp"
+  alt="Comment Flow"
+/>
 
 Pretty neat, right! with simple single cookie I can have both anonymous but also persistent profile that reader can uses to comments across the site. No more dealing with Personal Info, and no need to store image anywhere.
 
@@ -80,15 +91,18 @@ Profile picture is generated on each comment render on the fly. But with the sam
 
 Now that all the ingredients is here, let's cook things up and see what we got:
 
-<BlogImage src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_20.09.37-20250611130956.webp" alt="Sample of the Comment Feature" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_20.09.37-20250611130956.webp"
+  alt="Sample of the Comment Feature"
+/>
 
 Not bad! We got all the basics right. It also has collapsible thread by cheating a little bit using DaisyUI's menu component. It has drawbacks such as text can't be selected and every click event will trigger annoying background blip. But overall it's looking pretty slick!
 
-Now you may notice the *"Comment deleted by Admin"* in the image above, and that's clue for the next section.
+Now you may notice the _"Comment deleted by Admin"_ in the image above, and that's clue for the next section.
 
 ### Moderation 🫠
 
-Ohh boy, here we go. Moderation took double the time for me to implement than the comment input itself, and still it's incomplete as of the writing of this article. *But I digress,* now let's focus on 2 aspect of moderation that we need to deal with.
+Ohh boy, here we go. Moderation took double the time for me to implement than the comment input itself, and still it's incomplete as of the writing of this article. _But I digress,_ now let's focus on 2 aspect of moderation that we need to deal with.
 
 On every User Generated Content (UCG) processes, there's 2 place where we can apply moderation: at creation date, and sometimes in the future.
 
@@ -102,7 +116,10 @@ For this, I call another library to the rescue, this time I uses go-away: [https
 
 This one is relatively simple, and for now I set the filter to be relatively lenient. So straight up curses is prohibited, but leetspeak is fine! (example: `b!tch`). For immediate moderation like this, providing user feedback is the way to go, so this checks will return errors in user input when you're submitting curses.
 
-<BlogImage src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_20.57.58-20250611135808.webp" alt="curses example" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_20.57.58-20250611135808.webp"
+  alt="curses example"
+/>
 
 Neat! Other error messages will render the same as well, like say empty input, etc.
 
@@ -110,16 +127,22 @@ Neat! Other error messages will render the same as well, like say empty input, e
 
 Now onto the fun part! But before that, we need to define some rules on how moderation should work.
 
-<BlogImage src="https://resource.mwyndham.dev/0-Moderation_Type-20250611142601.webp" alt="moderation type" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-Moderation_Type-20250611142601.webp"
+  alt="moderation type"
+/>
 
 I divided the moderation into 4 Status: **Unmoderated, OK, Warning** and **Dangerous.**
 
 - **Unmoderated** means that it's new comment, and has not been auto-moderated yet. It will be part of the scheduled moderation.
 - **OK** means ok! it's normal comment, regular discussion and even civil disagreement. Free speech is respected here!
 - **Warning** means some key characteristics of comment that needed manual intervention, but otherwise okay for other to see. This include comment with URL / link, strong language but in context (example `yeah implementing auth is fu$king sucks`). Why URL? well I can't really trust AI to understood the contains of any URL so manual moderation is necessary.
-- **Dangerous** means anything that immediately harmful. Personal attack, hate speech, spam, anything goes. This category of comment will be hidden from other user but the trace of it will be visible with text *Comment hidden by Auto Moderation* in place instead.
+- **Dangerous** means anything that immediately harmful. Personal attack, hate speech, spam, anything goes. This category of comment will be hidden from other user but the trace of it will be visible with text _Comment hidden by Auto Moderation_ in place instead.
 
-<BlogImage src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_21.36.49-20250611143700.webp" alt="auto moderation example" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_21.36.49-20250611143700.webp"
+  alt="auto moderation example"
+/>
 
 The image above shows how auto-moderated dangerous comment will look to end user! let me know what you think!
 
@@ -157,23 +180,38 @@ If you're curious how I do it, just go over to the repository for this blog, it'
 
 As good as any AI moderation goes, using it in moderation (heh) is important. I still needs to occasionally review things myself, and for that I need good interface. I use Vercel's [v0.dev](http://v0.dev) to do some design mocking for me, this is what it gives me after several iteration:
 
-<BlogImage src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_22.48.18-20250611154946.webp" alt="v0 moderation" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_22.48.18-20250611154946.webp"
+  alt="v0 moderation"
+/>
 
 Taking it as my inspiration, and some sensible design tweaking, I made it work surprisingly well! It's still unfinished, like missing filter, search, and overall statistics, but it's functional and I can do simple moderation work here. Take a look!
 
-<BlogImage src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_22.50.53-20250611155212.webp" alt="comment moderation" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_22.50.53-20250611155212.webp"
+  alt="comment moderation"
+/>
 
-<BlogImage src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_22.50.59-20250611155232.webp" alt="comment moderation 2" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_22.50.59-20250611155232.webp"
+  alt="comment moderation 2"
+/>
 
 If a comment is replying to other comment, we can see the snippets of the parent comment on the "Replying To" section. This helps a lot when I need to do some skimming. A simple colored bar to indicate moderation status to the left also present.
 
-<BlogImage src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_22.57.25-20250611155740.webp" alt="reply context" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_22.57.25-20250611155740.webp"
+  alt="reply context"
+/>
 
 And if I need more information, I can always click onto the comment itself and shows the entire context: meaning the parent comment it replying to, and all immediate replies that this comment has.
 
-<BlogImage src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_22.59.55-20250611160008.webp" alt="detail dialog" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-Screenshot_2025-06-11_at_22.59.55-20250611160008.webp"
+  alt="detail dialog"
+/>
 
-If I were to click *"Mark as Safe"* it will change the moderation status to OK. And if I were to click delete, then it'll show the deleted by admin message you see few section ago!
+If I were to click _"Mark as Safe"_ it will change the moderation status to OK. And if I were to click delete, then it'll show the deleted by admin message you see few section ago!
 
 ## Conclusion
 
@@ -181,4 +219,5 @@ And that's conclude my ramblings about how I implement comment, auto-moderation,
 
 Thanks!!
 
-<u>**#Golang**</u> <u>**#HTMX.**</u> <u>**#ShowAndTell**</u> <u>**#Comment**</u> <u>**#Moderation**</u>
+<u>**#Golang**</u> <u>**#HTMX.**</u> <u>**#ShowAndTell**</u> <u>**#Comment**</u>
+<u>**#Moderation**</u>

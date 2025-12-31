@@ -1,49 +1,62 @@
 ---
-import { Image } from 'astro:assets';
-import type { CollectionEntry } from 'astro:content';
-import BaseLayout from './BaseLayout.astro';
-import FormattedDate from '../components/FormattedDate.astro';
-import CommentSection from '../components/comments/CommentSection.astro';
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "./BaseLayout.astro";
+import FormattedDate from "../components/FormattedDate.astro";
+import CommentSection from "../components/comments/CommentSection.astro";
 
-type Props = CollectionEntry<'blog'>['data'] & { slug: string };
+type Props = CollectionEntry<"blog">["data"] & { slug: string };
 
 const { title, description, pubDate, updatedDate, heroImage, slug } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} image={heroImage}>
-	<article class="card bg-base-100 shadow-xl">
-		{heroImage && (
-			<figure>
-				<Image loading='eager' height={510} src={heroImage} alt="" class="w-full max-h-64 object-cover" />
-			</figure>
-		)}
-		<div class="card-body">
-			<div class="text-center mb-6">
-				<p class="text-base-content/70 mb-2">
-					<FormattedDate date={pubDate} />
-					{updatedDate && (
-						<span class="italic">
-							{" "}| Updated: <FormattedDate date={updatedDate} />
-						</span>
-					)}
-				</p>
-				<h1 class="card-title text-3xl md:text-4xl font-extrabold justify-center">{title}</h1>
-				<div class="divider"></div>
-			</div>
-			<div class="prose prose-slate lg:prose-xl md:prose-lg max-w-none dark:prose-invert prose-pre:bg-slate-900 prose-pre:w-full prose-pre:text-white prose-em:text-secondary prose-strong:text-primary prose-strong:font-extrabold prose-a:font-extrabold prose-a:text-accent prose-a:brightness-90 prose-strong:brightness-50 prose-em:brightness-50 dark:prose-a:brightness-100 dark:prose-strong:brightness-100 dark:prose-em:brightness-100">
-				<slot />
-			</div>
-		</div>
-	</article>
+  <article class="card bg-base-100 shadow-xl">
+    {
+      heroImage && (
+        <figure>
+          <Image
+            loading="eager"
+            height={510}
+            src={heroImage}
+            alt=""
+            class="max-h-64 w-full object-cover"
+          />
+        </figure>
+      )
+    }
+    <div class="card-body">
+      <div class="mb-6 text-center">
+        <p class="text-base-content/70 mb-2">
+          <FormattedDate date={pubDate} />
+          {
+            updatedDate && (
+              <span class="italic">
+                {" "}
+                | Updated: <FormattedDate date={updatedDate} />
+              </span>
+            )
+          }
+        </p>
+        <h1 class="card-title justify-center text-3xl font-extrabold md:text-4xl">{title}</h1>
+        <div class="divider"></div>
+      </div>
+      <div
+        class="prose prose-slate lg:prose-xl md:prose-lg dark:prose-invert prose-pre:bg-slate-900 prose-pre:w-full prose-pre:text-white prose-em:text-secondary prose-strong:text-primary prose-strong:font-extrabold prose-a:font-extrabold prose-a:text-accent prose-a:brightness-90 prose-strong:brightness-50 prose-em:brightness-50 dark:prose-a:brightness-100 dark:prose-strong:brightness-100 dark:prose-em:brightness-100 max-w-none"
+      >
+        <slot />
+      </div>
+    </div>
+  </article>
 
-	<!-- Comment Section with Server Island for lazy loading -->
-	<CommentSection server:defer articleSlug={slug}>
-		<div slot="fallback" class="mt-8 card bg-base-100 shadow-xl">
-			<div class="card-body">
-				<h2 class="card-title text-2xl mb-4">Comments</h2>
-				<div class="skeleton h-24 w-full"></div>
-				<div class="skeleton h-16 w-full mt-4"></div>
-			</div>
-		</div>
-	</CommentSection>
+  <!-- Comment Section with Server Island for lazy loading -->
+  <CommentSection server:defer articleSlug={slug}>
+    <div slot="fallback" class="card bg-base-100 mt-8 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title mb-4 text-2xl">Comments</h2>
+        <div class="skeleton h-24 w-full"></div>
+        <div class="skeleton mt-4 h-16 w-full"></div>
+      </div>
+    </div>
+  </CommentSection>
 </BaseLayout>

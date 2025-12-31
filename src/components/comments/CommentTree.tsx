@@ -9,11 +9,7 @@ interface Props {
   userAlias: string;
 }
 
-function addToParent(
-  nodes: CommentNode[],
-  parentId: number,
-  newNode: CommentNode
-): CommentNode[] {
+function addToParent(nodes: CommentNode[], parentId: number, newNode: CommentNode): CommentNode[] {
   return nodes.map((node) => {
     if (node.id === parentId) {
       return {
@@ -31,10 +27,7 @@ function addToParent(
   });
 }
 
-export default function CommentTree({
-  comments: initialComments,
-  articleSlug,
-}: Props) {
+export default function CommentTree({ comments: initialComments, articleSlug }: Props) {
   const [comments, setComments] = useState<CommentNode[]>(initialComments);
   const [collapsedIds, setCollapsedIds] = useState<Set<number>>(new Set());
   const [activeReplyId, setActiveReplyId] = useState<number | null>(null);
@@ -96,15 +89,10 @@ export default function CommentTree({
 
   return (
     <div>
-      <CommentForm
-        onSubmit={(msg) => submitComment(msg, null)}
-        isSubmitting={isSubmitting}
-      />
+      <CommentForm onSubmit={(msg) => submitComment(msg, null)} isSubmitting={isSubmitting} />
       <div class="divider"></div>
       {comments.length === 0 ? (
-        <p class="text-base-content/50 italic text-center py-4">
-          No comments yet. Be the first!
-        </p>
+        <p class="text-base-content/50 py-4 text-center italic">No comments yet. Be the first!</p>
       ) : (
         comments.map((comment) => (
           <CommentItem

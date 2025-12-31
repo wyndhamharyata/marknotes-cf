@@ -1,109 +1,123 @@
 ---
-import HeaderLink from './HeaderLink.astro';
-import MenuIcon from '../icons/menu.svg';
-import SunIcon from '../icons/sun.svg';
-import MoonIcon from '../icons/moon.svg';
+import HeaderLink from "./HeaderLink.astro";
+import MenuIcon from "../icons/menu.svg";
+import SunIcon from "../icons/sun.svg";
+import MoonIcon from "../icons/moon.svg";
 ---
 
-<div class="navbar bg-base-100 shadow-xl md:rounded-field mx-auto md:max-w-2xl mt-4 md:mt-5 relative">
-	<!-- Identity display - hidden until comment section loads -->
-	<div id="identity-display" class="absolute left-2 hidden md:hidden items-center gap-2 text-xs text-base-content/70">
-		<span>Viewing as:</span>
-		<span id="identity-alias" class="font-semibold text-primary"></span>
-	</div>
+<div
+  class="navbar bg-base-100 md:rounded-field relative mx-auto mt-4 shadow-xl md:mt-5 md:max-w-2xl"
+>
+  <!-- Identity display - hidden until comment section loads -->
+  <div
+    id="identity-display"
+    class="text-base-content/70 absolute left-2 hidden items-center gap-2 text-xs md:hidden"
+  >
+    <span>Viewing as:</span>
+    <span id="identity-alias" class="text-primary font-semibold"></span>
+  </div>
 
-	<!-- Mobile hamburger menu - only on mobile -->
-	<div class="flex-none md:hidden">
-		<div class="dropdown">
-			<div tabindex="0" role="button" class="btn btn-ghost btn-circle">
-				<MenuIcon class="h-5 w-5" />
-			</div>
-			<ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-				<li><a href="/" data-nav-link>Home</a></li>
-				<li><a href="/articles" data-nav-link>Blog</a></li>
-				<li><a href="/articles/m-wyndham-haryata-permana-sr-full-stack-engineer" data-nav-link>Resume</a></li>
-			</ul>
-		</div>
-	</div>
+  <!-- Mobile hamburger menu - only on mobile -->
+  <div class="flex-none md:hidden">
+    <div class="dropdown">
+      <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+        <MenuIcon class="h-5 w-5" />
+      </div>
+      <ul
+        tabindex="0"
+        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+      >
+        <li><a href="/" data-nav-link>Home</a></li>
+        <li><a href="/articles" data-nav-link>Blog</a></li>
+        <li>
+          <a href="/articles/m-wyndham-haryata-permana-sr-full-stack-engineer" data-nav-link
+            >Resume</a>
+        </li>
+      </ul>
+    </div>
+  </div>
 
-	<!-- Desktop nav - truly centered (full width) -->
-	<div class="hidden md:flex w-full justify-center">
-		<ul class="menu menu-horizontal px-1 gap-2">
-			<li><HeaderLink href="/">Home</HeaderLink></li>
-			<li><HeaderLink href="/articles">Blog</HeaderLink></li>
-			<li><HeaderLink href="/articles/m-wyndham-haryata-permana-sr-full-stack-engineer">Resume</HeaderLink></li>
-		</ul>
-	</div>
+  <!-- Desktop nav - truly centered (full width) -->
+  <div class="hidden w-full justify-center md:flex">
+    <ul class="menu menu-horizontal gap-2 px-1">
+      <li><HeaderLink href="/">Home</HeaderLink></li>
+      <li><HeaderLink href="/articles">Blog</HeaderLink></li>
+      <li>
+        <HeaderLink href="/articles/m-wyndham-haryata-permana-sr-full-stack-engineer"
+          >Resume</HeaderLink>
+      </li>
+    </ul>
+  </div>
 
-	<!-- Theme toggle - absolute positioned so it doesn't affect centering -->
-	<div class="absolute right-2">
-		<button class="btn btn-ghost btn-circle">
+  <!-- Theme toggle - absolute positioned so it doesn't affect centering -->
+  <div class="absolute right-2">
+    <button class="btn btn-ghost btn-circle">
       <label class="swap swap-rotate" for="dark-toggle">
         <span class="hidden">Theme Switcher</span>
-				<input type="checkbox" id="dark-toggle" class="theme-controller" />
-				<!-- Sun icon -->
-				<SunIcon class="swap-off fill-current w-6 h-6" />
-				<!-- Moon icon -->
-				<MoonIcon class="swap-on fill-current w-6 h-6" />
-			</label>
-		</button>
-	</div>
+        <input type="checkbox" id="dark-toggle" class="theme-controller" />
+        <!-- Sun icon -->
+        <SunIcon class="swap-off h-6 w-6 fill-current" />
+        <!-- Moon icon -->
+        <MoonIcon class="swap-on h-6 w-6 fill-current" />
+      </label>
+    </button>
+  </div>
 </div>
 
 <script>
-	function initTheme() {
-		const toggle = document.getElementById('dark-toggle') as HTMLInputElement;
-		if (!toggle) return;
+  function initTheme() {
+    const toggle = document.getElementById("dark-toggle") as HTMLInputElement;
+    if (!toggle) return;
 
-		// Check for saved preference or system preference
-		const savedTheme = localStorage.getItem('dark-mode');
-		const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-		const isDark = savedTheme === 'true' || (savedTheme === null && prefersDark);
+    // Check for saved preference or system preference
+    const savedTheme = localStorage.getItem("dark-mode");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isDark = savedTheme === "true" || (savedTheme === null && prefersDark);
 
-		// Set initial state
-		toggle.checked = isDark;
-		updateTheme(isDark);
+    // Set initial state
+    toggle.checked = isDark;
+    updateTheme(isDark);
 
-		// Listen for changes
-		toggle.addEventListener('change', () => {
-			const isDark = toggle.checked;
-			localStorage.setItem('dark-mode', String(isDark));
-			updateTheme(isDark);
-		});
-	}
+    // Listen for changes
+    toggle.addEventListener("change", () => {
+      const isDark = toggle.checked;
+      localStorage.setItem("dark-mode", String(isDark));
+      updateTheme(isDark);
+    });
+  }
 
-	function updateTheme(isDark: boolean) {
-		const html = document.documentElement;
-		if (isDark) {
-			html.classList.add('dark');
-			html.setAttribute('data-theme', 'sunset');
-		} else {
-			html.classList.remove('dark');
-			html.setAttribute('data-theme', 'marknotes-light');
-		}
-	}
+  function updateTheme(isDark: boolean) {
+    const html = document.documentElement;
+    if (isDark) {
+      html.classList.add("dark");
+      html.setAttribute("data-theme", "sunset");
+    } else {
+      html.classList.remove("dark");
+      html.setAttribute("data-theme", "marknotes-light");
+    }
+  }
 
-	// Run on initial load
-	initTheme();
+  // Run on initial load
+  initTheme();
 
-	// Re-run on htmx page swaps
-	document.addEventListener('htmx:afterSettle', initTheme);
+  // Re-run on htmx page swaps
+  document.addEventListener("htmx:afterSettle", initTheme);
 
-	// Listen for comment alias loaded event from CommentSection
-	function initIdentity() {
-		window.addEventListener('comment-alias-loaded', ((event: CustomEvent<{ alias: string }>) => {
-			const identityDisplay = document.getElementById('identity-display');
-			const identityAlias = document.getElementById('identity-alias');
+  // Listen for comment alias loaded event from CommentSection
+  function initIdentity() {
+    window.addEventListener("comment-alias-loaded", ((event: CustomEvent<{ alias: string }>) => {
+      const identityDisplay = document.getElementById("identity-display");
+      const identityAlias = document.getElementById("identity-alias");
 
-			if (identityDisplay && identityAlias && event.detail.alias) {
-				identityAlias.textContent = event.detail.alias;
-				identityDisplay.classList.remove('hidden');
-				identityDisplay.classList.add('flex');
-				identityDisplay.classList.remove('md:hidden');
-				identityDisplay.classList.add('md:flex');
-			}
-		}) as EventListener);
-	}
+      if (identityDisplay && identityAlias && event.detail.alias) {
+        identityAlias.textContent = event.detail.alias;
+        identityDisplay.classList.remove("hidden");
+        identityDisplay.classList.add("flex");
+        identityDisplay.classList.remove("md:hidden");
+        identityDisplay.classList.add("md:flex");
+      }
+    }) as EventListener);
+  }
 
-	initIdentity();
+  initIdentity();
 </script>

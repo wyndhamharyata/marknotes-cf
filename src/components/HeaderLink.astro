@@ -1,26 +1,22 @@
 ---
-import type { HTMLAttributes } from 'astro/types';
+import type { HTMLAttributes } from "astro/types";
 
-type Props = HTMLAttributes<'a'>;
+type Props = HTMLAttributes<"a">;
 
 const { href, class: className, ...props } = Astro.props;
 const pathname = Astro.url.pathname;
 // Normalize by removing trailing slashes for comparison
-const normHref = href?.toString().replace(/\/+$/, '') || '';
-const normPath = pathname.replace(/\/+$/, '');
+const normHref = href?.toString().replace(/\/+$/, "") || "";
+const normPath = pathname.replace(/\/+$/, "");
 // Exact match only
 const isActive = normHref === normPath;
 ---
 
 <a
-	href={href}
-	data-nav-link
-	class:list={[
-		"font-sono text-base px-4 py-2",
-		{ "btn btn-accent": isActive },
-		className
-	]}
-	{...props}
+  href={href}
+  data-nav-link
+  class:list={["font-sono px-4 py-2 text-base", { "btn btn-accent": isActive }, className]}
+  {...props}
 >
-	<slot />
+  <slot />
 </a>

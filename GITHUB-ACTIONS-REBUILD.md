@@ -58,8 +58,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -82,12 +82,12 @@ Add these secrets to your repository:
 1. Go to **GitHub → marknotes-cf → Settings → Secrets and variables → Actions**
 2. Add the following repository secrets:
 
-| Secret Name | Value |
-|-------------|-------|
-| `CLOUDFLARE_API_TOKEN` | Your Cloudflare API token |
+| Secret Name                     | Value                      |
+| ------------------------------- | -------------------------- |
+| `CLOUDFLARE_API_TOKEN`          | Your Cloudflare API token  |
 | `CLOUDFLARE_DEFAULT_ACCOUNT_ID` | Your Cloudflare account ID |
-| `LIBSQL_URL` | Your Turso database URL |
-| `LIBSQL_AUTH_TOKEN` | Your Turso auth token |
+| `LIBSQL_URL`                    | Your Turso database URL    |
+| `LIBSQL_AUTH_TOKEN`             | Your Turso auth token      |
 
 ---
 
@@ -123,16 +123,16 @@ async function onPublish(postId: string) {
 
   // 2. Trigger GitHub Actions rebuild
   const response = await fetch(
-    'https://api.github.com/repos/wyndhamharyata/marknotes-cf/dispatches',
+    "https://api.github.com/repos/wyndhamharyata/marknotes-cf/dispatches",
     {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Accept': 'application/vnd.github+json',
-        'Authorization': `Bearer ${process.env.GITHUB_TOKEN}`,
-        'X-GitHub-Api-Version': '2022-11-28',
+        Accept: "application/vnd.github+json",
+        Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+        "X-GitHub-Api-Version": "2022-11-28",
       },
       body: JSON.stringify({
-        event_type: 'cms-publish',
+        event_type: "cms-publish",
         client_payload: {
           postId,
           timestamp: new Date().toISOString(),
@@ -142,18 +142,18 @@ async function onPublish(postId: string) {
   );
 
   if (!response.ok) {
-    console.error('Failed to trigger rebuild:', response.status);
+    console.error("Failed to trigger rebuild:", response.status);
     return {
       published: true,
       rebuildTriggered: false,
-      message: 'Published, but rebuild failed. Try again later.',
+      message: "Published, but rebuild failed. Try again later.",
     };
   }
 
   return {
     published: true,
     rebuildTriggered: true,
-    message: 'Published! Site will update in ~2-3 minutes.',
+    message: "Published! Site will update in ~2-3 minutes.",
   };
 }
 ```
@@ -174,10 +174,10 @@ async function onPublish(postId: string) {
 
 ## Trade-offs
 
-| Aspect | GitHub Actions Approach |
-|--------|------------------------|
-| **Rebuild time** | ~2-3 minutes (includes npm install) |
-| **Complexity** | Low - just a workflow file |
-| **Cost** | Free for public repos, 2000 min/month for private |
-| **Reliability** | High - GitHub Actions is very stable |
-| **Debugging** | Easy - full logs in GitHub UI |
+| Aspect           | GitHub Actions Approach                           |
+| ---------------- | ------------------------------------------------- |
+| **Rebuild time** | ~2-3 minutes (includes npm install)               |
+| **Complexity**   | Low - just a workflow file                        |
+| **Cost**         | Free for public repos, 2000 min/month for private |
+| **Reliability**  | High - GitHub Actions is very stable              |
+| **Debugging**    | Easy - full logs in GitHub UI                     |

@@ -1,8 +1,8 @@
 ---
 title: "My Top Go Patterns and Features to Use"
 description: "Five practical Go patterns including contextual primary keys, interface unions, test fixtures, go:embed, and the flag package."
-pubDate: 'May 10 2025'
-heroImage: '../../assets/hero-my-top-go-patterns-and-features-to-use.webp'
+pubDate: "May 10 2025"
+heroImage: "../../assets/hero-my-top-go-patterns-and-features-to-use.webp"
 ---
 
 Hi there! It's been a while since I last wrote an article on this blog. I think now that I have some more time to kill, let's start making this site a little bit more alive.
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS "surveys" (
 );
 ```
 
-Random string? UUID? hell, autoincrement number? *Please don't be an autoincrement number*.
+Random string? UUID? hell, autoincrement number? _Please don't be an autoincrement number_.
 
 For my personal use, my favourite is `string` But it's a combination of context and `uuid`. So, for example, given that the data is to represent `Survey` Let's set our ID as `survey-<<uuid>>`:
 

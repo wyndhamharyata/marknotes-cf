@@ -29,24 +29,23 @@ try {
 }
 ---
 
-<section
-  class="mt-8 card bg-base-100 shadow-xl"
-  data-comment-alias={alias}
->
+<section class="card bg-base-100 mt-8 shadow-xl" data-comment-alias={alias}>
   <div class="card-body">
-    <h2 class="card-title text-2xl mb-4">Comments</h2>
-    {error ? (
-      <div class="alert alert-error">
-        <span>Failed to load comments: {error}</span>
-      </div>
-    ) : (
-      <CommentTree
-        client:load
-        comments={serializedTree}
-        articleSlug={articleSlug}
-        userAlias={alias}
-      />
-    )}
+    <h2 class="card-title mb-4 text-2xl">Comments</h2>
+    {
+      error ? (
+        <div class="alert alert-error">
+          <span>Failed to load comments: {error}</span>
+        </div>
+      ) : (
+        <CommentTree
+          client:load
+          comments={serializedTree}
+          articleSlug={articleSlug}
+          userAlias={alias}
+        />
+      )
+    }
   </div>
 </section>
 
@@ -57,9 +56,7 @@ try {
     if (section) {
       const alias = section.getAttribute("data-comment-alias");
       if (alias) {
-        window.dispatchEvent(
-          new CustomEvent("comment-alias-loaded", { detail: { alias } })
-        );
+        window.dispatchEvent(new CustomEvent("comment-alias-loaded", { detail: { alias } }));
       }
     }
   });

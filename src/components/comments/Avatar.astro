@@ -16,10 +16,7 @@ const dataUri = `data:image/svg+xml;utf8,${encodeURIComponent(svgContent)}`;
 ---
 
 <div class="avatar">
-  <div
-    class="mask mask-squircle bg-base-200"
-    style={`width: ${size}px; height: ${size}px;`}
-  >
+  <div class="mask mask-squircle bg-base-200" style={`width: ${size}px; height: ${size}px;`}>
     <img src={dataUri} alt={`Avatar for ${seed}`} width={size} height={size} />
   </div>
 </div>

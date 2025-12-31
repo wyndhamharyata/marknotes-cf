@@ -57,12 +57,12 @@ A comprehensive learning guide for creating an in-house CMS that integrates with
 
 ### Key Concepts
 
-| Concept | Explanation |
-|---------|-------------|
-| **Content Loader** | A function that fetches content from any source and normalizes it for Astro's content collections API |
-| **R2** | Cloudflare's S3-compatible object storage, zero egress fees when accessed from Workers |
-| **Hybrid Rendering** | Mix of static (prerendered) and dynamic (SSR) pages in one Astro app |
-| **Deploy Hook** | A webhook URL that triggers a new deployment/build when called |
+| Concept              | Explanation                                                                                           |
+| -------------------- | ----------------------------------------------------------------------------------------------------- |
+| **Content Loader**   | A function that fetches content from any source and normalizes it for Astro's content collections API |
+| **R2**               | Cloudflare's S3-compatible object storage, zero egress fees when accessed from Workers                |
+| **Hybrid Rendering** | Mix of static (prerendered) and dynamic (SSR) pages in one Astro app                                  |
+| **Deploy Hook**      | A webhook URL that triggers a new deployment/build when called                                        |
 
 ---
 
@@ -95,10 +95,7 @@ export default $config({
 
     // Your Astro site with R2 binding
     const site = new sst.cloudflare.Astro("Max", {
-      domain:
-        $app.stage === "production"
-          ? "read.mwyndham.dev"
-          : "devread.mwyndham.dev",
+      domain: $app.stage === "production" ? "read.mwyndham.dev" : "devread.mwyndham.dev",
       // Link the bucket so your Astro app can access it
       link: [contentBucket],
     });
@@ -114,6 +111,7 @@ export default $config({
 ### Step 2.2: Understanding SST Resource Linking
 
 When you `link` a resource in SST, it:
+
 1. Creates the necessary Cloudflare bindings
 2. Generates TypeScript types in `sst-env.d.ts`
 3. Makes the resource accessible via `Resource.ContentBucket`
@@ -173,13 +171,13 @@ export async function savePost(bucket: R2Bucket, key: string, content: string) {
 
 ### Why R2 Over Other Options?
 
-| Feature | R2 | S3 | Database |
-|---------|----|----|----------|
-| Egress cost from Workers | **Free** | Paid | Varies |
-| Latency from Workers | **~1-5ms** | 50-200ms | 10-50ms |
-| Native binding support | **Yes** | No (need HTTP) | Some (D1) |
-| File versioning | Optional | Yes | Manual |
-| Good for markdown files | **Excellent** | Good | Awkward |
+| Feature                  | R2            | S3             | Database  |
+| ------------------------ | ------------- | -------------- | --------- |
+| Egress cost from Workers | **Free**      | Paid           | Varies    |
+| Latency from Workers     | **~1-5ms**    | 50-200ms       | 10-50ms   |
+| Native binding support   | **Yes**       | No (need HTTP) | Some (D1) |
+| File versioning          | Optional      | Yes            | Manual    |
+| Good for markdown files  | **Excellent** | Good           | Awkward   |
 
 ---
 
@@ -222,8 +220,8 @@ import { z } from "astro:content";
 
 // Define what configuration your loader accepts
 interface R2LoaderConfig {
-  bucketBinding: string;  // The R2 binding name
-  prefix?: string;        // Folder prefix in bucket (e.g., "posts/")
+  bucketBinding: string; // The R2 binding name
+  prefix?: string; // Folder prefix in bucket (e.g., "posts/")
 }
 
 // The loader factory function
@@ -244,7 +242,8 @@ export function r2Loader(config: R2LoaderConfig): Loader {
       // Option C: Use a "sync" script that downloads R2 → local files before build
 
       // For this example, we'll use Option A (S3-compatible API)
-      const { S3Client, ListObjectsV2Command, GetObjectCommand } = await import("@aws-sdk/client-s3");
+      const { S3Client, ListObjectsV2Command, GetObjectCommand } =
+        await import("@aws-sdk/client-s3");
 
       const s3 = new S3Client({
         region: "auto",
@@ -263,9 +262,10 @@ export function r2Loader(config: R2LoaderConfig): Loader {
         })
       );
 
-      const files = listResponse.Contents?.filter(
-        (obj) => obj.Key?.endsWith(".md") || obj.Key?.endsWith(".mdx")
-      ) || [];
+      const files =
+        listResponse.Contents?.filter(
+          (obj) => obj.Key?.endsWith(".md") || obj.Key?.endsWith(".mdx")
+        ) || [];
 
       logger.info(`Found ${files.length} markdown files in R2`);
 
@@ -288,9 +288,7 @@ export function r2Loader(config: R2LoaderConfig): Loader {
         const { frontmatter, body } = parseFrontmatter(content);
 
         // Generate a unique ID from the filename
-        const id = file.Key
-          .replace(config.prefix || "", "")
-          .replace(/\.(md|mdx)$/, "");
+        const id = file.Key.replace(config.prefix || "", "").replace(/\.(md|mdx)$/, "");
 
         // Create digest for caching
         const digest = generateDigest(content);
@@ -379,7 +377,7 @@ const localBlog = defineCollection({
 const r2Blog = defineCollection({
   loader: r2Loader({
     bucketBinding: "CONTENT_BUCKET",
-    prefix: "posts/"
+    prefix: "posts/",
   }),
   schema: z.object({
     title: z.string(),
@@ -423,6 +421,7 @@ This is **the most important concept** to understand:
 ```
 
 **This means:**
+
 - Your **CMS admin panel** (SSR) can use R2 bindings directly (fast!)
 - Your **content loader** (build time) must use S3-compatible HTTP API (requires credentials)
 - Alternative: Use full SSR for blog pages too, skip the loader entirely
@@ -531,13 +530,13 @@ export const GET: APIRoute = async ({ request, url }) => {
     if (!object) {
       return new Response(JSON.stringify({ error: "Not found" }), {
         status: 404,
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json" },
       });
     }
 
     const content = await object.text();
     return new Response(JSON.stringify({ id, content }), {
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   }
 
@@ -551,7 +550,7 @@ export const GET: APIRoute = async ({ request, url }) => {
   }));
 
   return new Response(JSON.stringify(posts), {
-    headers: { "Content-Type": "application/json" }
+    headers: { "Content-Type": "application/json" },
   });
 };
 
@@ -566,7 +565,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (!id || !content) {
     return new Response(JSON.stringify({ error: "Missing id or content" }), {
       status: 400,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   }
 
@@ -575,7 +574,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (existing) {
     return new Response(JSON.stringify({ error: "Post already exists" }), {
       status: 409,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   }
 
@@ -585,7 +584,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   return new Response(JSON.stringify({ success: true, id }), {
     status: 201,
-    headers: { "Content-Type": "application/json" }
+    headers: { "Content-Type": "application/json" },
   });
 };
 
@@ -602,7 +601,7 @@ export const PUT: APIRoute = async ({ request }) => {
   });
 
   return new Response(JSON.stringify({ success: true, id }), {
-    headers: { "Content-Type": "application/json" }
+    headers: { "Content-Type": "application/json" },
   });
 };
 
@@ -615,14 +614,14 @@ export const DELETE: APIRoute = async ({ request, url }) => {
   if (!id) {
     return new Response(JSON.stringify({ error: "Missing id" }), {
       status: 400,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   }
 
   await bucket.delete(`posts/${id}.md`);
 
   return new Response(JSON.stringify({ success: true }), {
-    headers: { "Content-Type": "application/json" }
+    headers: { "Content-Type": "application/json" },
   });
 };
 ```
@@ -677,7 +676,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     if (!auth || auth !== `Bearer ${import.meta.env.ADMIN_TOKEN}`) {
       return new Response("Unauthorized", {
         status: 401,
-        headers: { "WWW-Authenticate": "Bearer" }
+        headers: { "WWW-Authenticate": "Bearer" },
       });
     }
   }
@@ -817,12 +816,12 @@ Write your content here...
 
 For a better editing experience, consider these libraries:
 
-| Library | Pros | Cons |
-|---------|------|------|
-| **Monaco Editor** | VSCode-like, great syntax highlighting | Large bundle size (~2MB) |
-| **CodeMirror 6** | Lightweight, extensible, mobile-friendly | Steeper learning curve |
-| **Milkdown** | WYSIWYG markdown, plugin system | Newer, smaller community |
-| **Tiptap** | Rich text with markdown export | Not pure markdown |
+| Library           | Pros                                     | Cons                     |
+| ----------------- | ---------------------------------------- | ------------------------ |
+| **Monaco Editor** | VSCode-like, great syntax highlighting   | Large bundle size (~2MB) |
+| **CodeMirror 6**  | Lightweight, extensible, mobile-friendly | Steeper learning curve   |
+| **Milkdown**      | WYSIWYG markdown, plugin system          | Newer, smaller community |
+| **Tiptap**        | Rich text with markdown export           | Not pure markdown        |
 
 Example with a WYSIWYG library (Milkdown):
 
@@ -881,7 +880,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (!deployHookUrl) {
     return new Response(JSON.stringify({ error: "Deploy hook not configured" }), {
       status: 500,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   }
 
@@ -891,16 +890,19 @@ export const POST: APIRoute = async ({ request }) => {
   if (!response.ok) {
     return new Response(JSON.stringify({ error: "Deploy hook failed" }), {
       status: 500,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
   }
 
-  return new Response(JSON.stringify({
-    success: true,
-    message: "Build triggered"
-  }), {
-    headers: { "Content-Type": "application/json" }
-  });
+  return new Response(
+    JSON.stringify({
+      success: true,
+      message: "Build triggered",
+    }),
+    {
+      headers: { "Content-Type": "application/json" },
+    }
+  );
 };
 ```
 
@@ -944,6 +946,7 @@ Astro.response.headers.set(
 ```
 
 **Cache Header Explanation:**
+
 - `max-age=60`: Browser caches for 1 minute
 - `s-maxage=3600`: Edge (Cloudflare) caches for 1 hour
 - `stale-while-revalidate=86400`: Serve stale content while fetching fresh (up to 24h)
@@ -964,7 +967,7 @@ export const POST: APIRoute = async ({ request }) => {
     {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.CF_API_TOKEN}`,
+        Authorization: `Bearer ${process.env.CF_API_TOKEN}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -983,12 +986,12 @@ export const POST: APIRoute = async ({ request }) => {
 
 ### Comparison of Approaches
 
-| Approach | Latency | Cost | Complexity | Best For |
-|----------|---------|------|------------|----------|
-| Deploy Hook | ~1-3 min | Build minutes | Low | Infrequent updates |
-| SSR + Cache | ~50-200ms | Compute time | Medium | Frequent updates |
-| Cache Purge | Instant | API calls | Medium | Critical updates |
-| Full SSR | ~50-200ms | Higher compute | Low | Real-time content |
+| Approach    | Latency   | Cost           | Complexity | Best For           |
+| ----------- | --------- | -------------- | ---------- | ------------------ |
+| Deploy Hook | ~1-3 min  | Build minutes  | Low        | Infrequent updates |
+| SSR + Cache | ~50-200ms | Compute time   | Medium     | Frequent updates   |
+| Cache Purge | Instant   | API calls      | Medium     | Critical updates   |
+| Full SSR    | ~50-200ms | Higher compute | Low        | Real-time content  |
 
 ---
 
@@ -1065,9 +1068,7 @@ export default $config({
 
     // Your hybrid Astro site
     const site = new sst.cloudflare.Astro("Max", {
-      domain: $app.stage === "production"
-        ? "read.mwyndham.dev"
-        : "devread.mwyndham.dev",
+      domain: $app.stage === "production" ? "read.mwyndham.dev" : "devread.mwyndham.dev",
       link: [contentBucket],
       // Environment variables for build time
       environment: {
@@ -1092,12 +1093,12 @@ export default $config({
 
 ### When to Use Each Approach
 
-| Scenario | Recommended Approach |
-|----------|---------------------|
-| Personal blog, occasional posts | SSG + Deploy hooks |
-| Multiple editors, frequent updates | SSR + Edge caching |
-| High traffic, SEO critical | SSG for public, SSR for admin |
-| Real-time collaboration | Full SSR with WebSockets |
+| Scenario                           | Recommended Approach          |
+| ---------------------------------- | ----------------------------- |
+| Personal blog, occasional posts    | SSG + Deploy hooks            |
+| Multiple editors, frequent updates | SSR + Edge caching            |
+| High traffic, SEO critical         | SSG for public, SSR for admin |
+| Real-time collaboration            | Full SSR with WebSockets      |
 
 ### Performance Comparison
 
@@ -1112,12 +1113,12 @@ SSR (Origin):             ~200ms+   ██████████████�
 
 ### Cost Considerations (Cloudflare)
 
-| Resource | Free Tier | Paid |
-|----------|-----------|------|
-| Workers requests | 100k/day | $0.50/million |
-| R2 storage | 10GB | $0.015/GB/month |
-| R2 operations | 10M Class A, 10M Class B | $4.50/million, $0.36/million |
-| Pages builds | 500/month | Unlimited (Pro) |
+| Resource         | Free Tier                | Paid                         |
+| ---------------- | ------------------------ | ---------------------------- |
+| Workers requests | 100k/day                 | $0.50/million                |
+| R2 storage       | 10GB                     | $0.015/GB/month              |
+| R2 operations    | 10M Class A, 10M Class B | $4.50/million, $0.36/million |
+| Pages builds     | 500/month                | Unlimited (Pro)              |
 
 For a blog with ~10k monthly visitors, you'll likely stay in free tier.
 
@@ -1132,13 +1133,13 @@ For a blog with ~10k monthly visitors, you'll likely stay in free tier.
 
 ### What You Lose vs. Local Files
 
-| Feature | Local `.md` | R2 Storage |
-|---------|-------------|------------|
-| Hot reload in dev | ✅ Yes | ❌ No |
-| MDX components | ✅ Yes | ⚠️ Limited |
-| Image optimization | ✅ Automatic | 🔧 Manual |
-| Git history | ✅ Automatic | 🔧 Manual |
-| Instant preview | ✅ Yes | ⚠️ Requires save |
+| Feature            | Local `.md`  | R2 Storage       |
+| ------------------ | ------------ | ---------------- |
+| Hot reload in dev  | ✅ Yes       | ❌ No            |
+| MDX components     | ✅ Yes       | ⚠️ Limited       |
+| Image optimization | ✅ Automatic | 🔧 Manual        |
+| Git history        | ✅ Automatic | 🔧 Manual        |
+| Instant preview    | ✅ Yes       | ⚠️ Requires save |
 
 ---
 

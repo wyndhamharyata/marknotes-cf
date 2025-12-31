@@ -1,8 +1,8 @@
 ---
 title: "Personal Blog with HTMX + Go: Part 1 - Golang Templating"
 description: "The first part of a series on building a personal blog with HTMX and Go, covering the basics of Go templating with Labstack Echo."
-pubDate: 'Sep 01 2023'
-heroImage: '../../assets/hero-personal-blog-with-htmx-go-part-golang-templating.png'
+pubDate: "Sep 01 2023"
+heroImage: "../../assets/hero-personal-blog-with-htmx-go-part-golang-templating.png"
 ---
 
 This is the first part of the series where I document my journey creating a personal blog using HTMX and Go. This part will cover the basics of Go templating with Labstack Echo.
@@ -10,6 +10,7 @@ This is the first part of the series where I document my journey creating a pers
 ## Prerequisites
 
 Before we start, make sure you have:
+
 - Go installed (1.21 or later recommended)
 - Basic understanding of Go syntax
 - A text editor of your choice
@@ -33,6 +34,7 @@ go get github.com/labstack/echo/v4
 ## Understanding Go Templates
 
 Go's `html/template` package is powerful yet simple. Templates allow us to:
+
 - Separate HTML from Go code
 - Inject dynamic data into HTML
 - Create reusable components
@@ -68,14 +70,14 @@ Let's create `public/index.html`:
 {{define "index"}}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>My Blog</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Welcome to {{.Title}}</h1>
     <p>{{.Description}}</p>
-</body>
+  </body>
 </html>
 {{end}}
 ```
@@ -160,12 +162,12 @@ Create `public/name_card.html`:
 ```html
 {{define "name_card"}}
 <div>
-    <p>User Personal Information:</p>
-    <ol>
-        <li>Name: {{.Name}}</li>
-        <li>Phone: {{.Phone}}</li>
-        <li>Email: {{.Email}}</li>
-    </ol>
+  <p>User Personal Information:</p>
+  <ol>
+    <li>Name: {{.Name}}</li>
+    <li>Phone: {{.Phone}}</li>
+    <li>Email: {{.Email}}</li>
+  </ol>
 </div>
 {{end}}
 ```
@@ -187,13 +189,12 @@ Now here's where it gets interesting. HTMX allows us to make AJAX requests direc
 Now we can create interactive elements:
 
 ```html
-<button hx-get="/user-info" hx-target="#user-info" hx-swap="innerHTML">
-    Load User Info
-</button>
+<button hx-get="/user-info" hx-target="#user-info" hx-swap="innerHTML">Load User Info</button>
 <div id="user-info"></div>
 ```
 
 When clicked, this button will:
+
 1. Make a GET request to `/user-info`
 2. Replace the contents of `#user-info` with the response
 
@@ -215,6 +216,7 @@ e.GET("/user-info", func(c echo.Context) error {
 ## What's Next?
 
 In the next part, we'll integrate TailwindCSS to make our blog look professional. We'll cover:
+
 - Setting up TailwindCSS with Go
 - Creating responsive layouts
 - Styling our components

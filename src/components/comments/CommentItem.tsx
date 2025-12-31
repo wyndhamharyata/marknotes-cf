@@ -24,19 +24,15 @@ function formatDate(dateStr: string): string {
 
 function CommentContent({ comment }: { comment: CommentNode }) {
   if (comment.hidePublicity) {
-    return <p class="italic text-base-content/50">Comment deleted by Admin</p>;
+    return <p class="text-base-content/50 italic">Comment deleted by Admin</p>;
   }
 
   if (comment.moderationStatus === 3) {
-    return (
-      <p class="italic text-base-content/50">Comment hidden by Auto Moderation</p>
-    );
+    return <p class="text-base-content/50 italic">Comment hidden by Auto Moderation</p>;
   }
 
   return (
-    <p class="text-base-content/80 break-words whitespace-pre-wrap text-sm">
-      {comment.message}
-    </p>
+    <p class="text-base-content/80 text-sm break-words whitespace-pre-wrap">{comment.message}</p>
   );
 }
 
@@ -53,8 +49,7 @@ export default function CommentItem({
   const hasChildren = comment.children.length > 0;
   const isCollapsed = collapsedIds.has(comment.id);
   const maxDepth = 3;
-  const canReply =
-    depth < maxDepth && !comment.hidePublicity && comment.moderationStatus !== 3;
+  const canReply = depth < maxDepth && !comment.hidePublicity && comment.moderationStatus !== 3;
 
   // Progressive background darkness based on depth (using accent color)
   const bgClasses = [
@@ -71,12 +66,10 @@ export default function CommentItem({
         <div class="flex-shrink-0">
           <Avatar seed={comment.alias} size={40} />
         </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-1 flex-wrap">
-            <span class="font-semibold text-sm">{comment.alias}</span>
-            <span class="text-xs text-base-content/50">
-              {formatDate(comment.createdAt)}
-            </span>
+        <div class="min-w-0 flex-1">
+          <div class="mb-1 flex flex-wrap items-center gap-2">
+            <span class="text-sm font-semibold">{comment.alias}</span>
+            <span class="text-base-content/50 text-xs">{formatDate(comment.createdAt)}</span>
             {hasChildren && (
               <button
                 class="btn btn-ghost btn-xs hover:btn-primary"
@@ -92,10 +85,7 @@ export default function CommentItem({
           <CommentContent comment={comment} />
 
           {canReply && (
-            <button
-              class="btn btn-xs btn-ghost mt-2"
-              onClick={() => onOpenReply(comment.id)}
-            >
+            <button class="btn btn-xs btn-ghost mt-2" onClick={() => onOpenReply(comment.id)}>
               Reply
             </button>
           )}
@@ -112,7 +102,7 @@ export default function CommentItem({
       </div>
 
       {hasChildren && !isCollapsed && (
-        <div class="ml-6 mt-2">
+        <div class="mt-2 ml-6">
           {comment.children.map((child) => (
             <CommentItem
               key={child.id}

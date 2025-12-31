@@ -14,17 +14,27 @@ export default $config({
     const libsqlUrl = new sst.Secret("LibsqlUrl");
     const libsqlAuthToken = new sst.Secret("LibsqlAuthToken");
 
+    // Gemini API key for AI moderation
+    const geminiApiKey = new sst.Secret("GeminiApiKey");
+
     new sst.cloudflare.x.Astro("Max", {
-      domain:
-        $app.stage === "production"
-          ? "read.mwyndham.dev"
-          : "devread.mwyndham.dev",
-      link: [libsqlUrl, libsqlAuthToken],
+      domain: $app.stage === "production" ? "read.mwyndham.dev" : "devread.mwyndham.dev",
+      link: [libsqlUrl, libsqlAuthToken, geminiApiKey],
       environment: {
         LIBSQL_URL: libsqlUrl.value,
-        LIBSQL_AUTH_TOKEN: libsqlAuthToken.value
+        LIBSQL_AUTH_TOKEN: libsqlAuthToken.value,
+        GEMINI_API_KEY: geminiApiKey.value,
       },
-      dev: false
+      dev: false,
+    });
+
+    // Cron job for AI comment moderation (every 10 minutes)
+    new sst.cloudflare.Cron("ModerationCron", {
+      job: {
+        handler: "src/workers/moderation-cron.ts",
+        link: [libsqlUrl, libsqlAuthToken, geminiApiKey],
+      },
+      schedules: ["*/10 * * * *"],
     });
   },
 });

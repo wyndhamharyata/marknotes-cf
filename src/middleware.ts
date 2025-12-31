@@ -1,5 +1,5 @@
-import { defineMiddleware } from 'astro:middleware';
-import { fromCloudflareEnv } from 'sst';
+import { defineMiddleware } from "astro:middleware";
+import { fromCloudflareEnv } from "sst";
 
 export const onRequest = defineMiddleware((context, next) => {
   // Initialize SST resources from Cloudflare environment bindings

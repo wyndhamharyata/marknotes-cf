@@ -1,76 +1,84 @@
 ---
-import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import FormattedDate from '../components/FormattedDate.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import FormattedDate from "../components/FormattedDate.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 
 export const prerender = true;
 
-const latestPosts = (await getCollection('blog'))
-	.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-	.slice(0, 3);
+const latestPosts = (await getCollection("blog"))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
-	<!-- Intro Section -->
-	<div class="text-center mb-12 prose prose-lg max-w-none mx-auto prose-strong:text-primary prose-a:text-accent prose-a:font-extrabold">
-		<p class="text-4xl">
-			Hello! 🖖 My name is <strong>Wyndham</strong>
-		</p>
+  <!-- Intro Section -->
+  <div
+    class="prose prose-lg prose-strong:text-primary prose-a:text-accent prose-a:font-extrabold mx-auto mb-12 max-w-none text-center"
+  >
+    <p class="text-4xl">
+      Hello! 🖖 My name is <strong>Wyndham</strong>
+    </p>
     <p>
-      Specializing in fullstack apps development on all platform, 
-      my stack mostly consist of <strong>Mobile Development</strong> (Kotlin, Swift, React Native),
+      Specializing in fullstack apps development on all platform, my stack mostly consist of <strong
+        >Mobile Development</strong
+      > (Kotlin, Swift, React Native),
       <strong>Backend Development</strong> (Golang, Hono), and
       <strong>Frontend Development</strong> (React, Solid, Astro, Remix).
-		</p>
-		<p>
-			More on my resume <a href="/articles/m-wyndham-haryata-permana-sr-full-stack-engineer">here</a>.
-		</p>
-		<p>
-			Hit me up via
-			<a href="https://x.com/muhwyndham">Twitter</a>,
+    </p>
+    <p>
+      More on my resume <a href="/articles/m-wyndham-haryata-permana-sr-full-stack-engineer">here</a
+      >.
+    </p>
+    <p>
+      Hit me up via
+      <a href="https://x.com/muhwyndham">Twitter</a>,
       <a href="https://github.com/wyndhamharyata">Github</a>,
-			<a href="https://linkedin.com/in/mwyndham">LinkedIn</a> or
-			<a href="mailto:business@mwyndham.dev">Email</a> whenever you need help or just want to have some chit-chat!
-		</p>
-	</div>
+      <a href="https://linkedin.com/in/mwyndham">LinkedIn</a> or
+      <a href="mailto:business@mwyndham.dev">Email</a> whenever you need help or just want to have some
+      chit-chat!
+    </p>
+  </div>
 
-	<!-- Latest Articles Section -->
-	<div class="card bg-base-100 shadow-xl">
-		<div class="card-body">
-			<h2 class="text-2xl font-extrabold mb-6">Latest Articles</h2>
-			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-				{
-					latestPosts.map((post) => (
-						<article>
-							<a href={`/articles/${post.id}/`} class="group block p-3 -m-3 rounded-box hover:bg-accent/10 transition-colors">
-								{post.data.heroImage && (
-                <Image 
+  <!-- Latest Articles Section -->
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="mb-6 text-2xl font-extrabold">Latest Articles</h2>
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+        {
+          latestPosts.map((post) => (
+            <article>
+              <a
+                href={`/articles/${post.id}/`}
+                class="group rounded-box hover:bg-accent/10 -m-3 block p-3 transition-colors"
+              >
+                {post.data.heroImage && (
+                  <Image
                     loading="eager"
-										width={720}
-										height={360}
-										src={post.data.heroImage}
-										alt=""
-										class="w-full h-32 object-cover rounded-box mb-3"
-									/>
-								)}
-								<h3 class="text-lg font-extrabold group-hover:text-primary transition-colors">
-									{post.data.title}
-								</h3>
-								<p class="text-base-content/70 text-sm mt-1">
-									<FormattedDate date={post.data.pubDate} />
-								</p>
-							</a>
-						</article>
-					))
-				}
-			</div>
-			<div class="mt-6 text-center">
-				<a href="/articles" class="text-primary hover:underline font-extrabold">
-					View all articles →
-				</a>
-			</div>
-		</div>
-	</div>
+                    width={720}
+                    height={360}
+                    src={post.data.heroImage}
+                    alt=""
+                    class="rounded-box mb-3 h-32 w-full object-cover"
+                  />
+                )}
+                <h3 class="group-hover:text-primary text-lg font-extrabold transition-colors">
+                  {post.data.title}
+                </h3>
+                <p class="text-base-content/70 mt-1 text-sm">
+                  <FormattedDate date={post.data.pubDate} />
+                </p>
+              </a>
+            </article>
+          ))
+        }
+      </div>
+      <div class="mt-6 text-center">
+        <a href="/articles" class="text-primary font-extrabold hover:underline">
+          View all articles →
+        </a>
+      </div>
+    </div>
+  </div>
 </BaseLayout>

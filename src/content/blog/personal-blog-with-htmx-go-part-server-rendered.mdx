@@ -1,11 +1,11 @@
 ---
 title: "Personal Blog with HTMX + Go: Part 3 - Server-Rendered Markdown"
 description: "Building a real-time server-rendered markdown to HTML editor using HTMX, Goldmark, and Tailwind Typography."
-pubDate: 'Mar 11 2024'
-heroImage: '../../assets/hero-personal-blog-with-htmx-go-part-server-rendered.webp'
+pubDate: "Mar 11 2024"
+heroImage: "../../assets/hero-personal-blog-with-htmx-go-part-server-rendered.webp"
 ---
 
-import BlogImage from '../../components/BlogImage.astro';
+import BlogImage from "../../components/BlogImage.astro";
 
 This article will cover part 3 of the <u>**#blogging**</u> Tutorial. This one is going to be long as we start deep-diving into making some interactive stuff with the help of <u>**#HTMX.**</u> If you need a refresher, you can read the [first](https://mwyndham.dev/articles/personal-blog-with-htmx-go-part-golang-templating.html) or the [previous](https://mwyndham.dev/articles/personal-blog-with-htmx-go-part-integrating-tailwindcss.html) part.
 
@@ -35,7 +35,8 @@ Let's add our dependency to our Go project via:
 go get github.com/yuin/goldmark
 ```
 
-<u>**#Goldmark**</u> also brings its extension called **GFM (GitHub Flavored Markdown)** and **Typographer**. We will need these two extensions to increase our markdown parsing capabilities.
+<u>**#Goldmark**</u> also brings its extension called **GFM (GitHub Flavored Markdown)** and
+**Typographer**. We will need these two extensions to increase our markdown parsing capabilities.
 
 GFM, as the name suggests, adds GitHub style Markdown tags, such as table, strike-through, and linkify. There's more to it, but you can read it yourself in the formal spec [here](https://github.github.com/gfm).
 
@@ -109,10 +110,11 @@ This endpoint will serve yet to-be-created template called `markdown` where we s
 
 ```markdown
 # Header 1
+
 ## Header 2
 ```
 
-as `ParsedMarkdown` and pass it down to the template body.  If rendered correctly, it should be something similar to this:
+as `ParsedMarkdown` and pass it down to the template body. If rendered correctly, it should be something similar to this:
 
 ```
 <h1>Header 1</h1>
@@ -126,9 +128,7 @@ Let's name it as `/public/markdown.html`:
 ```html
 {{define "markdown"}}
 <!-- This is tailwind class for bright blue-greyish background, horizontally centered div with padding of 6 in all direction-->
-<div class="bg-slate-100 mx-auto p6">
-   {{.ParsedMarkdown}}
-</div>
+<div class="p6 mx-auto bg-slate-100">{{.ParsedMarkdown}}</div>
 {{end}}
 ```
 
@@ -137,14 +137,10 @@ As we learned in Part 1, partial is not a valid HTML. This is where HTMX comes i
 To do that, let's modify our `index.html` a little bit by adding the following lines of code under the `user-info` `<div>` we had previously:
 
 ```html
-<div id="user-info">
-   ...
-</div>
+<div id="user-info">...</div>
 <!-- Put following lines here-->
 <div id="markdown">
-   <button hx-get="/markdown" hx-target="#markdown-part" hx-swap="innerHTML">
-      Parse Markdown
-   </button>
+  <button hx-get="/markdown" hx-target="#markdown-part" hx-swap="innerHTML">Parse Markdown</button>
 </div>
 ```
 
@@ -154,17 +150,23 @@ Now, if everything is according to plan, we should see a well-rendered markdown 
 
 Run the tailwind build command (`npx tailwindcss -i ...etc`) and then run the go server ( `go run .`) and open `localhost:4040` in our server:
 
-<BlogImage src="https://resource.mwyndham.dev/0-example-1-20240411112756.gif" alt="gif of renderring markdown" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-example-1-20240411112756.gif"
+  alt="gif of renderring markdown"
+/>
 
-**Yeay!... or not?** While the Tailwind class we specified before is rendered correctly, the header looks the same... *what gives? Is the markdown rendering not working?*
+**Yeay!... or not?** While the Tailwind class we specified before is rendered correctly, the header looks the same... _what gives? Is the markdown rendering not working?_
 
 Nope, it's working just fine.
 
 Press `F12` and open inspector, and see exactly that we have already rendered both `<h1>` and `<h2>` as per the standard rendering of Markdown to HTML:
 
-<BlogImage src="https://resource.mwyndham.dev/0-0-a-20240409031752-20240421100132.webp" alt="Inspector on the Page to see if Markdown is renderred correctly" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-0-a-20240409031752-20240421100132.webp"
+  alt="Inspector on the Page to see if Markdown is renderred correctly"
+/>
 
-*But it looks a bit..* *underwhelming* isn't it? you would think that a well-rendered markdown would be similar to what GitHub offering would look like. But let alone have nice styling, `<h1>` and `<h2>` does not render any differently.
+_But it looks a bit.._ _underwhelming_ isn't it? you would think that a well-rendered markdown would be similar to what GitHub offering would look like. But let alone have nice styling, `<h1>` and `<h2>` does not render any differently.
 
 ---
 
@@ -184,13 +186,13 @@ With that in mind, we still need to somehow introduce styling to our content. Th
 
 ```css
 .h1 {
-   @apply text-slate-900
+  @apply text-slate-900;
 }
 ```
 
 But applying this globally against HTML elements will also cause more styling issues down the line. Fortunately, Tailwind has the exact solution to our problem which is Tailwind Typography.
 
-I won't go deep dive into what is Tailwind Typography, but I will just jump straight to the specific implementation we're aiming for: *stylize the different headers.*
+I won't go deep dive into what is Tailwind Typography, but I will just jump straight to the specific implementation we're aiming for: _stylize the different headers._
 
 ### Implementing Tailwind Typography
 
@@ -211,9 +213,7 @@ Then go back to our `markdown.html` code up there for a second:
 ```html
 {{define "markdown"}}
 <!-- -->
-<div class="bg-slate-100 mx-auto p6">
-   {{.ParsedMarkdown}}
-</div>
+<div class="p6 mx-auto bg-slate-100">{{.ParsedMarkdown}}</div>
 {{end}}
 ```
 
@@ -222,8 +222,10 @@ We should modify the parent div class attribute in it to be like this:
 ```html
 {{define "markdown"}}
 <!-- please look at the class attribute content-->
-<div class="bg-slate-100 mx-auto p6 prose prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-lg">
-   {{.ParsedMarkdown}}
+<div
+  class="p6 prose prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-lg mx-auto bg-slate-100"
+>
+  {{.ParsedMarkdown}}
 </div>
 {{end}}
 ```
@@ -237,9 +239,12 @@ All other attributes are the same, but just applying it to other header sizes.
 
 Now if we're to run our code again, it should show something like this:
 
-<BlogImage src="https://resource.mwyndham.dev/0-0-s-20240409031802-20240421100206.webp" alt="Tailwind Typography demo" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-0-s-20240409031802-20240421100206.webp"
+  alt="Tailwind Typography demo"
+/>
 
-Looks great right? But you might be wondering why we got more than we bargained for. Like now it's centered horizontally and has a specific width applied to it. That's what `prose` class is used for. You can read  more [here](https://github.com/tailwindlabs/tailwindcss-typography). But the gist is it's just what Tailwind Typography does and it will help us build our simple blog faster.
+Looks great right? But you might be wondering why we got more than we bargained for. Like now it's centered horizontally and has a specific width applied to it. That's what `prose` class is used for. You can read more [here](https://github.com/tailwindlabs/tailwindcss-typography). But the gist is it's just what Tailwind Typography does and it will help us build our simple blog faster.
 
 ---
 
@@ -275,41 +280,42 @@ This endpoint should return a new page that will host our simple editor. But bef
 {{define "editor"}}
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <!-- copy paste from index.html -->
-</head>
-<body>
-   <div class="flex flex-row w-full">
-      <textarea
-         class="flex-1 p-6 min-h-96"
-         id="editor">
-      </textarea>
-      <div
-         id="preview"
-         class="flex-1 bg-stone-50 p-6 min-h-96">
-      </div>
-   </div>
-</body>
+  </head>
+  <body>
+    <div class="flex w-full flex-row">
+      <textarea class="min-h-96 flex-1 p-6" id="editor"> </textarea>
+      <div id="preview" class="min-h-96 flex-1 bg-stone-50 p-6"></div>
+    </div>
+  </body>
 </html>
 {{end}}
 ```
 
-It's a simple HTML page with `div` and has two elements as its child. One of which is  `textarea` marked as `editor` and the other is simply `div` marked as `preview`. Both of which have equal widths and are split in half in the middle.
+It's a simple HTML page with `div` and has two elements as its child. One of which is `textarea` marked as `editor` and the other is simply `div` marked as `preview`. Both of which have equal widths and are split in half in the middle.
 
 What we're going to make is a split editor where you write your markdown on the left side, and render the output on the right.
 
 If done correctly, it should render to this:
 
-<BlogImage src="https://resource.mwyndham.dev/0-0-d-20240409032036-20240421100231.webp" alt="Split Editor" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-0-d-20240409032036-20240421100231.webp"
+  alt="Split Editor"
+/>
 
 Next, we're going to repurpose the `markdown.html` we had previously to display the content on the preview side. But first, we need to modify it:
 
 ```html
 <!-- before -->
-<div class="mx-auto p-6 prose prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-lg">
-
-<!-- after -->
-<div class="prose prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-lg">
+<div
+  class="prose prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-lg mx-auto p-6"
+>
+  <!-- after -->
+  <div
+    class="prose prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-h4:text-xl prose-h5:text-lg"
+  ></div>
+</div>
 ```
 
 ### HTMX Boogaloo!
@@ -318,18 +324,19 @@ Next is the fun part. We're going to make use of the `hx-` attributes to add som
 
 ```html
 <!-- add the hx-..., type, and name attributes -->
-   <div class="flex flex-row w-full">
-      <textarea
-         ...
-         hx-post="/editor/render"
-         hx-trigger="keyup delay:500ms"
-         hx-target="#preview"
-         hx-swap="innerHTML"
-         type="text"
-         name="content">
-      </textarea>
-      ...
-    </div>
+<div class="flex w-full flex-row">
+  <textarea
+    ...
+    hx-post="/editor/render"
+    hx-trigger="keyup delay:500ms"
+    hx-target="#preview"
+    hx-swap="innerHTML"
+    type="text"
+    name="content"
+  >
+  </textarea>
+  ...
+</div>
 ```
 
 Those extra attributes bring us quite a lot of functionality on the table. When described, it will do the following:
@@ -338,13 +345,16 @@ Those extra attributes bring us quite a lot of functionality on the table. When 
 - `hx-post` => Then after that, send an AJAX Request `POST` to endpoint `/editor/render`.
 - `hx-target` => After that, put the response from the AJAX towards the element with the CSS Selector `id` of `preview` (hence the `#` prefix).
 - `hx-swap` => And please put the response **inside** the target element.
-- `name` => When AJAX happens, please carry the content  `textarea` along. And please set the `Form-Data` key to `content`.
+- `name` => When AJAX happens, please carry the content `textarea` along. And please set the `Form-Data` key to `content`.
 
 If you run it and start typing in the text area, you will see that there's a new AJAX request against `/editor/render` the endpoint which returns `404`.
 
 If you open the `Request` tab, you'll see the exact content of the text area in the form of data, like this:
 
-<BlogImage src="https://resource.mwyndham.dev/0-0-f-20240409032043-20240421100300.webp" alt="Inspect on the Split Editor to se if htmx works" />
+<BlogImage
+  src="https://resource.mwyndham.dev/0-0-f-20240409032043-20240421100300.webp"
+  alt="Inspect on the Split Editor to se if htmx works"
+/>
 
 Which is good! now we know that we can interactively send the text area content to the server, and the server will be able to render the HTML for us!
 
@@ -397,7 +407,7 @@ And just like that, we have our server-rendered Markdown done. It's not that muc
 
 Now that we're finished with this part 3, we have some room to breathe. In the next part, we'll be improving the Developer Experience a little bit by adding:
 
--  TempL for component-based UI, similar to JSX
+- TempL for component-based UI, similar to JSX
 - Air for hot reload
 - ESBuild so we can use JS Libraries.
 

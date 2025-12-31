@@ -1,39 +1,61 @@
 ---
-import TwitterIcon from '../icons/twitter.svg';
-import YoutubeIcon from '../icons/youtube.svg';
-import GithubIcon from '../icons/github.svg';
-import MediumIcon from '../icons/medium.svg';
-import LinkedinIcon from '../icons/linkedin.svg';
-import RssIcon from '../icons/rss.svg';
+import TwitterIcon from "../icons/twitter.svg";
+import YoutubeIcon from "../icons/youtube.svg";
+import GithubIcon from "../icons/github.svg";
+import MediumIcon from "../icons/medium.svg";
+import LinkedinIcon from "../icons/linkedin.svg";
+import RssIcon from "../icons/rss.svg";
 
 const today = new Date();
 ---
 
-<footer class="footer footer-center p-10 bg-base-100 text-base-content mt-10 border-t border-base-300">
-	<aside>
-		<p class="font-bold font-sono">Marknotes by Wyndham</p>
-		<p class="font-sono">&copy; {today.getFullYear()} - All rights reserved</p>
-	</aside>
-	<nav>
-		<div class="grid grid-flow-col gap-4">
-			<a href="https://twitter.com/muhwyndham" aria-label="Twitter" class="hover:text-primary transition-colors">
-				<TwitterIcon class="fill-current w-6 h-6" />
-			</a>
-			<a href="https://www.youtube.com/channel/UCPmxWqF9kzhe-VrOylqH2AA" aria-label="YouTube" class="hover:text-primary transition-colors">
-				<YoutubeIcon class="fill-current w-6 h-6" />
-			</a>
-			<a href="https://github.com/wyndhamharyata" aria-label="GitHub" class="hover:text-primary transition-colors">
-				<GithubIcon class="fill-current w-6 h-6" />
-			</a>
-			<a href="https://mwyndham.medium.com" aria-label="Medium" class="hover:text-primary transition-colors">
-				<MediumIcon class="fill-current w-6 h-6" />
-			</a>
-			<a href="https://www.linkedin.com/in/mwyndham" aria-label="LinkedIn" class="hover:text-primary transition-colors">
-				<LinkedinIcon class="fill-current w-6 h-6" />
-			</a>
-			<a href="/rss.xml" aria-label="RSS Feed" class="hover:text-primary transition-colors">
-				<RssIcon class="fill-current w-6 h-6" />
-			</a>
-		</div>
-	</nav>
+<footer
+  class="footer footer-center bg-base-100 text-base-content border-base-300 mt-10 border-t p-10"
+>
+  <aside>
+    <p class="font-sono font-bold">Marknotes by Wyndham</p>
+    <p class="font-sono">&copy; {today.getFullYear()} - All rights reserved</p>
+  </aside>
+  <nav>
+    <div class="grid grid-flow-col gap-4">
+      <a
+        href="https://twitter.com/muhwyndham"
+        aria-label="Twitter"
+        class="hover:text-primary transition-colors"
+      >
+        <TwitterIcon class="h-6 w-6 fill-current" />
+      </a>
+      <a
+        href="https://www.youtube.com/channel/UCPmxWqF9kzhe-VrOylqH2AA"
+        aria-label="YouTube"
+        class="hover:text-primary transition-colors"
+      >
+        <YoutubeIcon class="h-6 w-6 fill-current" />
+      </a>
+      <a
+        href="https://github.com/wyndhamharyata"
+        aria-label="GitHub"
+        class="hover:text-primary transition-colors"
+      >
+        <GithubIcon class="h-6 w-6 fill-current" />
+      </a>
+      <a
+        href="https://mwyndham.medium.com"
+        aria-label="Medium"
+        class="hover:text-primary transition-colors"
+      >
+        <MediumIcon class="h-6 w-6 fill-current" />
+      </a>
+      <a
+        href="https://www.linkedin.com/in/mwyndham"
+        aria-label="LinkedIn"
+        class="hover:text-primary transition-colors"
+      >
+        <LinkedinIcon class="h-6 w-6 fill-current" />
+      </a>
+      <a href="/rss.xml" aria-label="RSS Feed" class="hover:text-primary transition-colors">
+        <RssIcon class="h-6 w-6 fill-current" />
+      </a>
+    </div>
+  </nav>
 </footer>
