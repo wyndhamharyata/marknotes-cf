@@ -152,29 +152,7 @@ I uses **Gemini Flash 2.5 Preview.** At free tier, I got **500 Requests Per Day*
 
 With that budget in mind, I set the scheduled run of comment moderation to be run **every 10 minutes (144 Requests Per Day).** It will check if there's any comment that has not been moderated yet, fetch the comments, and add it into the prompt.
 
-Below is the prompt I use to moderate the comment:
-
-```
-Imagine you are content moderator for a blog site revolving around technology and programming.
-Your task is to moderate following comments.
-
-'id' is an integer and should return the same id that supplied from the input.
-
-'message' is a string and should return the same message that supplied from the input.
-
-'moderation_status' is an integer, where 1 means "OK", 2 means "Warning", and 3 means "Dangerous".
-- OK means all comments that uses normal language, including disagreement and civil debates.
-- Warning means it may have strong language, implicit mockery, swearing in context, and any normal message that contains URL.
-- Dangerous should cover actual hate speech, slander, slur, ad hominem, straw man fallacy, and spam / unrelated content promotion including placeholder / lipsum texts.
-
-'moderation_reason' is a string that contains single sentence, no more than 15 words summarizing the
-reasoning for the moderation status.
-
-Comments will be provided in a JSON format of { "id": integer, "message": string }, and will be attached
-right after this message.
-```
-
-If you're curious how I do it, just go over to the repository for this blog, it's public on GitHub 😉: [github.com/muhwyndhamhp/marknotes/blob/main/internal/llm/client.go](https://github.com/muhwyndhamhp/marknotes/blob/main/internal/llm/client.go)
+You can check the prompt and entire implementation [here](https://github.com/muhwyndhamhp/marknotes/blob/main/internal/llm/client.go).
 
 #### Manual Moderation (Yes, Really)
 

@@ -10,14 +10,14 @@ const today = new Date();
 ---
 
 <footer
-  class="footer footer-center bg-base-100 text-base-content border-base-300 mt-10 border-t p-10"
+  class="footer footer-vertical md:footer-horizontal footer-center bg-base-100 text-base-content border-base-300 mt-10 border-t p-10"
 >
   <aside>
     <p class="font-sono font-bold">Marknotes by Wyndham</p>
     <p class="font-sono">&copy; {today.getFullYear()} - All rights reserved</p>
   </aside>
   <nav>
-    <div class="grid grid-flow-col gap-4">
+    <div class="flex flex-wrap justify-center gap-4">
       <a
         href="https://twitter.com/muhwyndham"
         aria-label="Twitter"
