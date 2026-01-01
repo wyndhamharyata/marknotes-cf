@@ -1,7 +1,7 @@
 import { useState } from "preact/hooks";
 import CommentForm from "./CommentForm";
 import CommentItem from "./CommentItem";
-import type { CommentNode } from "./types";
+import type { CommentNode, CreateCommentResponse, ErrorResponse } from "./types";
 
 interface Props {
   comments: CommentNode[];
@@ -65,7 +65,7 @@ export default function CommentTree({ comments: initialComments, articleSlug }: 
       });
 
       if (res.ok) {
-        const data = await res.json();
+        const data = (await res.json()) as CreateCommentResponse;
         const newNode: CommentNode = {
           ...data.comment,
           children: [],
@@ -79,7 +79,7 @@ export default function CommentTree({ comments: initialComments, articleSlug }: 
         setActiveReplyId(null);
         return true;
       } else {
-        const errorData = await res.json();
+        const errorData = (await res.json()) as ErrorResponse;
         setFormError({ parentId, message: errorData.error || "Failed to post comment" });
         return false;
       }

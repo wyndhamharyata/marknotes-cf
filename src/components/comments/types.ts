@@ -9,3 +9,12 @@ export interface CommentNode {
   hidePublicity: boolean;
   children: CommentNode[];
 }
+
+export interface CreateCommentResponse {
+  success: true;
+  comment: Omit<CommentNode, "children">;
+}
+
+export interface ErrorResponse {
+  error: string;
+}
