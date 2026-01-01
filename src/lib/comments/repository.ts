@@ -64,24 +64,33 @@ export async function createComment(input: CreateCommentInput): Promise<number> 
 
 export function buildCommentTree(comments: Reply[]): CommentNode[] {
   const commentMap = new Map<number, CommentNode>();
-  const roots: CommentNode[] = [];
 
   for (const comment of comments) {
     commentMap.set(comment.id, { ...comment, children: [] });
   }
 
-  for (const comment of comments) {
+  const roots = comments
+    .map((v) => commentMap.get(v.id))
+    .filter((v) => !!v && v.parentId === null)
+    .filter((v) => !!v);
+
+  const childComments = comments
+    .map((v) => commentMap.get(v.id))
+    .filter((v) => !!v && v.parentId !== null)
+    .filter((v) => !!v)
+    // reverse order for subsequent replies, since replies makes more sense on chronological order
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
+  for (const comment of childComments) {
+    if (!comment || !comment.parentId) continue;
+
     const node = commentMap.get(comment.id)!;
 
-    if (comment.parentId === null) {
-      roots.push(node);
+    const parent = commentMap.get(comment.parentId);
+    if (parent) {
+      parent.children.push(node);
     } else {
-      const parent = commentMap.get(comment.parentId);
-      if (parent) {
-        parent.children.push(node);
-      } else {
-        roots.push(node);
-      }
+      roots.push(node);
     }
   }
 
