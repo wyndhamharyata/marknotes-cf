@@ -1,0 +1,70 @@
+.contribution-graph {
+  width: 100%;
+  overflow-x: auto;
+  --empty-cell-bg: var(--color-base-300);
+}
+
+.dark .contribution-graph {
+  --empty-cell-bg: oklch(32% 0.015 250);
+}
+
+.contribution-graph .height-full {
+  height: auto !important;
+}
+
+.contribution-graph table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 4px;
+  height: auto !important;
+  table-layout: fixed;
+}
+
+.contribution-graph tbody tr,
+.contribution-graph thead tr {
+  height: auto;
+}
+
+.contribution-graph .ContributionCalendar-day {
+  padding: 0;
+  border-radius: 2px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.contribution-graph .ContributionCalendar-day::before {
+  content: "";
+  display: block;
+  padding-bottom: 100%;
+}
+
+.contribution-graph [data-level="0"] {
+  background-color: var(--empty-cell-bg);
+}
+
+.contribution-graph [data-level="1"] {
+  background-color: oklch(from var(--color-primary) l c h / 0.3);
+}
+
+.contribution-graph [data-level="2"] {
+  background-color: oklch(from var(--color-primary) l c h / 0.5);
+}
+
+.contribution-graph [data-level="3"] {
+  background-color: oklch(from var(--color-primary) l c h / 0.75);
+}
+
+.contribution-graph [data-level="4"] {
+  background-color: var(--color-primary);
+}
+
+.contribution-graph .ContributionCalendar-label {
+  color: var(--color-base-content);
+  opacity: 0.6;
+  font-size: 0.65rem;
+}
+
+.contribution-graph tool-tip,
+.contribution-graph .sr-only {
+  display: none;
+}
