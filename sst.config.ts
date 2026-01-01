@@ -10,11 +10,8 @@ export default $config({
     };
   },
   async run() {
-    // Turso database secrets
     const libsqlUrl = new sst.Secret("LibsqlUrl");
     const libsqlAuthToken = new sst.Secret("LibsqlAuthToken");
-
-    // Gemini API key for AI moderation
     const geminiApiKey = new sst.Secret("GeminiApiKey");
 
     new sst.cloudflare.x.Astro("Max", {
@@ -47,7 +44,6 @@ export default $config({
       },
     });
 
-    // Cron job for AI comment moderation (every 10 minutes)
     new sst.cloudflare.Cron("ModerationCron", {
       job: {
         handler: "src/workers/moderation-cron.ts",

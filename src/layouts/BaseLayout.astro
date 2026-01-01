@@ -17,7 +17,7 @@ const { title, description, image } = Astro.props;
   <head>
     <BaseHead title={title} description={description} image={image} />
   </head>
-  <body class="font-sono flex min-h-screen flex-col" hx-boost="true">
+  <body class="font-sono flex min-h-screen flex-col" hx-boost="true" hx-ext="head-support">
     {/* Background layer */}
     <div class="bg-base-200 dark:bg-base-300 fixed inset-0 -z-10">
       <div class="grid-bg absolute inset-0"></div>

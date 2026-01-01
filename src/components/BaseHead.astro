@@ -20,7 +20,7 @@ const { title, description, image = FallbackImage } = Astro.props;
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/x-icon" href="/favicon.ico" />
 <link rel="sitemap" href="/sitemap-index.xml" />
 <link
   rel="alternate"
@@ -29,10 +29,6 @@ const { title, description, image = FallbackImage } = Astro.props;
   href={new URL("rss.xml", Astro.site)}
 />
 <meta name="generator" content={Astro.generator} />
-
-<!-- Font preloads -->
-<!-- <link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin /> -->
-<!-- <link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin /> -->
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
@@ -59,10 +55,32 @@ const { title, description, image = FallbackImage } = Astro.props;
 <!-- htmx -->
 <script>
   import "htmx.org";
+  import "htmx-ext-head-support";
 </script>
 
 <!-- Dynamic favicon from user identity -->
 <script>
-  const link = document.querySelector('link[rel="icon"]') as HTMLLinkElement;
-  if (link) link.href = "/api/favicon.svg";
+  function setDynamicFavicon() {
+    const existingLink = document.querySelector('link[rel="icon"]');
+
+    // Skip if already pointing to dynamic favicon
+    if (existingLink?.href.includes("/api/favicon.svg")) {
+      return;
+    }
+
+    // Remove static favicon if present
+    existingLink?.remove();
+
+    // Session-based cache buster - stays same for session, fresh on new visits
+    const sessionId = sessionStorage.getItem("favicon-session") || Date.now().toString();
+    sessionStorage.setItem("favicon-session", sessionId);
+
+    const newLink = document.createElement("link");
+    newLink.rel = "icon";
+    newLink.type = "image/svg+xml"; // Dynamic favicon is still SVG (minidenticon)
+    newLink.href = `/api/favicon.svg?v=${sessionId}`;
+    document.head.appendChild(newLink);
+  }
+  setDynamicFavicon();
+  document.addEventListener("htmx:afterSettle", setDynamicFavicon);
 </script>

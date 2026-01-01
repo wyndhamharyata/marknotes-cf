@@ -1,0 +1,25 @@
+---
+// Floating scroll buttons for blog article pages
+import ChevronUp from "../assets/svg/chevron-up.svg?raw";
+import ChatBubble from "../assets/svg/chat-bubble.svg?raw";
+---
+
+<div class="fixed bottom-4 right-4 z-40 flex flex-col gap-2">
+  <!-- Scroll to Top -->
+  <button
+    class="btn btn-circle btn-primary shadow-lg [&>svg]:h-5 [&>svg]:w-5"
+    onclick="window.scrollTo({top:0,behavior:'smooth'})"
+    aria-label="Scroll to top"
+  >
+    <Fragment set:html={ChevronUp} />
+  </button>
+
+  <!-- Scroll to Comments -->
+  <button
+    class="btn btn-circle btn-secondary shadow-lg [&>svg]:h-5 [&>svg]:w-5"
+    onclick="document.getElementById('comments')?.scrollIntoView({behavior:'smooth'})"
+    aria-label="Scroll to comments"
+  >
+    <Fragment set:html={ChatBubble} />
+  </button>
+</div>

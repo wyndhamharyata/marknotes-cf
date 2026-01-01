@@ -23,6 +23,7 @@
     "astro": "^5.16.6",
     "bad-words": "^4.0.0",
     "daisyui": "^5.5.14",
+    "htmx-ext-head-support": "^2.0.5",
     "htmx.org": "^2.0.8",
     "minidenticons": "^4.2.1",
     "preact": "^10.28.1",
