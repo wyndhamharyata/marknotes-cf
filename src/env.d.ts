@@ -9,5 +9,14 @@ interface Env {
 type Runtime = import("@astrojs/cloudflare").Runtime<Env>;
 
 declare namespace App {
-  interface Locals extends Runtime {}
+  interface Locals extends Runtime {
+    user?: {
+      type: "user";
+      properties: {
+        userID: string;
+        email: string;
+        oauthID?: string;
+      };
+    };
+  }
 }

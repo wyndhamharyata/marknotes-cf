@@ -35,6 +35,16 @@ export default defineConfig({
         access: "secret",
         optional: true,
       }),
+      OPEN_AUTH_URL: envField.string({
+        context: "server",
+        access: "secret",
+        optional: true,
+      }),
+      BASE_URL: envField.string({
+        context: "server",
+        access: "public", // needed for redirect URIs
+        optional: true,
+      }),
     },
   },
 });

@@ -6,6 +6,10 @@
 import "sst"
 declare module "sst" {
   export interface Resource {
+    "BaseUrl": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "GeminiApiKey": {
       "type": "sst.sst.Secret"
       "value": string
@@ -21,6 +25,10 @@ declare module "sst" {
     "Max": {
       "type": "sst.cloudflare.Astro"
       "url": string
+    }
+    "OpenAuthUrl": {
+      "type": "sst.sst.Secret"
+      "value": string
     }
   }
 }
