@@ -16,22 +16,21 @@ import MoonIcon from "../icons/moon.svg";
   </div>
 
   <!-- Mobile hamburger menu - only on mobile -->
-  <div class="flex-none md:hidden">
-    <button id="mobile-menu-toggle" class="btn btn-ghost btn-circle">
+  <div class="dropdown md:hidden">
+    <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
       <MenuIcon class="h-5 w-5" />
-    </button>
-  </div>
-
-  <!-- Full-width slide-down mobile menu -->
-  <div
-    id="mobile-menu"
-    class="bg-base-100 absolute top-full right-0 left-0 z-50 hidden w-full shadow-lg md:hidden"
-  >
-    <ul class="menu w-full p-4">
-      <li><a href="/" data-nav-link>Home</a></li>
-      <li><a href="/articles" data-nav-link>Blog</a></li>
+    </div>
+    <ul
+      tabindex="0"
+      class="dropdown-content menu bg-base-100 fixed left-0 right-0 z-50 w-full p-4 shadow-lg"
+    >
+      <li><a href="/" data-nav-link onclick="document.activeElement?.blur()">Home</a></li>
+      <li><a href="/articles" data-nav-link onclick="document.activeElement?.blur()">Blog</a></li>
       <li>
-        <a href="/articles/m-wyndham-haryata-permana-sr-full-stack-engineer" data-nav-link>Resume</a
+        <a
+          href="/articles/m-wyndham-haryata-permana-sr-full-stack-engineer"
+          data-nav-link
+          onclick="document.activeElement?.blur()">Resume</a
         >
       </li>
     </ul>
@@ -66,37 +65,6 @@ import MoonIcon from "../icons/moon.svg";
 </div>
 
 <script>
-  function initMobileMenu() {
-    const menuToggle = document.getElementById("mobile-menu-toggle");
-    const mobileMenu = document.getElementById("mobile-menu");
-
-    menuToggle?.addEventListener("click", () => {
-      mobileMenu?.classList.toggle("hidden");
-    });
-
-    mobileMenu?.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("click", () => {
-        mobileMenu.classList.add("hidden");
-      });
-    });
-
-    document.addEventListener("click", (e) => {
-      if (
-        mobileMenu &&
-        !mobileMenu.classList.contains("hidden") &&
-        !mobileMenu.contains(e.target as Node) &&
-        !menuToggle?.contains(e.target as Node)
-      ) {
-        mobileMenu.classList.add("hidden");
-      }
-    });
-  }
-
-  initMobileMenu();
-
-  // Re-run on htmx page swaps
-  document.addEventListener("htmx:afterSettle", initMobileMenu);
-
   function initTheme() {
     const toggle = document.getElementById("dark-toggle") as HTMLInputElement;
     if (!toggle) return;
