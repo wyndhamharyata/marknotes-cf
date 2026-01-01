@@ -79,5 +79,8 @@ export function filterTableByDateRange(
     ""
   );
 
+  // Remove tabindex from td elements (accessibility: non-interactive elements shouldn't have tabindex)
+  filtered = filtered.replace(/<td([^>]*)\stabindex="[^"]*"/g, "<td$1");
+
   return filtered;
 }

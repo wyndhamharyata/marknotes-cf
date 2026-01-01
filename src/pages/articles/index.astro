@@ -25,6 +25,7 @@ const posts = (await getCollection("blog")).sort(
               post={post}
               index={index}
               totalPost={posts.length}
+              lazyThumbnail={index >= 9}
             />
           ))
         }

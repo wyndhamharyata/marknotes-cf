@@ -48,7 +48,12 @@ const latestPosts = (await getCollection("blog"))
       <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
         {
           latestPosts.map((post, index) => (
-            <ArticleThumbnail post={post} index={index} totalPost={latestPosts.length} />
+            <ArticleThumbnail
+              post={post}
+              index={index}
+              totalPost={latestPosts.length}
+              lazyThumbnail={false}
+            />
           ))
         }
       </div>

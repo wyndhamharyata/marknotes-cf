@@ -8,9 +8,10 @@ interface Props {
   index: number;
   totalPost: number;
   withVerticalGap?: boolean;
+  lazyThumbnail?: boolean;
 }
 
-const { post, index, totalPost, withVerticalGap = false } = Astro.props;
+const { post, index, totalPost, withVerticalGap = false, lazyThumbnail = true } = Astro.props;
 ---
 
 <article
@@ -27,6 +28,7 @@ const { post, index, totalPost, withVerticalGap = false } = Astro.props;
           height={360}
           src={post.data.heroImage}
           alt=""
+          loading={lazyThumbnail ? "lazy" : "eager"}
           class="rounded-box mb-3 h-32 w-full object-cover"
         />
       )
