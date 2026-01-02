@@ -3,86 +3,34 @@
 // This page is on-demand rendered (SSR)
 export const prerender = false;
 
+import BaseAdminLayout from "../../layouts/BaseAdminLayout.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
+
 const user = Astro.locals.user;
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard</title>
-    <style>
-      body {
-        font-family:
-          system-ui,
-          -apple-system,
-          sans-serif;
-        max-width: 800px;
-        margin: 2rem auto;
-        padding: 0 1rem;
-        background: #f9fafb;
-        color: #111827;
-      }
-      .card {
-        background: white;
-        border-radius: 8px;
-        padding: 2rem;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      }
-      h1 {
-        margin-top: 0;
-        color: #1f2937;
-      }
-      .user-info {
-        background: #f3f4f6;
-        padding: 1rem;
-        border-radius: 6px;
-        margin: 1rem 0;
-      }
-      .user-info dt {
-        font-weight: 600;
-        color: #6b7280;
-        font-size: 0.875rem;
-      }
-      .user-info dd {
-        margin: 0 0 0.75rem 0;
-        color: #111827;
-      }
-      a {
-        color: #2563eb;
-        text-decoration: none;
-      }
-      a:hover {
-        text-decoration: underline;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="card">
-      <h1>Admin Dashboard</h1>
-      <p>You are authenticated. Admin functionality coming soon.</p>
+<BaseAdminLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+  <div>
+    <p>You are authenticated. Admin functionality coming soon.</p>
+    {
+      user && (
+        <div class="user-info">
+          <dl>
+            <dt>Email</dt>
+            <dd>{user.properties.email}</dd>
+            <dt>User ID</dt>
+            <dd>{user.properties.userID}</dd>
+            {user.properties.oauthID && (
+              <>
+                <dt>OAuth ID</dt>
+                <dd>{user.properties.oauthID}</dd>
+              </>
+            )}
+          </dl>
+        </div>
+      )
+    }
 
-      {
-        user && (
-          <div class="user-info">
-            <dl>
-              <dt>Email</dt>
-              <dd>{user.properties.email}</dd>
-              <dt>User ID</dt>
-              <dd>{user.properties.userID}</dd>
-              {user.properties.oauthID && (
-                <>
-                  <dt>OAuth ID</dt>
-                  <dd>{user.properties.oauthID}</dd>
-                </>
-              )}
-            </dl>
-          </div>
-        )
-      }
-
-      <p><a href="/">← Back to Home</a></p>
-    </div>
-  </body>
-</html>
+    <p><a href="/">← Back to Home</a></p>
+  </div>
+</BaseAdminLayout>

@@ -4,6 +4,7 @@ import sitemap from "@astrojs/sitemap";
 import cloudflare from "@astrojs/cloudflare";
 import preact from "@astrojs/preact";
 import tailwindcss from "@tailwindcss/vite";
+import icon from "astro-icon";
 import { defineConfig, envField } from "astro/config";
 
 // https://astro.build/config
@@ -19,7 +20,7 @@ export default defineConfig({
   image: {
     domains: ["resource.mwyndham.dev"],
   },
-  integrations: [mdx(), sitemap(), preact()],
+  integrations: [mdx(), sitemap(), preact(), icon()],
   vite: {
     plugins: [tailwindcss()],
   },
