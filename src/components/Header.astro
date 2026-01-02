@@ -1,8 +1,6 @@
 ---
 import HeaderLink from "./HeaderLink.astro";
-import MenuIcon from "../icons/menu.svg";
-import SunIcon from "../icons/sun.svg";
-import MoonIcon from "../icons/moon.svg";
+import { Icon } from "astro-icon/components";
 ---
 
 <div class="navbar bg-base-100 md:rounded-field relative mx-auto shadow-xl md:mt-5 md:max-w-2xl">
@@ -18,7 +16,7 @@ import MoonIcon from "../icons/moon.svg";
   <!-- Mobile hamburger menu - only on mobile -->
   <div class="dropdown md:hidden">
     <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
-      <MenuIcon class="h-5 w-5" />
+      <Icon name="heroicons:bars-3" class="h-5 w-5" />
     </div>
     <ul
       tabindex="0"
@@ -56,9 +54,9 @@ import MoonIcon from "../icons/moon.svg";
         <span class="hidden">Theme Switcher</span>
         <input type="checkbox" id="dark-toggle" class="theme-controller" />
         <!-- Sun icon -->
-        <SunIcon class="swap-off h-6 w-6 fill-current" />
+        <Icon name="heroicons:sun" class="swap-off h-6 w-6 fill-current" />
         <!-- Moon icon -->
-        <MoonIcon class="swap-on h-6 w-6 fill-current" />
+        <Icon name="heroicons:moon" class="swap-on h-6 w-6 fill-current" />
       </label>
     </button>
   </div>

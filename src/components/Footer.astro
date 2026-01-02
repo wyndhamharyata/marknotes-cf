@@ -1,10 +1,5 @@
 ---
-import TwitterIcon from "../icons/twitter.svg";
-import YoutubeIcon from "../icons/youtube.svg";
-import GithubIcon from "../icons/github.svg";
-import MediumIcon from "../icons/medium.svg";
-import LinkedinIcon from "../icons/linkedin.svg";
-import RssIcon from "../icons/rss.svg";
+import { Icon } from "astro-icon/components";
 
 const today = new Date();
 ---
@@ -23,38 +18,38 @@ const today = new Date();
         aria-label="Twitter"
         class="hover:text-primary transition-colors"
       >
-        <TwitterIcon class="h-6 w-6 fill-current" />
+        <Icon name="simple-icons:x" class="h-6 w-6 fill-current" />
       </a>
       <a
         href="https://www.youtube.com/channel/UCPmxWqF9kzhe-VrOylqH2AA"
         aria-label="YouTube"
         class="hover:text-primary transition-colors"
       >
-        <YoutubeIcon class="h-6 w-6 fill-current" />
+        <Icon name="simple-icons:youtube" class="h-6 w-6 fill-current" />
       </a>
       <a
         href="https://github.com/wyndhamharyata"
         aria-label="GitHub"
         class="hover:text-primary transition-colors"
       >
-        <GithubIcon class="h-6 w-6 fill-current" />
+        <Icon name="simple-icons:github" class="h-6 w-6 fill-current" />
       </a>
       <a
         href="https://mwyndham.medium.com"
         aria-label="Medium"
         class="hover:text-primary transition-colors"
       >
-        <MediumIcon class="h-6 w-6 fill-current" />
+        <Icon name="simple-icons:medium" class="h-6 w-6 fill-current" />
       </a>
       <a
         href="https://www.linkedin.com/in/mwyndham"
         aria-label="LinkedIn"
         class="hover:text-primary transition-colors"
       >
-        <LinkedinIcon class="h-6 w-6 fill-current" />
+        <Icon name="simple-icons:linkedin" class="h-6 w-6 fill-current" />
       </a>
       <a href="/rss.xml" aria-label="RSS Feed" class="hover:text-primary transition-colors">
-        <RssIcon class="h-6 w-6 fill-current" />
+        <Icon name="heroicons:rss" class="h-6 w-6 fill-current" />
       </a>
     </div>
   </nav>
