@@ -1,0 +1,53 @@
+---
+import {
+  ModerationStatus,
+  type CommentCounts,
+  type ModerationStatusType,
+} from "../../lib/comments/types";
+
+type Props = {
+  filterStatus: ModerationStatusType | null;
+  counts: CommentCounts;
+};
+const { filterStatus, counts } = Astro.props;
+---
+
+<div class="flex flex-wrap gap-2" role="tablist">
+  <a
+    href="/admin/comments"
+    role="tab"
+    class:list={["btn btn-sm", filterStatus === null ? "btn-primary" : "btn-ghost"]}
+  >
+    All <span class="badge badge-sm ml-1">{counts.all}</span>
+  </a>
+  <a
+    href="/admin/comments?status=0"
+    role="tab"
+    class:list={[
+      "btn btn-sm",
+      filterStatus === ModerationStatus.UNVERIFIED ? "btn-primary" : "btn-ghost",
+    ]}
+  >
+    Unmoderated <span class="badge badge-sm ml-1">{counts.unverified}</span>
+  </a>
+  <a
+    href="/admin/comments?status=2"
+    role="tab"
+    class:list={[
+      "btn btn-sm",
+      filterStatus === ModerationStatus.WARNING ? "btn-warning" : "btn-ghost",
+    ]}
+  >
+    Warning <span class="badge badge-warning badge-sm ml-1">{counts.warning}</span>
+  </a>
+  <a
+    href="/admin/comments?status=3"
+    role="tab"
+    class:list={[
+      "btn btn-sm",
+      filterStatus === ModerationStatus.DANGEROUS ? "btn-error" : "btn-ghost",
+    ]}
+  >
+    Dangerous <span class="badge badge-error badge-sm ml-1">{counts.dangerous}</span>
+  </a>
+</div>

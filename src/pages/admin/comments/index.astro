@@ -1,8 +1,65 @@
 ---
 export const prerender = false;
 
+import { getCollection } from "astro:content";
 import BaseAdminLayout from "../../../layouts/BaseAdminLayout.astro";
+import Avatar from "../../../components/admin/Avatar.astro";
+import CommentFilter from "../../../components/admin/CommentFilter.astro";
 import { SITE_DESCRIPTION, SITE_TITLE, ADMIN_DOCK } from "../../../consts";
+import { getCommentsForAdmin, getCommentCounts } from "../../../lib/comments/admin-repository";
+import {
+  ModerationStatus,
+  getModerationLabel,
+  getModerationBadgeClass,
+  getModerationBorderClass,
+  type ModerationStatusType,
+} from "../../../lib/comments/types";
+
+// Get filter from URL
+const url = new URL(Astro.request.url);
+const statusParam = url.searchParams.get("status");
+let filterStatus: ModerationStatusType | null = null;
+
+if (statusParam !== null) {
+  const statusNum = parseInt(statusParam, 10);
+  if ([0, 1, 2, 3].includes(statusNum)) {
+    filterStatus = statusNum as ModerationStatusType;
+  }
+}
+
+// Fetch comments and counts
+const [{ comments }, counts] = await Promise.all([
+  getCommentsForAdmin({ status: filterStatus, limit: 50 }),
+  getCommentCounts(),
+]);
+
+// Fetch all articles to get titles
+const articles = await getCollection("blog");
+const articleTitleMap = new Map(articles.map((a) => [a.id, a.data.title]));
+
+// Enrich comments with article titles
+const enrichedComments = comments.map((c) => ({
+  ...c,
+  articleTitle: articleTitleMap.get(c.articleSlug) || c.articleSlug,
+}));
+
+function formatDate(date: Date): string {
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (minutes < 60) return `${minutes} min ago`;
+  if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  if (days < 7) return `${days} day${days > 1 ? "s" : ""} ago`;
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function truncate(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + "...";
+}
 ---
 
 <BaseAdminLayout
@@ -10,8 +67,131 @@ import { SITE_DESCRIPTION, SITE_TITLE, ADMIN_DOCK } from "../../../consts";
   description={SITE_DESCRIPTION}
   dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin/comments" }}
 >
-  <div>
-    <p>Currently you're in admin Comment Page</p>
-    <a href="/admin">Back to Admin Home</a>
+  <div class="space-y-6">
+    <h1 class="text-2xl font-bold">Comment Moderation</h1>
+
+    <!-- Filter Tabs -->
+    <CommentFilter filterStatus={filterStatus} counts={counts} />
+
+    <!-- Comment List -->
+    <div id="comment-list" class="space-y-4">
+      {enrichedComments.length === 0 && (
+        <div class="card bg-base-100/60 p-8 text-center">
+          <p class="text-base-content/60">No comments found</p>
+        </div>
+      )}
+
+      {enrichedComments.map((comment) => (
+        <div
+          class:list={[
+            "card bg-base-100/80 border-l-4",
+            getModerationBorderClass(comment.moderationStatus),
+          ]}
+        >
+          <div class="card-body p-4 space-y-3">
+            <!-- Parent Context (if replying) -->
+            {comment.parent && (
+              <div class="bg-base-200/50 rounded-lg p-3 text-sm">
+                <div class="flex items-center gap-2 text-base-content/60 mb-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                  </svg>
+                  <span>Replying to</span>
+                </div>
+                <div class="flex items-start gap-2">
+                  <Avatar seed={comment.parent.alias} size={24} />
+                  <div>
+                    <span class="font-semibold text-sm">{comment.parent.alias}</span>
+                    <p class="text-base-content/70 line-clamp-2">{truncate(comment.parent.message, 150)}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <!-- Comment Header -->
+            <div class="flex items-start gap-3">
+              <Avatar seed={comment.alias} size={40} />
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="font-semibold">{comment.alias}</span>
+                  {comment.moderationStatus !== ModerationStatus.UNVERIFIED && (
+                    <span class:list={["badge badge-sm", getModerationBadgeClass(comment.moderationStatus)]}>
+                      {comment.moderationStatus === ModerationStatus.WARNING && "⚠ "}
+                      {comment.moderationStatus === ModerationStatus.DANGEROUS && "⊘ "}
+                      {getModerationLabel(comment.moderationStatus)}
+                    </span>
+                  )}
+                </div>
+                <!-- Comment Content -->
+                <p class="mt-1 text-base-content/80 whitespace-pre-wrap break-words">{comment.message}</p>
+                <!-- Meta -->
+                <div class="flex flex-wrap gap-2 mt-2 text-xs text-base-content/50">
+                  <span>{formatDate(comment.createdAt)}</span>
+                  <span>on "{truncate(comment.articleTitle, 40)}"</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Moderation Reason -->
+            {comment.moderationReason && (comment.moderationStatus === ModerationStatus.WARNING || comment.moderationStatus === ModerationStatus.DANGEROUS) && (
+              <div class:list={[
+                "rounded-lg p-3 text-sm flex items-start gap-2",
+                comment.moderationStatus === ModerationStatus.WARNING ? "bg-warning/20 text-warning-content" : "bg-error/20 text-error-content",
+              ]}>
+                <span class="text-lg">✦</span>
+                <p>{comment.moderationReason}</p>
+              </div>
+            )}
+
+            <!-- Replies (children) -->
+            {comment.children.length > 0 && (
+              <details class="collapse collapse-arrow bg-base-200/30">
+                <summary class="collapse-title text-sm font-medium py-2 min-h-0">
+                  {comment.children.length} {comment.children.length === 1 ? "reply" : "replies"}
+                </summary>
+                <div class="collapse-content">
+                  <div class="space-y-2 pt-2">
+                    {comment.children.map((child) => (
+                      <div class="flex items-start gap-2 p-2 bg-base-100/50 rounded">
+                        <Avatar seed={child.alias} size={24} />
+                        <div class="flex-1 min-w-0">
+                          <div class="flex items-center gap-2">
+                            <span class="font-semibold text-sm">{child.alias}</span>
+                            <span class:list={["badge badge-xs", getModerationBadgeClass(child.moderationStatus)]}>
+                              {getModerationLabel(child.moderationStatus)}
+                            </span>
+                          </div>
+                          <p class="text-sm text-base-content/70 line-clamp-2">{truncate(child.message, 100)}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </details>
+            )}
+
+            <!-- Actions -->
+            <div class="flex justify-end gap-2 pt-2 border-t border-base-content/10">
+              {comment.moderationStatus !== ModerationStatus.OK && (
+                <button
+                  class="btn btn-sm btn-outline hover:btn-success"
+                  hx-post={`/api/admin/comments/${comment.id}/approve`}
+                  hx-confirm="Mark this comment as safe?"
+                >
+                  Mark as Safe
+                </button>
+              )}
+              <button
+                class="btn btn-sm btn-error"
+                hx-post={`/api/admin/comments/${comment.id}/hide`}
+                hx-confirm="Delete this comment?"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
   </div>
 </BaseAdminLayout>

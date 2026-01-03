@@ -47,3 +47,65 @@ export interface ModerationBatchResult {
   results: ModerationResult[];
   errors?: string[];
 }
+
+// Admin moderation types
+export interface AdminComment extends Reply {
+  moderationReason: string | null;
+  lastModeratedAt: Date | null;
+  parent: Reply | null;
+  children: Reply[];
+  articleTitle: string;
+}
+
+export interface CommentCounts {
+  all: number;
+  unverified: number;
+  warning: number;
+  dangerous: number;
+}
+
+// Helper functions for moderation UI
+export function getModerationLabel(status: ModerationStatusType): string {
+  switch (status) {
+    case ModerationStatus.UNVERIFIED:
+      return "Unmoderated";
+    case ModerationStatus.OK:
+      return "OK";
+    case ModerationStatus.WARNING:
+      return "Warning";
+    case ModerationStatus.DANGEROUS:
+      return "Dangerous";
+    default:
+      return "Unknown";
+  }
+}
+
+export function getModerationBadgeClass(status: ModerationStatusType): string {
+  switch (status) {
+    case ModerationStatus.UNVERIFIED:
+      return "badge-ghost";
+    case ModerationStatus.OK:
+      return "badge-success";
+    case ModerationStatus.WARNING:
+      return "badge-warning";
+    case ModerationStatus.DANGEROUS:
+      return "badge-error";
+    default:
+      return "badge-ghost";
+  }
+}
+
+export function getModerationBorderClass(status: ModerationStatusType): string {
+  switch (status) {
+    case ModerationStatus.UNVERIFIED:
+      return "border-l-base-content/30";
+    case ModerationStatus.OK:
+      return "border-l-success";
+    case ModerationStatus.WARNING:
+      return "border-l-warning";
+    case ModerationStatus.DANGEROUS:
+      return "border-l-error";
+    default:
+      return "border-l-base-content/30";
+  }
+}
