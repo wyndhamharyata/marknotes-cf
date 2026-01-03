@@ -21,7 +21,7 @@ const { menus, currentPath } = Astro.props;
       <li>
         <a
           href={menu.path}
-          class={`${menu.path === currentPath ? "menu-active" : ""} mx-1 flex h-16 w-24 flex-col px-6`}
+          class={`${menu.path === currentPath ? "menu-active w-28" : "w-24"} mx-1 flex h-16 flex-col px-6`}
         >
           <Icon name={menu.iconName} class="mt-2 h-5 w-5" />
           {menu.label}
