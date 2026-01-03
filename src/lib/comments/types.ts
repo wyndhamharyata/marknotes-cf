@@ -59,6 +59,7 @@ export interface AdminComment extends Reply {
 
 export interface CommentCounts {
   all: number;
+  ok: number;
   unverified: number;
   warning: number;
   dangerous: number;
@@ -74,7 +75,7 @@ export function getModerationLabel(status: ModerationStatusType): string {
     case ModerationStatus.WARNING:
       return "Warning";
     case ModerationStatus.DANGEROUS:
-      return "Dangerous";
+      return "Alert";
     default:
       return "Unknown";
   }

@@ -1,0 +1,96 @@
+---
+import {
+  ModerationStatus,
+  getModerationLabel,
+  getModerationBadgeClass,
+  getModerationBorderClass,
+  type AdminComment,
+} from "../../../lib/comments/types";
+import Avatar from "../Avatar.astro";
+import ParentContext from "./ParentContext.astro";
+import ModerationReason from "./ModerationReason.astro";
+import CommentReplies from "./CommentReplies.astro";
+
+type Props = {
+  comment: AdminComment;
+};
+
+const { comment } = Astro.props;
+---
+
+<div
+  class:list={[
+    "card bg-base-100/80 border-l-4",
+    getModerationBorderClass(comment.moderationStatus),
+  ]}
+>
+  <div class="card-body space-y-3 p-4">
+    {comment.parent && <ParentContext comment={comment} />}
+
+    <!-- Comment Header -->
+    <div class="flex items-start gap-3">
+      <Avatar seed={comment.alias} size={40} />
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="font-semibold">{comment.alias}</span>
+          {
+            comment.moderationStatus !== ModerationStatus.UNVERIFIED && (
+              <span
+                class:list={["badge badge-sm", getModerationBadgeClass(comment.moderationStatus)]}
+              >
+                {comment.moderationStatus === ModerationStatus.WARNING && "⚠ "}
+                {comment.moderationStatus === ModerationStatus.DANGEROUS && "⊘ "}
+                {getModerationLabel(comment.moderationStatus)}
+              </span>
+            )
+          }
+        </div>
+        <!-- Comment Content -->
+        <p class="text-base-content/80 wrap-break-words mt-1 whitespace-pre-wrap">
+          {comment.message}
+        </p>
+        <!-- Meta -->
+        <div class="text-base-content/50 mt-2 flex flex-wrap gap-2 text-xs">
+          <span
+            >{
+              comment.createdAt.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })
+            }</span
+          >
+          <span>on "{comment.articleTitle}"</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Moderation Reason -->
+    <ModerationReason comment={comment} />
+
+    <!-- Replies (children) -->
+    {comment.children.length > 0 && <CommentReplies comment={comment} />}
+
+    <!-- Actions -->
+    <div class="border-base-content/10 flex justify-end gap-2 border-t pt-2">
+      {
+        comment.moderationStatus !== ModerationStatus.OK && (
+          <button
+            class="btn btn-sm btn-outline hover:btn-success"
+            hx-post={`/api/admin/comments/${comment.id}/approve`}
+            hx-confirm="Mark this comment as safe?"
+          >
+            Mark as Safe
+          </button>
+        )
+      }
+      <button
+        class="btn btn-sm btn-error"
+        hx-post={`/api/admin/comments/${comment.id}/hide`}
+        hx-confirm="Delete this comment?"
+      >
+        Delete
+      </button>
+    </div>
+  </div>
+</div>

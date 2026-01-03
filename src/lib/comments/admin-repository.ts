@@ -143,6 +143,7 @@ export async function getCommentCounts(): Promise<CommentCounts> {
       SELECT
         COUNT(*) as all_count,
         SUM(CASE WHEN moderation_status = 0 THEN 1 ELSE 0 END) as unverified,
+        SUM(CASE WHEN moderation_status = 1 THEN 1 ELSE 0 END) as ok,
         SUM(CASE WHEN moderation_status = 2 THEN 1 ELSE 0 END) as warning,
         SUM(CASE WHEN moderation_status = 3 THEN 1 ELSE 0 END) as dangerous
       FROM replies
@@ -155,6 +156,7 @@ export async function getCommentCounts(): Promise<CommentCounts> {
   return {
     all: (row?.all_count as number) || 0,
     unverified: (row?.unverified as number) || 0,
+    ok: (row?.ok as number) || 0,
     warning: (row?.warning as number) || 0,
     dangerous: (row?.dangerous as number) || 0,
   };

@@ -1,0 +1,27 @@
+---
+import type { AdminComment } from "../../../lib/comments/types";
+
+type Props = {
+  comment: AdminComment;
+};
+const { comment } = Astro.props;
+---
+
+<div class="bg-base-300 rounded-lg p-3 text-sm">
+  <div class="text-base-content/60 mb-1 flex items-center gap-2">
+    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+    </svg>
+    <span>Replying to</span>
+  </div>
+  <div class="flex items-start gap-2">
+    <div>
+      <span class="text-xs font-semibold">{comment?.parent?.alias}</span>
+      <p class="text-base-content/40 text-xs">{comment?.parent?.message}</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+---
+import type { AdminComment } from "../../../lib/comments/types";
+import { getModerationBadgeClass, getModerationLabel } from "../../../lib/comments/types";
+import Avatar from "../../admin/Avatar.astro";
+
+type Props = {
+  comment: AdminComment;
+};
+const { comment } = Astro.props;
+---
+
+<details class="collapse-arrow bg-base-200/30 collapse">
+  <summary class="collapse-title min-h-0 py-2 text-sm font-medium">
+    {comment.children.length}
+    {comment.children.length === 1 ? "reply" : "replies"}
+  </summary>
+  <div class="collapse-content">
+    <div class="space-y-2 pt-2">
+      {
+        comment.children.map((child) => (
+          <div class="bg-base-100/50 flex items-start gap-2 rounded p-2">
+            <Avatar seed={child.alias} size={24} />
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold">{child.alias}</span>
+                <span
+                  class:list={["badge badge-xs", getModerationBadgeClass(child.moderationStatus)]}
+                >
+                  {getModerationLabel(child.moderationStatus)}
+                </span>
+              </div>
+              <p class="text-base-content/70 text-sm">{child.message}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</details>

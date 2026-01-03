@@ -1,0 +1,27 @@
+---
+import { ModerationStatus, type AdminComment } from "../../../lib/comments/types";
+
+type Props = {
+  comment: AdminComment;
+};
+
+const { comment } = Astro.props;
+---
+
+{
+  comment.moderationReason &&
+    (comment.moderationStatus === ModerationStatus.WARNING ||
+      comment.moderationStatus === ModerationStatus.DANGEROUS) && (
+      <div
+        class:list={[
+          "flex items-start gap-2 rounded-lg p-3 text-sm",
+          comment.moderationStatus === ModerationStatus.WARNING
+            ? "bg-warning text-warning-content"
+            : "bg-error text-error-content",
+        ]}
+      >
+        <span class="text-lg">✦</span>
+        <p>{comment.moderationReason}</p>
+      </div>
+    )
+}
