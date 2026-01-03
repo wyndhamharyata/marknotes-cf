@@ -11,6 +11,9 @@ import { defineConfig, envField } from "astro/config";
 export default defineConfig({
   site: "https://blog.mwyndham.dev",
   output: "server",
+  redirects: {
+    "/resume": "/articles/m-wyndham-haryata-permana-sr-full-stack-engineer/",
+  },
   adapter: cloudflare({
     platformProxy: {
       enabled: true,
