@@ -17,7 +17,7 @@ export default $config({
     const baseUrl = new sst.Secret("BaseUrl");
 
     new sst.cloudflare.x.Astro("Max", {
-      domain: $app.stage === "production" ? "read.mwyndham.dev" : "devread.mwyndham.dev",
+      domain: $app.stage === "production" ? "mwyndham.dev" : "devread.mwyndham.dev",
       link: [libsqlUrl, libsqlAuthToken, geminiApiKey, openAuthUrl, baseUrl],
       environment: {
         LIBSQL_URL: libsqlUrl.value,
