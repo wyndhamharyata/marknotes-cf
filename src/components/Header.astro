@@ -23,7 +23,7 @@ import { Icon } from "astro-icon/components";
       class="dropdown-content menu bg-base-100 fixed right-0 left-0 z-50 w-full p-4 shadow-lg"
     >
       <li><a href="/" data-nav-link onclick="document.activeElement?.blur()">Home</a></li>
-      <li><a href="/articles" data-nav-link onclick="document.activeElement?.blur()">Blog</a></li>
+      <li><a href="/articles/" data-nav-link onclick="document.activeElement?.blur()">Blog</a></li>
       <li>
         <a
           href="/articles/m-wyndham-haryata-permana-sr-full-stack-engineer"
@@ -32,7 +32,9 @@ import { Icon } from "astro-icon/components";
         >
       </li>
       <li>
-        <a href="/admin" data-nav-link onclick="document.activeElement?.blur()">Admin Panel</a>
+        <a href="/admin" hx-boost="false" data-nav-link onclick="document.activeElement?.blur()"
+          >Admin Panel</a
+        >
       </li>
     </ul>
   </div>
@@ -41,13 +43,13 @@ import { Icon } from "astro-icon/components";
   <div class="hidden w-full justify-center md:flex">
     <ul class="menu menu-horizontal gap-2 px-1">
       <li><HeaderLink href="/">Home</HeaderLink></li>
-      <li><HeaderLink href="/articles">Blog</HeaderLink></li>
+      <li><HeaderLink href="/articles/">Blog</HeaderLink></li>
       <li>
         <HeaderLink href="/articles/m-wyndham-haryata-permana-sr-full-stack-engineer"
           >Resume</HeaderLink
         >
       </li>
-      <li><HeaderLink href="/admin">Admin Panel</HeaderLink></li>
+      <li><HeaderLink href="/admin" hx-boost="false">Admin Panel</HeaderLink></li>
     </ul>
   </div>
 
