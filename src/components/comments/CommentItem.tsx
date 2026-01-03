@@ -34,7 +34,7 @@ function CommentContent({ comment }: { comment: CommentNode }) {
   }
 
   return (
-    <p class="text-base-content/80 text-sm break-words whitespace-pre-wrap">{comment.message}</p>
+    <p class="text-base-content/80 text-[10pt] wrap-break-word whitespace-pre-wrap">{comment.message}</p>
   );
 }
 
@@ -58,16 +58,16 @@ export default function CommentItem({
   // Progressive background darkness based on depth (using accent color)
   const bgClasses = [
     "border border-transparent hover:border-base-content/20 rounded-lg p-3 transition-colors", // depth 0: outline on hover
-    "bg-accent/5 rounded-lg p-3", // depth 1
-    "bg-accent/10 rounded-lg p-3", // depth 2
-    "bg-accent/15 rounded-lg p-3", // depth 3
+    "bg-accent/5 rounded-lg px-4", // depth 1
+    "bg-accent/10 rounded-lg px-4", // depth 2
+    "bg-accent/15 rounded-lg px-4", // depth 3
   ];
   const bgClass = bgClasses[Math.min(depth, 3)];
 
   return (
-    <div class={`py-3 ${bgClass}`}>
+    <div class={`py-4 ${bgClass}`}>
       <div class="flex gap-3">
-        <div class="flex-shrink-0">
+        <div class="shrink-0">
           <Avatar seed={comment.alias} size={40} />
         </div>
         <div class="min-w-0 flex-1">
@@ -89,10 +89,12 @@ export default function CommentItem({
           <CommentContent comment={comment} />
 
           {canReply && (
-            <button class="btn btn-xs btn-ghost mt-2" onClick={() => onOpenReply(comment.id)}>
+            <button class="btn btn-sm btn-ghost mt-2 hover:btn-accent -ms-3" onClick={() => onOpenReply(comment.id)}>
               Reply
             </button>
           )}
+
+          <div class="h-2" />
 
           {activeReplyId === comment.id && (
             <CommentForm

@@ -21,12 +21,12 @@ const { title, description, image } = Astro.props;
     {/* Background layer */}
     <div class="bg-base-200 dark:bg-base-300 fixed inset-0 -z-10">
       <div class="grid-bg absolute inset-0"></div>
-      <div class="from-secondary/5 via-accent/5 absolute inset-0 bg-gradient-to-bl to-transparent">
+      <div class="from-secondary/5 via-accent/5 absolute inset-0 bg-linear-to-bl to-transparent">
       </div>
     </div>
 
     <Header />
-    <main id="main-content" class="mx-auto max-w-4xl flex-1 px-4 py-8">
+    <main id="main-content" class="mx-auto max-w-4xl flex-1 py-8">
       <slot />
     </main>
     <Footer />

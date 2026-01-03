@@ -1,8 +1,6 @@
 ---
 import {
   ModerationStatus,
-  getModerationLabel,
-  getModerationBadgeClass,
   getModerationBorderClass,
   type AdminComment,
 } from "../../../lib/comments/types";
@@ -35,7 +33,8 @@ const { comment } = Astro.props;
           <span class="font-semibold">{comment.alias}</span>
         </div>
         <!-- Comment Content -->
-        <p class="text-base-content wrap-break-words mt-1 whitespace-pre-wrap">{comment.message}</p>
+        <!-- prettier-ignore -->
+        <p class="text-base-content wrap-break-words mt-1 whitespace-pre-wrap text-[10pt] font-light">{comment.message}</p>
         <!-- Meta -->
         <div class="text-base-content/50 mt-2 flex flex-wrap gap-2 text-xs">
           <span

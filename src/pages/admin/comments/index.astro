@@ -31,9 +31,8 @@ const [{ comments, total }, counts] = await Promise.all([
 ]);
 
 const totalPages = Math.ceil(total / limit);
-const baseUrl = filterStatus !== null
-  ? `/admin/comments?status=${filterStatus}`
-  : "/admin/comments";
+const baseUrl =
+  filterStatus !== null ? `/admin/comments?status=${filterStatus}` : "/admin/comments";
 
 const articles = await getCollection("blog");
 const articleTitleMap = new Map(articles.map((a) => [a.id, a.data.title]));
@@ -49,20 +48,18 @@ const enrichedComments = comments.map((c) => ({
   description={SITE_DESCRIPTION}
   dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin/comments" }}
 >
-  <div class="w-2xl space-y-6">
+  <div class="flex w-3xl flex-col space-y-6">
     <h1 class="text-2xl font-bold">Comment Moderation</h1>
 
     <CommentFilter filterStatus={filterStatus} counts={counts} />
 
-    {totalPages > 1 && (
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        baseUrl={baseUrl}
-      />
-    )}
+    {
+      totalPages > 1 && (
+        <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={baseUrl} />
+      )
+    }
 
-    <div id="comment-list" class="w-2xl space-y-4">
+    <div id="comment-list" class="w-3xl space-y-4">
       {
         enrichedComments.length === 0 && (
           <div class="card bg-base-100/60 p-8 text-center">

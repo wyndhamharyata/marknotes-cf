@@ -38,7 +38,7 @@ export default function CommentForm({
     <form onSubmit={handleSubmit} class={isReply ? "mt-3" : "mb-2"}>
       <div class="form-control">
         <textarea
-          class={`textarea textarea-bordered w-full ${error ? "textarea-error" : ""}`}
+          class={`text-[10pt] textarea textarea-bordered w-full ${error ? "textarea-error" : ""}`}
           placeholder={isReply ? "Write a reply..." : "Write a comment..."}
           rows={isReply ? 2 : 3}
           value={message}
@@ -46,7 +46,7 @@ export default function CommentForm({
           required
           disabled={isSubmitting}
         />
-        {error && <p class="text-error text-sm mt-1">{error}</p>}
+        {error && <p class="text-error mt-1">{error}</p>}
       </div>
       <div class="mt-2 flex justify-end gap-2">
         {isReply && onCancel && (
