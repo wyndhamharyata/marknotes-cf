@@ -10,7 +10,15 @@ export const GET: APIRoute = async ({ url }) => {
   let status: ModerationStatusType | null = null;
   if (statusParam !== null) {
     const statusNum = parseInt(statusParam, 10);
-    if (statusNum in [ModerationStatus.UNVERIFIED, ModerationStatus.OK, ModerationStatus.WARNING, ModerationStatus.DANGEROUS]) {
+    if (
+      statusNum in
+      [
+        ModerationStatus.UNVERIFIED,
+        ModerationStatus.OK,
+        ModerationStatus.WARNING,
+        ModerationStatus.DANGEROUS,
+      ]
+    ) {
       status = statusNum as ModerationStatusType;
     }
   }

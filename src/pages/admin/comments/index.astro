@@ -8,11 +8,13 @@ import { getCommentsForAdmin, getCommentCounts } from "../../../lib/comments/adm
 import { type ModerationStatusType } from "../../../lib/comments/types";
 import CommentFilter from "../../../components/admin/CommentFilter.astro";
 import CommentModerationItem from "../../../components/admin/CommentModerationItem/CommentModerationItem.astro";
+import Pagination from "../../../components/admin/Pagination.astro";
 
 const url = new URL(Astro.request.url);
 const statusParam = url.searchParams.get("status");
-let filterStatus: ModerationStatusType | null = null;
+const pageParam = url.searchParams.get("page");
 
+let filterStatus: ModerationStatusType | null = null;
 if (statusParam !== null) {
   const statusNum = parseInt(statusParam, 10);
   if ([0, 1, 2, 3].includes(statusNum)) {
@@ -20,10 +22,18 @@ if (statusParam !== null) {
   }
 }
 
-const [{ comments }, counts] = await Promise.all([
-  getCommentsForAdmin({ status: filterStatus, limit: 50 }),
+const currentPage = Math.max(1, parseInt(pageParam ?? "1", 10) || 1);
+const limit = 10;
+
+const [{ comments, total }, counts] = await Promise.all([
+  getCommentsForAdmin({ status: filterStatus, page: currentPage, limit }),
   getCommentCounts(),
 ]);
+
+const totalPages = Math.ceil(total / limit);
+const baseUrl = filterStatus !== null
+  ? `/admin/comments?status=${filterStatus}`
+  : "/admin/comments";
 
 const articles = await getCollection("blog");
 const articleTitleMap = new Map(articles.map((a) => [a.id, a.data.title]));
@@ -43,6 +53,14 @@ const enrichedComments = comments.map((c) => ({
     <h1 class="text-2xl font-bold">Comment Moderation</h1>
 
     <CommentFilter filterStatus={filterStatus} counts={counts} />
+
+    {totalPages > 1 && (
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        baseUrl={baseUrl}
+      />
+    )}
 
     <div id="comment-list" class="w-2xl space-y-4">
       {
