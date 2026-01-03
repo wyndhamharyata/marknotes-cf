@@ -1,0 +1,32 @@
+---
+import { Icon } from "astro-icon/components";
+
+type Props = {
+  menus: Menu[];
+  currentPath: string;
+};
+
+type Menu = {
+  path: string;
+  iconName: string;
+  label: string;
+};
+
+const { menus, currentPath } = Astro.props;
+---
+
+<ul class="menu menu-horizontal bg-base-100 mx-auto my-10 rounded-2xl py-2 drop-shadow-2xl">
+  {
+    menus.map((menu) => (
+      <li>
+        <a
+          href={menu.path}
+          class={`${menu.path === currentPath ? "menu-active" : ""} mx-1 flex h-16 w-24 flex-col px-6`}
+        >
+          <Icon name={menu.iconName} class="mt-2 h-5 w-5" />
+          {menu.label}
+        </a>
+      </li>
+    ))
+  }
+</ul>

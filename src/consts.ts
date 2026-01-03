@@ -3,3 +3,21 @@
 
 export const SITE_TITLE = `Wyndham's Blog`;
 export const SITE_DESCRIPTION = "Blog by Wyndham Haryata";
+
+export const ADMIN_DOCK = [
+  {
+    path: "/admin",
+    iconName: "heroicons:home",
+    label: "Home",
+  },
+  {
+    path: "/admin/articles",
+    iconName: "heroicons:document-text",
+    label: "Articles",
+  },
+  {
+    path: "/admin/comments",
+    iconName: "heroicons:chat-bubble-left",
+    label: "Comments",
+  },
+];

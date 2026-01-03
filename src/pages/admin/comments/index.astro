@@ -1,0 +1,17 @@
+---
+export const prerender = false;
+
+import BaseAdminLayout from "../../../layouts/BaseAdminLayout.astro";
+import { SITE_DESCRIPTION, SITE_TITLE, ADMIN_DOCK } from "../../../consts";
+---
+
+<BaseAdminLayout
+  title={SITE_TITLE}
+  description={SITE_DESCRIPTION}
+  dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin/comments" }}
+>
+  <div>
+    <p>Currently you're in admin Comment Page</p>
+    <a href="/admin">Back to Admin Home</a>
+  </div>
+</BaseAdminLayout>

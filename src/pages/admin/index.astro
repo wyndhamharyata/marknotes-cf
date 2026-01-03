@@ -1,15 +1,17 @@
 ---
-// Admin dashboard - protected by auth middleware
-// This page is on-demand rendered (SSR)
 export const prerender = false;
 
 import BaseAdminLayout from "../../layouts/BaseAdminLayout.astro";
-import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
+import { SITE_DESCRIPTION, SITE_TITLE, ADMIN_DOCK } from "../../consts";
 
 const user = Astro.locals.user;
 ---
 
-<BaseAdminLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+<BaseAdminLayout
+  title={SITE_TITLE}
+  description={SITE_DESCRIPTION}
+  dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin" }}
+>
   <div>
     <p>You are authenticated. Admin functionality coming soon.</p>
     {
