@@ -18,21 +18,24 @@ const { filterStatus, counts } = Astro.props;
     role="tab"
     class:list={["btn", filterStatus === null ? "btn-accent" : "btn-ghost"]}
   >
-    All <span class="badge badge-xs ml-1">{counts.all}</span>
+    All <span class="badge badge-accent badge-xs ml-1">{counts.all}</span>
   </a>
   <a
     href="/admin/comments?status=0"
     role="tab"
-    class:list={["btn", filterStatus === ModerationStatus.UNVERIFIED ? "" : "btn-ghost"]}
+    class:list={[
+      "btn",
+      filterStatus === ModerationStatus.UNVERIFIED ? "btn-secondary" : "btn-ghost",
+    ]}
   >
     Unmoderated <span class="badge badge-xs ml-1">{counts.unverified}</span>
   </a>
   <a
     href="/admin/comments?status=1"
     role="tab"
-    class:list={["btn", filterStatus === ModerationStatus.OK ? "btn-primary" : "btn-ghost"]}
+    class:list={["btn", filterStatus === ModerationStatus.OK ? "btn-success" : "btn-ghost"]}
   >
-    OK <span class="badge badge-xs ml-1">{counts.ok}</span>
+    OK <span class="badge badge-success badge-xs ml-1">{counts.ok}</span>
   </a>
   <a
     href="/admin/comments?status=2"

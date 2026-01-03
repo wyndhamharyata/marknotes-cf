@@ -4,7 +4,7 @@
 @plugin "daisyui" {
   themes:
     marknotes-light,
-    sunset --prefersdark;
+    marknotes-dark --prefersdark;
 }
 
 @theme {
@@ -36,6 +36,44 @@
   --color-warning-content: oklch(27% 0.072 132.109);
   --color-error: oklch(52% 0.223 3.958);
   --color-error-content: oklch(94% 0.03 12.58);
+  --radius-selector: 2rem;
+  --radius-field: 1rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.3125rem;
+  --size-field: 0.21875rem;
+  --border: 2px;
+  --depth: 1;
+  --noise: 1;
+}
+
+@plugin "daisyui/theme" {
+  name: "marknotes-dark";
+  default: false;
+  prefersdark: true;
+  color-scheme: "dark";
+  /* Base colors from sunset theme */
+  --color-base-100: oklch(25.33% 0.015 252.42);
+  --color-base-200: oklch(23.26% 0.014 253.1);
+  --color-base-300: oklch(21.15% 0.012 254.09);
+  --color-base-content: oklch(90% 0 0);
+  --color-primary: oklch(66.27% 0.2 22.22);
+  --color-primary-content: oklch(13.25% 0.04 22.22);
+  --color-secondary: oklch(56.86% 0.2 277.69);
+  --color-secondary-content: oklch(11.37% 0.04 277.69);
+  /* Blue accent */
+  --color-accent: oklch(55% 0.15 245);
+  --color-accent-content: oklch(98% 0.02 245);
+  --color-neutral: oklch(15% 0.02 252);
+  --color-neutral-content: oklch(90% 0.02 252);
+  --color-info: oklch(58% 0.158 241.966);
+  --color-info-content: oklch(95% 0.026 236.824);
+  /* Softer status colors (rich & darker) */
+  --color-success: oklch(55% 0.14 145);
+  --color-success-content: oklch(98% 0.02 145);
+  --color-warning: oklch(55% 0.14 75);
+  --color-warning-content: oklch(98% 0.02 75);
+  --color-error: oklch(52% 0.18 20);
+  --color-error-content: oklch(98% 0.02 20);
   --radius-selector: 2rem;
   --radius-field: 1rem;
   --radius-box: 0.5rem;

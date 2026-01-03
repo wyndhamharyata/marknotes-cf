@@ -15,25 +15,46 @@ type Menu = {
 const { menus, currentPath } = Astro.props;
 ---
 
-<div class="fixed bottom-0 left-0 right-0 z-40">
+<div class="fixed right-0 bottom-0 left-0 z-40">
   <!-- Gradient fade overlay - semi-transparent even at bottom -->
-  <div class="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-base-200/80 to-transparent dark:from-base-300/80"></div>
+  <div
+    class="from-base-200/80 dark:from-base-300/80 pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t to-transparent"
+  >
+  </div>
   <!-- Dock container -->
   <div class="relative flex justify-center pb-4">
-    <ul class="menu menu-horizontal bg-base-100 rounded-2xl py-2 drop-shadow-2xl">
-    {
-      menus.map((menu) => (
-        <li>
-          <a
-            href={menu.path}
-            class={`${menu.path === currentPath ? "menu-active w-28" : "w-24"} mx-1 flex h-16 flex-col px-6`}
-          >
-            <Icon name={menu.iconName} class="mt-2 h-5 w-5" />
-            {menu.label}
-          </a>
-        </li>
-      ))
-    }
+    <ul class="menu menu-horizontal bg-base-100 rounded-2xl px-30 py-2 drop-shadow-2xl">
+      <li class="absolute top-0 bottom-0 left-6">
+        <a href="/" class="btn btn-ghost btn-circle my-auto">
+          <Icon name="heroicons:arrow-uturn-left" class="h-6 w-6 fill-current" />
+        </a>
+      </li>
+      {
+        menus.map((menu) => (
+          <li>
+            <a
+              href={menu.path}
+              class={`${menu.path === currentPath ? "menu-active w-28" : "w-24"} mx-1 flex h-16 flex-col px-6`}
+            >
+              <Icon name={menu.iconName} class="mt-2 h-5 w-5" />
+              {menu.label}
+            </a>
+          </li>
+        ))
+      }
+
+      <li class="absolute top-0 right-6 bottom-0">
+        <button class="btn btn-ghost btn-circle my-auto">
+          <label class="swap swap-rotate" for="dark-toggle">
+            <span class="hidden">Theme Switcher</span>
+            <input type="checkbox" id="dark-toggle" class="theme-controller" />
+            <!-- Sun icon -->
+            <Icon name="heroicons:sun" class="swap-off h-6 w-6 fill-current" />
+            <!-- Moon icon -->
+            <Icon name="heroicons:moon" class="swap-on h-6 w-6 fill-current" />
+          </label>
+        </button>
+      </li>
     </ul>
   </div>
 </div>

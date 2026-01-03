@@ -33,22 +33,9 @@ const { comment } = Astro.props;
       <div class="min-w-0 flex-1">
         <div class="flex flex-wrap items-center gap-2">
           <span class="font-semibold">{comment.alias}</span>
-          {
-            comment.moderationStatus !== ModerationStatus.UNVERIFIED && (
-              <span
-                class:list={["badge badge-sm", getModerationBadgeClass(comment.moderationStatus)]}
-              >
-                {comment.moderationStatus === ModerationStatus.WARNING && "⚠ "}
-                {comment.moderationStatus === ModerationStatus.DANGEROUS && "⊘ "}
-                {getModerationLabel(comment.moderationStatus)}
-              </span>
-            )
-          }
         </div>
         <!-- Comment Content -->
-        <p class="text-base-content/80 wrap-break-words mt-1 whitespace-pre-wrap">
-          {comment.message}
-        </p>
+        <p class="text-base-content wrap-break-words mt-1 whitespace-pre-wrap">{comment.message}</p>
         <!-- Meta -->
         <div class="text-base-content/50 mt-2 flex flex-wrap gap-2 text-xs">
           <span
@@ -60,7 +47,12 @@ const { comment } = Astro.props;
               })
             }</span
           >
-          <span>on "{comment.articleTitle}"</span>
+          <a
+            href={`/articles/${comment.articleSlug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:underline">on "{comment.articleTitle}"</a
+          >
         </div>
       </div>
     </div>
