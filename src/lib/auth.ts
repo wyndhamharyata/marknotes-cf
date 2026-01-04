@@ -50,3 +50,12 @@ export function setTokensFromCookies(
     maxAge: 34560000,
   });
 }
+
+const ADMIN_OAUTH_ID = "34619560";
+const ADMIN_EMAIL = "mwyndham.business@gmail.com";
+
+export function isAdmin(user: App.Locals["user"]): boolean {
+  if (!user) return false;
+  const { oauthID, email } = user.properties;
+  return oauthID === ADMIN_OAUTH_ID && email === ADMIN_EMAIL;
+}

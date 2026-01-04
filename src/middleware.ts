@@ -1,6 +1,6 @@
 import { defineMiddleware, sequence } from "astro:middleware";
 import { fromCloudflareEnv } from "sst";
-import { client, subjects, setTokensFromCookies } from "./lib/auth";
+import { client, subjects, setTokensFromCookies, isAdmin } from "./lib/auth";
 
 const sstMiddleware = defineMiddleware((context, next) => {
   if (context.locals.runtime?.env) {
@@ -10,11 +10,16 @@ const sstMiddleware = defineMiddleware((context, next) => {
 });
 
 const authMiddleware = defineMiddleware(async (context, next) => {
-  if (context.url.pathname === "/callback") {
+  const { pathname } = context.url;
+
+  if (pathname === "/callback") {
     return next();
   }
 
-  if (!context.url.pathname.startsWith("/admin")) {
+  const isAdminPage = pathname.startsWith("/admin");
+  const isAdminApi = pathname.startsWith("/api/admin");
+
+  if (!isAdminPage && !isAdminApi) {
     return next();
   }
 
@@ -35,10 +40,30 @@ const authMiddleware = defineMiddleware(async (context, next) => {
         );
       }
       context.locals.user = verified.subject;
+
+      // Check if user is admin
+      if (!isAdmin(verified.subject)) {
+        if (isAdminApi) {
+          return new Response(
+            JSON.stringify({ error: "Forbidden", message: "Admin access required" }),
+            { status: 403, headers: { "Content-Type": "application/json" } },
+          );
+        }
+        return context.redirect("/", 302);
+      }
+
       return next();
     }
   } catch (e) {
     console.error("Auth verification failed:", e);
+  }
+
+  // Not authenticated
+  if (isAdminApi) {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized", message: "Authentication required" }),
+      { status: 401, headers: { "Content-Type": "application/json" } },
+    );
   }
 
   const { url } = await client.authorize(
