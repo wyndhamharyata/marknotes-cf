@@ -6,9 +6,9 @@ import BaseAdminLayout from "../../../layouts/BaseAdminLayout.astro";
 import { SITE_DESCRIPTION, SITE_TITLE, ADMIN_DOCK } from "../../../consts";
 import { getCommentsForAdmin, getCommentCounts } from "../../../lib/comments/admin-repository";
 import { type ModerationStatusType } from "../../../lib/comments/types";
-import CommentFilter from "../../../components/admin/CommentFilter.astro";
-import CommentModerationItem from "../../../components/admin/CommentModerationItem/CommentModerationItem.astro";
-import Pagination from "../../../components/admin/Pagination.astro";
+import CommentFilter from "./_components/CommentFilter.astro";
+import CommentModerationItem from "./_components/CommentModerationItem.astro";
+import Pagination from "./_components/Pagination.astro";
 
 const url = new URL(Astro.request.url);
 const statusParam = url.searchParams.get("status");

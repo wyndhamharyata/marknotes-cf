@@ -1,0 +1,81 @@
+---
+import {
+  ModerationStatus,
+  type CommentCounts,
+  type ModerationStatusType,
+} from "../../../../lib/comments/types";
+
+type Props = {
+  filterStatus: ModerationStatusType | null;
+  counts: CommentCounts;
+};
+
+type Filter = {
+  link: string;
+  color: string;
+  badgeColor: string;
+  label: string;
+  key: keyof CommentCounts;
+  moderationStatus: ModerationStatusType | null;
+};
+
+const { filterStatus, counts } = Astro.props;
+
+const filters: Filter[] = [
+  {
+    link: "/admin/comments",
+    color: "btn-accent",
+    badgeColor: "badge-accent",
+    label: "All",
+    key: "all",
+    moderationStatus: null,
+  },
+  {
+    link: "/admin/comments?status=0",
+    color: "btn-secondary",
+    badgeColor: "badge-secondary",
+    label: "Unmoderated",
+    key: "unverified",
+    moderationStatus: ModerationStatus.UNVERIFIED,
+  },
+  {
+    link: "/admin/comments?status=1",
+    color: "btn-success",
+    badgeColor: "badge-success",
+    label: "OK",
+    key: "ok",
+    moderationStatus: ModerationStatus.OK,
+  },
+  {
+    link: "/admin/comments?status=2",
+    color: "btn-warning",
+    badgeColor: "badge-warning",
+    label: "Warning",
+    key: "warning",
+    moderationStatus: ModerationStatus.WARNING,
+  },
+  {
+    link: "/admin/comments?status=3",
+    color: "btn-error",
+    badgeColor: "badge-error",
+    label: "Alert",
+    key: "dangerous",
+    moderationStatus: ModerationStatus.DANGEROUS,
+  },
+];
+---
+
+<div class="mx-auto flex flex-wrap gap-2" role="tablist">
+  {
+    filters.map((filter) => (
+      <a
+        href={filter.link}
+        role="tab"
+        class:list={["btn", filterStatus === filter.moderationStatus ? filter.color : "btn-ghost"]}
+      >
+        {filter.label}{" "}
+        <span class:list={["badge badge-xs ml-1", filter.badgeColor]}>{counts[filter.key]}</span>
+      </a>
+    ))
+  }
+</div>
