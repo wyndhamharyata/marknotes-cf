@@ -3,6 +3,12 @@ export const prerender = false;
 
 import BaseAdminLayout from "../../../layouts/BaseAdminLayout.astro";
 import { SITE_DESCRIPTION, SITE_TITLE, ADMIN_DOCK } from "../../../consts";
+import { getCollection } from "astro:content";
+import ArticleItem from "./_components/ArticleItem.astro";
+
+const articles = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
 ---
 
 <BaseAdminLayout
@@ -10,8 +16,8 @@ import { SITE_DESCRIPTION, SITE_TITLE, ADMIN_DOCK } from "../../../consts";
   description={SITE_DESCRIPTION}
   dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin/articles" }}
 >
-  <div>
-    <p>Currently you're in admin Article Page</p>
-    <a href="/admin">Back to Admin Home</a>
+  <div class="flex w-3xl flex-col space-y-6">
+    <h1 class="text-2xl font-bold">Articles</h1>
+    {articles.map((article) => <ArticleItem article={article} />)}
   </div>
 </BaseAdminLayout>

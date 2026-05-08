@@ -48,6 +48,13 @@ export default $config({
       },
     });
 
+    new sst.x.DevCommand("LocalDev", {
+      dev: {
+        autostart: false,
+        command: "npm run dev"
+      }
+    })
+
     new sst.cloudflare.Cron("ModerationCron", {
       job: {
         handler: "src/workers/moderation-cron.ts",

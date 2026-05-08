@@ -1,3 +1,5 @@
+import type { InferEntrySchema, RenderedContent } from "astro:content";
+
 // Moderation status constants
 export const ModerationStatus = {
   UNVERIFIED: 0, // New comment awaiting AI moderation
@@ -55,6 +57,15 @@ export interface AdminComment extends Reply {
   parent: Reply | null;
   children: Reply[];
   articleTitle: string;
+}
+
+export interface AdminArticle {
+  id: string;
+  body?: string;
+  collection: "blog";
+  data: InferEntrySchema<"blog">;
+  rendered?: RenderedContent;
+  filePath?: string;
 }
 
 export interface CommentCounts {

@@ -1,0 +1,21 @@
+---
+import type { AdminArticle } from "../../../../lib/comments/types";
+import FormattedDate from "../../../articles/_components/FormattedDate.astro";
+
+type Props = {
+  article: AdminArticle;
+};
+const prop: Props = Astro.props;
+---
+
+<div class="bg-base-100 flex w-full gap-6 rounded-2xl p-4">
+  <img src={prop.article.data.heroImage?.src} class="aspect-video max-w-40 rounded-2xl" />
+  <div class="flex w-full flex-col">
+    <p class="flex-1 text-lg font-bold">{prop.article.data.title}</p>
+    <p>
+      Published at: <span>
+        <FormattedDate date={prop.article.data.pubDate} />
+      </span>
+    </p>
+  </div>
+</div>
