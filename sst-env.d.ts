@@ -2,8 +2,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /* deno-fmt-ignore-file */
+/* biome-ignore-all lint: auto-generated */
 
-import "sst"
 declare module "sst" {
   export interface Resource {
     "BaseUrl": {
@@ -26,17 +26,11 @@ declare module "sst" {
       "type": "sst.cloudflare.Astro"
       "url": string
     }
+    "ModerationCronHandler": import("@cloudflare/workers-types").Service
     "OpenAuthUrl": {
       "type": "sst.sst.Secret"
       "value": string
     }
-  }
-}
-// cloudflare 
-import * as cloudflare from "@cloudflare/workers-types";
-declare module "sst" {
-  export interface Resource {
-    "ModerationCronHandler": cloudflare.Service
   }
 }
 

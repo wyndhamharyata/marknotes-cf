@@ -1,13 +1,5 @@
 import { defineMiddleware, sequence } from "astro:middleware";
-import { fromCloudflareEnv } from "sst";
 import { client, subjects, setTokensFromCookies, isAdmin } from "./lib/auth";
-
-const sstMiddleware = defineMiddleware((context, next) => {
-  if (context.locals.runtime?.env) {
-    fromCloudflareEnv(context.locals.runtime.env);
-  }
-  return next();
-});
 
 const authMiddleware = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
@@ -73,4 +65,4 @@ const authMiddleware = defineMiddleware(async (context, next) => {
   return context.redirect(url, 302);
 });
 
-export const onRequest = sequence(sstMiddleware, authMiddleware);
+export const onRequest = sequence(authMiddleware);

@@ -6,7 +6,7 @@ export default $config({
       removal: input?.stage === "production" ? "retain" : "remove",
       protect: ["production"].includes(input?.stage),
       home: "cloudflare",
-      providers: { cloudflare: "6.11.0" },
+      providers: { cloudflare: "6.13.0" },
     };
   },
   async run() {
@@ -16,7 +16,7 @@ export default $config({
     const openAuthUrl = new sst.Secret("OpenAuthUrl");
     const baseUrl = new sst.Secret("BaseUrl");
 
-    new sst.cloudflare.x.Astro("Max", {
+    new sst.cloudflare.Astro("Max", {
       domain: $app.stage === "production" ? "mwyndham.dev" : "devread.mwyndham.dev",
       link: [libsqlUrl, libsqlAuthToken, geminiApiKey, openAuthUrl, baseUrl],
       environment: {
