@@ -11,7 +11,8 @@ import {
 
 const { slug } = Astro.props;
 
-const history = await getAnalyticsHistoryBySlug(slug);
+const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+const history = await getAnalyticsHistoryBySlug(slug, { since: sevenDaysAgo });
 const hasChartData = history.length >= 2;
 const pv = hasChartData ? toPageviewsSeries(history) : null;
 const vitals = hasChartData ? toWebVitalRatioSeries(history) : null;

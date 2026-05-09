@@ -14,13 +14,14 @@ export interface FetchAnalyticsArgs {
   token: string;
   email: string;
   slug: string;
+  endTime?: Date;
 }
 
 export async function fetchArticleAnalytics(
   args: FetchAnalyticsArgs,
 ): Promise<AnalyticsSnapshot> {
   const path = `/articles/${args.slug}/`;
-  const now = new Date();
+  const now = args.endTime ?? new Date();
 
   const windows: { key: AnalyticsWindowKey; start: Date }[] = [
     { key: "24h", start: addDays(now, -1) },

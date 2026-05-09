@@ -68,7 +68,7 @@ export default function WebVitalsChart(props: Props) {
           stroke: s.stroke,
           width: 2,
           spanGaps: false,
-          points: { show: true, size: 5 },
+          points: { show: false },
         })),
       ],
       axes: [

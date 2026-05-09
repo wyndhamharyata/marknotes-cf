@@ -49,7 +49,7 @@ export async function insertAnalyticsSnapshot(
 
   await client.execute({
     sql: `
-      INSERT INTO article_analytics_snapshots (
+      INSERT OR IGNORE INTO article_analytics_snapshots (
         article_slug,
         pageviews_24h, visits_24h,
         pageviews_7d,  visits_7d,

@@ -1,6 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
 import { Resource } from "sst";
 import { fetchArticleAnalytics } from "../lib/analytics/cloudflare-client";
+import { roundDownToSlot, SLOT_3H_SECONDS } from "../lib/analytics/timeslot";
 import { fetchArticleSlugs, insertAnalyticsSnapshot } from "./analytics-repository";
 
 const handler: ExportedHandler = {
@@ -34,7 +35,7 @@ async function runAnalyticsPoll(): Promise<void> {
 
   console.log(`Polling analytics for ${slugs.length} articles`);
 
-  const capturedAt = new Date();
+  const capturedAt = roundDownToSlot(new Date(), SLOT_3H_SECONDS);
   let ok = 0;
   let failed = 0;
 

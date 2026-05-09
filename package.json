@@ -9,6 +9,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "migrate": "node --env-file=.env scripts/migrate.mjs",
+    "backfill": "node --env-file=.env --import tsx scripts/backfill-analytics.ts",
     "preview": "astro preview"
   },
   "dependencies": {
@@ -43,6 +44,7 @@
     "@types/bad-words": "^3.0.3",
     "prettier": "3.7.4",
     "prettier-plugin-astro": "0.14.1",
-    "prettier-plugin-tailwindcss": "0.6.14"
+    "prettier-plugin-tailwindcss": "0.6.14",
+    "tsx": "^4.19.0"
   }
 }

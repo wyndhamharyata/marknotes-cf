@@ -51,7 +51,7 @@ export default function PageviewsChart({ ts, pv7d }: Props) {
           stroke: STROKE,
           width: 2,
           fill: "rgba(59,130,246,0.12)",
-          points: { show: true, size: 5 },
+          points: { show: false },
         },
       ],
       axes: [
