@@ -1,33 +1,89 @@
 ---
-import { getLatestAnalyticsBySlug } from "../../../../lib/analytics/repository";
+import StatSnapshot from "./StatSnapshot.astro";
+import PageviewsChart from "./PageviewsChart.tsx";
+import WebVitalsChart from "./WebVitalsChart.tsx";
+import { getAnalyticsHistoryBySlug } from "../../../../lib/analytics/repository";
+import {
+  hasAnyWebVitalSamples,
+  toPageviewsSeries,
+  toWebVitalRatioSeries,
+} from "../../../../lib/analytics/transform";
 
 const { slug } = Astro.props;
 
-const analytics = await getLatestAnalyticsBySlug(slug);
+const history = await getAnalyticsHistoryBySlug(slug);
+const hasChartData = history.length >= 2;
+const pv = hasChartData ? toPageviewsSeries(history) : null;
+const vitals = hasChartData ? toWebVitalRatioSeries(history) : null;
+const vitalsHaveSamples = vitals ? hasAnyWebVitalSamples(vitals) : false;
+
+const oldestCaptured = history[0]?.capturedAt;
+const newestCaptured = history[history.length - 1]?.capturedAt;
 ---
 
-<div class="gap-4 flex flex-col">
-  <div class="stats bg-base-100 stats-vertical flex max-w-72 flex-col gap-3 shadow">
-    <div class="stat">
-      <div class="stat-title">Total Page Views (24 Hour)</div>
-      <div class="stat-value">{analytics?.pageviews24h}</div>
-      <div class="stat-desc">Total views in the last 24 hr</div>
-    </div>
-  </div>
+<div class="flex flex-col gap-6">
+  <StatSnapshot slug={slug} />
 
-  <div class="stats bg-base-100 stats-vertical flex max-w-72 flex-col gap-3 shadow">
-    <div class="stat">
-      <div class="stat-title">Total Page Views (7 Day)</div>
-      <div class="stat-value">{analytics?.pageviews7d}</div>
-      <div class="stat-desc">Total views in the last 7 days</div>
-    </div>
-  </div>
+  {
+    history.length === 0 && (
+      <div class="alert alert-info">
+        <span>No analytics captured yet. Snapshots run every 3 hours.</span>
+      </div>
+    )
+  }
 
-  <div class="stats bg-base-100 stats-vertical flex max-w-72 flex-col gap-3 shadow">
-    <div class="stat">
-      <div class="stat-title">Total Page Views (30 Day)</div>
-      <div class="stat-value">{analytics?.pageviews30d}</div>
-      <div class="stat-desc">Total views in the last 30 days</div>
+  {
+    history.length > 0 && oldestCaptured && newestCaptured && (
+      <div class="text-base-content/60 text-xs">
+        {history.length} snapshots from{" "}
+        <time datetime={oldestCaptured.toISOString()}>{oldestCaptured.toLocaleString()}</time>
+        {" → "}
+        <time datetime={newestCaptured.toISOString()}>{newestCaptured.toLocaleString()}</time>
+      </div>
+    )
+  }
+
+  <section class="card bg-base-100 shadow">
+    <div class="card-body">
+      <h3 class="card-title">Pageviews trend</h3>
+      <p class="text-base-content/60 text-sm">
+        Each point is the rolling 7-day pageview count at capture time.
+      </p>
+      {
+        hasChartData && pv ? (
+          <PageviewsChart client:idle ts={pv.ts} pv7d={pv.pv7d} />
+        ) : (
+          <div class="text-base-content/60 py-12 text-center">
+            Need at least two snapshots to draw a trend — check back after the next 3-hour
+            snapshot.
+          </div>
+        )
+      }
     </div>
-  </div>
+  </section>
+
+  <section class="card bg-base-100 shadow">
+    <div class="card-body">
+      <h3 class="card-title">Web vitals — % rated "Good"</h3>
+      <p class="text-base-content/60 text-sm">
+        Share of samples scoring "Good" per Core Web Vital, using each snapshot's 7-day window.
+      </p>
+      {
+        hasChartData && vitals && vitalsHaveSamples ? (
+          <WebVitalsChart
+            client:idle
+            ts={vitals.ts}
+            lcp={vitals.lcp}
+            inp={vitals.inp}
+            cls={vitals.cls}
+            ttfb={vitals.ttfb}
+          />
+        ) : (
+          <div class="text-base-content/60 py-12 text-center">
+            No web-vital samples recorded yet for this article.
+          </div>
+        )
+      }
+    </div>
+  </section>
 </div>

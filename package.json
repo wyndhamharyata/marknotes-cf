@@ -35,6 +35,7 @@
     "sharp": "^0.34.3",
     "sst": "4.13.1",
     "tailwindcss": "^4.1.18",
+    "uplot": "^1.6.32",
     "valibot": "^1.0.0"
   },
   "devDependencies": {
