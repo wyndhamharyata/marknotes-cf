@@ -44,8 +44,8 @@ const newestCaptured = history[history.length - 1]?.capturedAt;
     )
   }
 
-  <section class="card bg-base-100 shadow">
-    <div class="card-body">
+  <section>
+    <div>
       <h3 class="card-title">Pageviews trend</h3>
       <p class="text-base-content/60 text-sm">
         Each point is the rolling 7-day pageview count at capture time.
@@ -55,16 +55,15 @@ const newestCaptured = history[history.length - 1]?.capturedAt;
           <PageviewsChart client:idle ts={pv.ts} pv7d={pv.pv7d} />
         ) : (
           <div class="text-base-content/60 py-12 text-center">
-            Need at least two snapshots to draw a trend — check back after the next 3-hour
-            snapshot.
+            Need at least two snapshots to draw a trend — check back after the next 3-hour snapshot.
           </div>
         )
       }
     </div>
   </section>
 
-  <section class="card bg-base-100 shadow">
-    <div class="card-body">
+  <section>
+    <div>
       <h3 class="card-title">Web vitals — % rated "Good"</h3>
       <p class="text-base-content/60 text-sm">
         Share of samples scoring "Good" per Core Web Vital, using each snapshot's 7-day window.

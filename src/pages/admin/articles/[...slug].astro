@@ -24,17 +24,26 @@ const { title, description, pubDate, updatedDate, heroImage } = post.data;
   description={description}
   dockProp={{ menus: ADMIN_DOCK, currentPath: `/admin/${post.id}` }}
 >
-  <div class="mx-auto w-full max-w-5xl">
-    <div class="breadcrumbs bg-base-100 my-2 w-fit rounded-xl px-4 py-2 text-sm font-semibold">
-      <ul>
+  <div class="mx-auto mt-4 w-full max-w-5xl md:mt-0">
+    <div class="breadcrumbs my-2 hidden w-fit px-4 py-2 text-sm md:block">
+      <ul class="flex flex-wrap overflow-x-clip text-ellipsis">
         <li><a href="/admin/articles">Articles</a></li>
-        <li><a href={`/admin/articles/${post.id}`}>{title}</a></li>
+        <li>
+          <a href={`/admin/articles/${post.id}`}>{title}</a>
+        </li>
       </ul>
     </div>
 
-    <div role="tablist" class="tabs tabs-lift">
-      <input type="radio" name="article_tabs" role="tab" class="tab" aria-label="Article" checked />
-      <div role="tabpanel" class="tab-content border-base-300 bg-base-100 rounded-box p-2 md:p-6">
+    <div role="tablist" class="tabs tabs-lg tabs-lift">
+      <input
+        type="radio"
+        name="article_tabs"
+        role="tab"
+        class="tab mx-auto md:mx-0"
+        aria-label="Article"
+        checked
+      />
+      <div role="tabpanel" class="tab-content border-base-300 bg-base-100 rounded-box md:p-6">
         <article class="card bg-base-100 mx-auto w-full shadow-xl">
           {
             heroImage && (
@@ -76,11 +85,23 @@ const { title, description, pubDate, updatedDate, heroImage } = post.data;
         </article>
       </div>
 
-      <input type="radio" name="article_tabs" role="tab" class="tab" aria-label="Stats" />
-      <div role="tabpanel" class="tab-content border-base-300 bg-base-100 rounded-box p-2 md:p-6">
+      <input
+        type="radio"
+        name="article_tabs"
+        role="tab"
+        class="tab mx-auto md:mx-0"
+        aria-label="Stats"
+      />
+      <div role="tabpanel" class="tab-content border-base-300 bg-base-100 rounded-box p-4 md:p-6">
         <Analytics slug={post.id} server:defer />
       </div>
-      <input type="radio" name="article_tabs" role="tab" class="tab" aria-label="Comments" />
+      <input
+        type="radio"
+        name="article_tabs"
+        role="tab"
+        class="tab mx-auto md:mx-0"
+        aria-label="Comments"
+      />
       <div role="tabpanel" class="tab-content border-base-300 bg-base-100 rounded-box">
         <CommentSection server:defer articleSlug={post.id}>
           <div slot="fallback" class="card bg-base-100 shadow-xl">

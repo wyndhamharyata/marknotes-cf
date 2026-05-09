@@ -35,10 +35,10 @@ export default function CommentForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} class={isReply ? "mt-3" : "mb-2"}>
+    <form onSubmit={handleSubmit} class={isReply ? "mt-3 px-4" : "mb-2 px-4"}>
       <div class="form-control">
         <textarea
-          class={`text-[10pt] textarea textarea-bordered w-full ${error ? "textarea-error" : ""}`}
+          class={`textarea textarea-bordered w-full text-[10pt] ${error ? "textarea-error" : ""}`}
           placeholder={isReply ? "Write a reply..." : "Write a comment..."}
           rows={isReply ? 2 : 3}
           value={message}
