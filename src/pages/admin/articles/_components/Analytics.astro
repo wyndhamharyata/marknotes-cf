@@ -1,0 +1,33 @@
+---
+import { getLatestAnalyticsBySlug } from "../../../../lib/analytics/repository";
+
+const { slug } = Astro.props;
+
+const analytics = await getLatestAnalyticsBySlug(slug);
+---
+
+<div class="gap-4 flex flex-col">
+  <div class="stats bg-base-100 stats-vertical flex max-w-72 flex-col gap-3 shadow">
+    <div class="stat">
+      <div class="stat-title">Total Page Views (24 Hour)</div>
+      <div class="stat-value">{analytics?.pageviews24h}</div>
+      <div class="stat-desc">Total views in the last 24 hr</div>
+    </div>
+  </div>
+
+  <div class="stats bg-base-100 stats-vertical flex max-w-72 flex-col gap-3 shadow">
+    <div class="stat">
+      <div class="stat-title">Total Page Views (7 Day)</div>
+      <div class="stat-value">{analytics?.pageviews7d}</div>
+      <div class="stat-desc">Total views in the last 7 days</div>
+    </div>
+  </div>
+
+  <div class="stats bg-base-100 stats-vertical flex max-w-72 flex-col gap-3 shadow">
+    <div class="stat">
+      <div class="stat-title">Total Page Views (30 Day)</div>
+      <div class="stat-value">{analytics?.pageviews30d}</div>
+      <div class="stat-desc">Total views in the last 30 days</div>
+    </div>
+  </div>
+</div>
