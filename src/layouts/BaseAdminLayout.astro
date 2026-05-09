@@ -9,9 +9,10 @@ interface Props {
   description: string;
   image?: ImageMetadata;
   dockProp: ComponentProps<typeof BaseAdminDock>;
+  maxWidthClass?: string;
 }
 
-const { title, description, image, dockProp } = Astro.props;
+const { title, description, image, dockProp, maxWidthClass = "max-w-4xl" } = Astro.props;
 ---
 
 <html lang="en">
@@ -26,7 +27,7 @@ const { title, description, image, dockProp } = Astro.props;
       </div>
     </div>
 
-    <main id="main-content" class="mx-auto w-full max-w-4xl flex-1 px-0 md:py-8 pb-28 md:px-4">
+    <main id="main-content" class={`mx-auto w-full ${maxWidthClass} flex-1 px-0 pb-40 md:py-8 md:px-4 md:pb-40`}>
       <slot />
     </main>
 

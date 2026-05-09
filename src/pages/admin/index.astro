@@ -3,36 +3,55 @@ export const prerender = false;
 
 import BaseAdminLayout from "../../layouts/BaseAdminLayout.astro";
 import { SITE_DESCRIPTION, SITE_TITLE, ADMIN_DOCK } from "../../consts";
+import { getSiteWidePageviewHistory } from "../../lib/analytics/repository";
+import HomeModerationAlert from "./_components/HomeModerationAlert.astro";
+import HomeKpiStrip from "./_components/HomeKpiStrip.astro";
+import HomeTrendChart from "./_components/HomeTrendChart.tsx";
+import HomeRecentComments from "./_components/HomeRecentComments.astro";
+import HomeTopArticles from "./_components/HomeTopArticles.astro";
 
-const user = Astro.locals.user;
+const trend = await getSiteWidePageviewHistory(30);
+const hasTrendData = trend.ts.length >= 2;
 ---
 
 <BaseAdminLayout
   title={SITE_TITLE}
   description={SITE_DESCRIPTION}
   dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin" }}
+  maxWidthClass="max-w-6xl"
 >
-  <div>
-    <p>You are authenticated. Admin functionality coming soon.</p>
-    {
-      user && (
-        <div class="user-info">
-          <dl>
-            <dt>Email</dt>
-            <dd>{user.properties.email}</dd>
-            <dt>User ID</dt>
-            <dd>{user.properties.userID}</dd>
-            {user.properties.oauthID && (
-              <>
-                <dt>OAuth ID</dt>
-                <dd>{user.properties.oauthID}</dd>
-              </>
-            )}
-          </dl>
-        </div>
-      )
-    }
+  <div class="mx-auto flex w-full flex-col gap-6 px-4 md:px-0">
+    <HomeModerationAlert />
 
-    <p><a href="/">← Back to Home</a></p>
+    <HomeKpiStrip />
+
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <section class="card bg-base-100/60 px-4 py-2 shadow-2xl md:col-span-2">
+        <h3 class="card-title">Pageviews — last 30 days</h3>
+        <p class="text-base-content/60 text-sm">
+          Site-wide rolling 24-hour total at each snapshot.
+        </p>
+        {
+          hasTrendData ? (
+            <HomeTrendChart server:defer client:idle ts={trend.ts} pv={trend.pv} />
+          ) : (
+            <div class="text-base-content/60 py-12 text-center">
+              Need at least two snapshots to draw a trend — check back after the next 3-hour
+              snapshot.
+            </div>
+          )
+        }
+      </section>
+
+      <section class="md:col-span-1">
+        <h3 class="card-title">Recent comments</h3>
+        <p class="text-base-content/60 text-sm">Newest first across all articles.</p>
+        <div class="mt-3">
+          <HomeRecentComments />
+        </div>
+      </section>
+    </div>
+
+    <HomeTopArticles />
   </div>
 </BaseAdminLayout>

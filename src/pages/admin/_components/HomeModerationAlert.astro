@@ -1,0 +1,27 @@
+---
+import { Icon } from "astro-icon/components";
+import { getCommentCounts } from "../../../lib/comments/admin-repository";
+
+const counts = await getCommentCounts();
+const pending = counts.unverified + counts.warning;
+---
+
+{
+  pending > 0 && (
+    <div class="alert alert-warning flex flex-col items-start gap-3 shadow-sm sm:flex-row sm:items-center">
+      <Icon name="heroicons:exclamation-triangle" class="h-6 w-6 shrink-0" />
+      <div class="flex flex-1 flex-col">
+        <span class="font-semibold">
+          {pending} comment{pending === 1 ? "" : "s"} need
+          {pending === 1 ? "s" : ""} review
+        </span>
+        <span class="text-xs opacity-80">
+          {counts.unverified} unmoderated · {counts.warning} flagged
+        </span>
+      </div>
+      <a href="/admin/comments" class="btn btn-sm btn-warning">
+        Review
+      </a>
+    </div>
+  )
+}

@@ -65,6 +65,90 @@ export async function getAnalyticsHistoryBySlug(
   return result.rows.map(rowToAnalytics);
 }
 
+export interface SiteWideTotals {
+  pageviews24h: number;
+  pageviews7d: number;
+  pageviews30d: number;
+  visits24h: number;
+  visits7d: number;
+  visits30d: number;
+}
+
+export async function getSiteWideTotals(): Promise<SiteWideTotals> {
+  const client = getTursoClient(getAstroCredentials());
+
+  // Sum the latest snapshot for each article. Different articles can have
+  // slightly different latest captured_at, so we pick MAX(captured_at) per slug.
+  const result = await client.execute({
+    sql: `
+      WITH latest AS (
+        SELECT article_slug, MAX(captured_at) AS max_ts
+        FROM article_analytics_snapshots
+        GROUP BY article_slug
+      )
+      SELECT
+        COALESCE(SUM(s.pageviews_24h), 0) AS pv24h,
+        COALESCE(SUM(s.pageviews_7d), 0)  AS pv7d,
+        COALESCE(SUM(s.pageviews_30d), 0) AS pv30d,
+        COALESCE(SUM(s.visits_24h), 0)    AS v24h,
+        COALESCE(SUM(s.visits_7d), 0)     AS v7d,
+        COALESCE(SUM(s.visits_30d), 0)    AS v30d
+      FROM article_analytics_snapshots s
+      INNER JOIN latest l
+        ON s.article_slug = l.article_slug
+        AND s.captured_at = l.max_ts
+    `,
+    args: [],
+  });
+
+  const row = result.rows[0];
+  return {
+    pageviews24h: Number(row?.pv24h ?? 0),
+    pageviews7d: Number(row?.pv7d ?? 0),
+    pageviews30d: Number(row?.pv30d ?? 0),
+    visits24h: Number(row?.v24h ?? 0),
+    visits7d: Number(row?.v7d ?? 0),
+    visits30d: Number(row?.v30d ?? 0),
+  };
+}
+
+export interface SiteWidePageviewSeries {
+  ts: number[];
+  pv: number[];
+}
+
+export async function getSiteWidePageviewHistory(
+  days: number = 30,
+): Promise<SiteWidePageviewSeries> {
+  const sinceDate = new Date();
+  sinceDate.setUTCDate(sinceDate.getUTCDate() - days);
+
+  const client = getTursoClient(getAstroCredentials());
+
+  // For each snapshot timestamp, sum pageviews_24h across all articles.
+  // This gives a site-wide "rolling 24h pageview" trend at every snapshot.
+  const result = await client.execute({
+    sql: `
+      SELECT
+        captured_at AS ts,
+        COALESCE(SUM(pageviews_24h), 0) AS pv
+      FROM article_analytics_snapshots
+      WHERE captured_at >= ?
+      GROUP BY captured_at
+      ORDER BY captured_at ASC
+    `,
+    args: [Math.floor(sinceDate.getTime() / 1000)],
+  });
+
+  const ts: number[] = [];
+  const pv: number[] = [];
+  for (const row of result.rows) {
+    ts.push(Number(row.ts));
+    pv.push(Number(row.pv));
+  }
+  return { ts, pv };
+}
+
 function defaultSince(): Date {
   const d = new Date();
   d.setUTCDate(d.getUTCDate() - 30);

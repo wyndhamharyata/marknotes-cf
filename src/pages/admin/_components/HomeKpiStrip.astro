@@ -1,0 +1,42 @@
+---
+import { getCollection } from "astro:content";
+import { getSiteWideTotals } from "../../../lib/analytics/repository";
+import { getCommentCounts } from "../../../lib/comments/admin-repository";
+
+const [articles, totals, counts] = await Promise.all([
+  getCollection("blog"),
+  getSiteWideTotals(),
+  getCommentCounts(),
+]);
+
+const pending = counts.unverified + counts.warning;
+const fmt = new Intl.NumberFormat();
+---
+
+<div class="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+  <div class="stat bg-base-100/60 rounded-box shadow-sm">
+    <div class="stat-title">Articles</div>
+    <div class="stat-value text-2xl md:text-3xl">{articles.length}</div>
+    <div class="stat-desc">Published</div>
+  </div>
+
+  <div class="stat bg-base-100/60 rounded-box shadow-sm">
+    <div class="stat-title">Pageviews (7d)</div>
+    <div class="stat-value text-2xl md:text-3xl">{fmt.format(totals.pageviews7d)}</div>
+    <div class="stat-desc">Site-wide</div>
+  </div>
+
+  <div class="stat bg-base-100/60 rounded-box shadow-sm">
+    <div class="stat-title">Visits (7d)</div>
+    <div class="stat-value text-2xl md:text-3xl">{fmt.format(totals.visits7d)}</div>
+    <div class="stat-desc">Site-wide</div>
+  </div>
+
+  <div class="stat bg-base-100/60 rounded-box shadow-sm">
+    <div class="stat-title">Comments</div>
+    <div class="stat-value text-2xl md:text-3xl">{fmt.format(counts.all)}</div>
+    <div class="stat-desc">
+      {pending > 0 ? `${pending} pending` : "All clear"}
+    </div>
+  </div>
+</div>

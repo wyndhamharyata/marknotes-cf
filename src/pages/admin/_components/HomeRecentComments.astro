@@ -1,0 +1,65 @@
+---
+import { getCollection } from "astro:content";
+import { getCommentsForAdmin } from "../../../lib/comments/admin-repository";
+import { getModerationBadgeClass, getModerationLabel } from "../../../lib/comments/types";
+
+const [{ comments }, articles] = await Promise.all([
+  getCommentsForAdmin({ limit: 20, page: 1 }),
+  getCollection("blog"),
+]);
+
+const titleMap = new Map(articles.map((a) => [a.id, a.data.title]));
+
+const relTime = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" });
+function formatRelative(date: Date): string {
+  const diffSec = Math.round((date.getTime() - Date.now()) / 1000);
+  const abs = Math.abs(diffSec);
+  if (abs < 60) return relTime.format(diffSec, "second");
+  if (abs < 3600) return relTime.format(Math.round(diffSec / 60), "minute");
+  if (abs < 86400) return relTime.format(Math.round(diffSec / 3600), "hour");
+  return relTime.format(Math.round(diffSec / 86400), "day");
+}
+
+function truncate(s: string, n: number): string {
+  if (s.length <= n) return s;
+  return s.slice(0, n).trimEnd() + "…";
+}
+---
+
+{
+  comments.length === 0 ? (
+    <div class="text-base-content/60 py-8 text-center text-sm">No comments yet.</div>
+  ) : (
+    <ul class="flex max-h-[280px] flex-col gap-3 overflow-y-auto pr-1">
+      {comments.map((c) => {
+        const articleTitle = titleMap.get(c.articleSlug) ?? c.articleSlug;
+        return (
+          <li class="bg-base-100/60 rounded-box flex flex-col gap-1 p-3 shadow-sm">
+            <div class="flex items-baseline justify-between gap-2">
+              <span class="truncate text-sm font-semibold">{c.alias}</span>
+              <time
+                class="text-base-content/60 shrink-0 text-xs"
+                datetime={c.createdAt.toISOString()}
+              >
+                {formatRelative(c.createdAt)}
+              </time>
+            </div>
+            <p class="text-base-content/80 text-sm break-words">{truncate(c.message, 120)}</p>
+            <div class="flex items-center justify-between gap-2 text-xs">
+              <a
+                href={`/blog/${c.articleSlug}`}
+                class="link link-hover text-base-content/60 truncate"
+                title={articleTitle}
+              >
+                {articleTitle}
+              </a>
+              <span class={`badge badge-sm ${getModerationBadgeClass(c.moderationStatus)}`}>
+                {getModerationLabel(c.moderationStatus)}
+              </span>
+            </div>
+          </li>
+        );
+      })}
+    </ul>
+  )
+}

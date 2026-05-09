@@ -1,0 +1,67 @@
+---
+import { getCollection } from "astro:content";
+import { getLatestAnalyticsBySlug } from "../../../lib/analytics/repository";
+
+const articles = await getCollection("blog");
+
+const enriched = await Promise.all(
+  articles.map(async (a) => {
+    const analytics = await getLatestAnalyticsBySlug(a.id);
+    return {
+      slug: a.id,
+      title: a.data.title,
+      pubDate: a.data.pubDate,
+      pageviews7d: analytics?.pageviews7d ?? 0,
+      visits7d: analytics?.visits7d ?? 0,
+    };
+  }),
+);
+
+const top = enriched
+  .filter((a) => a.pageviews7d > 0)
+  .sort((a, b) => b.pageviews7d - a.pageviews7d)
+  .slice(0, 5);
+
+const fmt = new Intl.NumberFormat();
+---
+
+<section>
+  <h3 class="card-title">Top articles</h3>
+  <p class="text-base-content/60 text-sm">Last 7 days, ranked by pageviews.</p>
+
+  {
+    top.length === 0 ? (
+      <div class="text-base-content/60 py-8 text-center text-sm">
+        No analytics data yet. Snapshots run every 3 hours.
+      </div>
+    ) : (
+      <div class="overflow-x-auto">
+        <table class="table table-zebra mt-3">
+          <thead>
+            <tr>
+              <th>Article</th>
+              <th class="text-right">Pageviews</th>
+              <th class="text-right">Visits</th>
+            </tr>
+          </thead>
+          <tbody>
+            {top.map((a) => (
+              <tr>
+                <td>
+                  <a
+                    href={`/admin/articles/${a.slug}`}
+                    class="link link-hover font-medium"
+                  >
+                    {a.title}
+                  </a>
+                </td>
+                <td class="text-right tabular-nums">{fmt.format(a.pageviews7d)}</td>
+                <td class="text-right tabular-nums">{fmt.format(a.visits7d)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+</section>
