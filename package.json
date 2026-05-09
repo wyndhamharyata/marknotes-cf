@@ -8,6 +8,7 @@
     "dev": "astro dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "migrate": "node --env-file=.env scripts/migrate.mjs",
     "preview": "astro preview"
   },
   "dependencies": {

@@ -1,19 +1,15 @@
 ---
-import { type CollectionEntry, getCollection, render } from "astro:content";
+import { getEntry, render } from "astro:content";
 import AdminBlogpost from "../../../layouts/AdminBlogpost.astro";
 
-export const prerender = true;
+export const prerender = false;
 
-export async function getStaticPaths() {
-  const posts = await getCollection("blog");
-  return posts.map((post) => ({
-    params: { slug: post.id },
-    props: post,
-  }));
-}
-type Props = CollectionEntry<"blog">;
+const { slug } = Astro.params;
+if (!slug) return new Response("Not found", { status: 404 });
 
-const post = Astro.props;
+const post = await getEntry("blog", slug);
+if (!post) return new Response("Not found", { status: 404 });
+
 const { Content } = await render(post);
 ---
 

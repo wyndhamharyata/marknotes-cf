@@ -6,7 +6,24 @@
 
 declare module "sst" {
   export interface Resource {
+    "AnalyticsCronHandler": import("@cloudflare/workers-types").Service
     "BaseUrl": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "CfAccountId": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "CfAnalyticsEmail": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "CfAnalyticsToken": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "CfSiteTag": {
       "type": "sst.sst.Secret"
       "value": string
     }

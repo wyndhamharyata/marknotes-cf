@@ -15,6 +15,10 @@ export default $config({
     const geminiApiKey = new sst.Secret("GeminiApiKey");
     const openAuthUrl = new sst.Secret("OpenAuthUrl");
     const baseUrl = new sst.Secret("BaseUrl");
+    const cfAccountId = new sst.Secret("CfAccountId");
+    const cfSiteTag = new sst.Secret("CfSiteTag");
+    const cfAnalyticsToken = new sst.Secret("CfAnalyticsToken");
+    const cfAnalyticsEmail = new sst.Secret("CfAnalyticsEmail");
 
     new sst.cloudflare.Astro("Max", {
       domain: $app.stage === "production" ? "mwyndham.dev" : "devread.mwyndham.dev",
@@ -61,6 +65,22 @@ export default $config({
         link: [libsqlUrl, libsqlAuthToken, geminiApiKey],
       },
       schedules: ["*/10 * * * *"],
+    });
+
+    new sst.cloudflare.Cron("AnalyticsCron", {
+      job: {
+        handler: "src/workers/analytics-cron.ts",
+        link: [
+          libsqlUrl,
+          libsqlAuthToken,
+          cfAccountId,
+          cfSiteTag,
+          cfAnalyticsToken,
+          cfAnalyticsEmail,
+          baseUrl,
+        ],
+      },
+      schedules: ["0 */3 * * *"],
     });
   },
 });

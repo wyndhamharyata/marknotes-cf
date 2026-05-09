@@ -62,6 +62,14 @@ const authMiddleware = defineMiddleware(async (context, next) => {
     context.url.origin + "/callback",
     "code",
   );
+
+  if (context.request.headers.get("HX-Request") === "true") {
+    return new Response(null, {
+      status: 200,
+      headers: { "HX-Redirect": url },
+    });
+  }
+
   return context.redirect(url, 302);
 });
 
