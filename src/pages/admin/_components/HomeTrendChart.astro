@@ -1,0 +1,17 @@
+---
+import { getSiteWidePageviewHistory } from "../../../lib/analytics/repository";
+import HomeTrendChartCanvas from "./HomeTrendChartCanvas.tsx";
+
+const trend = await getSiteWidePageviewHistory(30);
+const hasTrendData = trend.ts.length >= 2;
+---
+
+{
+  hasTrendData ? (
+    <HomeTrendChartCanvas client:idle ts={trend.ts} pv={trend.pv} />
+  ) : (
+    <div class="text-base-content/60 py-12 text-center">
+      Need at least two snapshots to draw a trend — check back after the next 3-hour snapshot.
+    </div>
+  )
+}

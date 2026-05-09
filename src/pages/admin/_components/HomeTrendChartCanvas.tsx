@@ -11,7 +11,7 @@ interface Props {
 
 const HEIGHT = 280;
 
-export default function HomeTrendChart({ ts, pv }: Props) {
+export default function HomeTrendChartCanvas({ ts, pv }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
