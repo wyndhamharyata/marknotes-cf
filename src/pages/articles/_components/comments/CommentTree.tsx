@@ -95,7 +95,7 @@ export default function CommentTree({ comments: initialComments, articleSlug }: 
   const clearFormError = () => setFormError(null);
 
   return (
-    <div>
+    <div class="w-full">
       <CommentForm
         onSubmit={(msg) => submitComment(msg, null)}
         isSubmitting={isSubmitting}

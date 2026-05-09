@@ -51,15 +51,17 @@ const { title, description, pubDate, updatedDate, heroImage, slug } = Astro.prop
   </article>
 
   <!-- Comment Section with Server Island for lazy loading -->
-  <CommentSection server:defer articleSlug={slug}>
-    <div slot="fallback" class="card bg-base-100 mt-8 shadow-xl">
-      <div class="card-body">
-        <h2 class="card-title mb-4 text-2xl">Comments</h2>
-        <div class="skeleton h-24 w-full"></div>
-        <div class="skeleton mt-4 h-16 w-full"></div>
+  <div class="mt-8">
+    <CommentSection server:defer articleSlug={slug}>
+      <div slot="fallback" class="card bg-base-100 mt-8 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title mb-4 text-2xl">Comments</h2>
+          <div class="skeleton h-24 w-full"></div>
+          <div class="skeleton mt-4 h-16 w-full"></div>
+        </div>
       </div>
-    </div>
-  </CommentSection>
+    </CommentSection>
+  </div>
 
   <ScrollButtons />
 </BaseLayout>

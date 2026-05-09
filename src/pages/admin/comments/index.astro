@@ -48,7 +48,7 @@ const enrichedComments = comments.map((c) => ({
   description={SITE_DESCRIPTION}
   dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin/comments" }}
 >
-  <div class="flex w-3xl flex-col space-y-6">
+  <div class="mx-auto flex flex-col space-y-6 md:w-3xl">
     <h1 class="text-2xl font-bold">Comment Moderation</h1>
 
     <CommentFilter filterStatus={filterStatus} counts={counts} />
@@ -59,7 +59,7 @@ const enrichedComments = comments.map((c) => ({
       )
     }
 
-    <div id="comment-list" class="w-3xl space-y-4">
+    <div id="comment-list" class="space-y-2 md:w-3xl md:space-y-4">
       {
         enrichedComments.length === 0 && (
           <div class="card bg-base-100/60 p-8 text-center">

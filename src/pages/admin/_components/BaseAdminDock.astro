@@ -23,10 +23,10 @@ const { menus, currentPath } = Astro.props;
   </div>
   <!-- Dock container -->
   <div class="relative flex justify-center pb-4">
-    <ul class="menu menu-horizontal bg-base-100 rounded-2xl px-30 py-2 drop-shadow-2xl">
-      <li class="absolute top-0 bottom-0 left-6">
+    <ul class="menu menu-horizontal bg-base-100 rounded-2xl px-2 py-2 drop-shadow-2xl md:px-30">
+      <li class="md:absolute md:top-0 md:bottom-0 md:left-6">
         <a href="/" hx-boost="false" class="btn btn-ghost btn-circle my-auto">
-          <Icon name="heroicons:arrow-uturn-left" class="h-6 w-6 fill-current" />
+          <Icon name="heroicons:arrow-uturn-left" class="h-5 w-5 fill-current" />
         </a>
       </li>
       {
@@ -34,24 +34,24 @@ const { menus, currentPath } = Astro.props;
           <li>
             <a
               href={menu.path}
-              class={`${currentPath === menu.path ? "menu-active w-28" : "w-24"} mx-1 flex h-16 flex-col px-6`}
+              class={`${currentPath === menu.path ? "menu-active" : ""} mx-1 flex w-16 flex-col px-6 md:h-16 md:w-24`}
             >
-              <Icon name={menu.iconName} class="mt-2 h-5 w-5" />
-              {menu.label}
+              <Icon name={menu.iconName} class="h-5 w-5 md:mt-2" />
+              <p class="hidden md:block">{menu.label}</p>
             </a>
           </li>
         ))
       }
 
-      <li class="absolute top-0 right-6 bottom-0">
+      <li class="md:absolute md:top-0 md:right-6 md:bottom-0">
         <button class="btn btn-ghost btn-circle my-auto">
           <label class="swap swap-rotate" for="dark-toggle">
             <span class="hidden">Theme Switcher</span>
             <input type="checkbox" id="dark-toggle" class="theme-controller" />
             <!-- Sun icon -->
-            <Icon name="heroicons:sun" class="swap-off h-6 w-6 fill-current" />
+            <Icon name="heroicons:sun" class="swap-off h-5 w-5 fill-current" />
             <!-- Moon icon -->
-            <Icon name="heroicons:moon" class="swap-on h-6 w-6 fill-current" />
+            <Icon name="heroicons:moon" class="swap-on h-5 w-5 fill-current" />
           </label>
         </button>
       </li>

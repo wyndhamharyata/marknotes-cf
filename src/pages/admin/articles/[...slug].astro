@@ -24,7 +24,7 @@ const { title, description, pubDate, updatedDate, heroImage } = post.data;
   description={description}
   dockProp={{ menus: ADMIN_DOCK, currentPath: `/admin/${post.id}` }}
 >
-  <div class="mx-auto w-full max-w-5xl px-2">
+  <div class="mx-auto w-full max-w-5xl">
     <div class="breadcrumbs bg-base-100 my-2 w-fit rounded-xl px-4 py-2 text-sm font-semibold">
       <ul>
         <li><a href="/admin/articles">Articles</a></li>
@@ -74,9 +74,16 @@ const { title, description, pubDate, updatedDate, heroImage } = post.data;
             </div>
           </div>
         </article>
+      </div>
 
+      <input type="radio" name="article_tabs" role="tab" class="tab" aria-label="Stats" />
+      <div role="tabpanel" class="tab-content border-base-300 bg-base-100 rounded-box p-2 md:p-6">
+        <Analytics slug={post.id} server:defer />
+      </div>
+      <input type="radio" name="article_tabs" role="tab" class="tab" aria-label="Comments" />
+      <div role="tabpanel" class="tab-content border-base-300 bg-base-100 rounded-box">
         <CommentSection server:defer articleSlug={post.id}>
-          <div slot="fallback" class="card bg-base-100 mt-8 shadow-xl">
+          <div slot="fallback" class="card bg-base-100 shadow-xl">
             <div class="card-body">
               <h2 class="card-title mb-4 text-2xl">Comments</h2>
               <div class="skeleton h-24 w-full"></div>
@@ -84,21 +91,6 @@ const { title, description, pubDate, updatedDate, heroImage } = post.data;
             </div>
           </div>
         </CommentSection>
-      </div>
-
-      <input type="radio" name="article_tabs" role="tab" class="tab" aria-label="Stats" />
-      <div role="tabpanel" class="tab-content border-base-300 bg-base-100 rounded-box p-2 md:p-6">
-        <Analytics slug={post.id} server:defer>
-          <div slot="fallback" class="flex flex-col gap-4">
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div class="skeleton h-28 w-full"></div>
-              <div class="skeleton h-28 w-full"></div>
-              <div class="skeleton h-28 w-full"></div>
-            </div>
-            <div class="skeleton h-72 w-full"></div>
-            <div class="skeleton h-80 w-full"></div>
-          </div>
-        </Analytics>
       </div>
     </div>
   </div>

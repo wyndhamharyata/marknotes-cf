@@ -65,13 +65,16 @@ const filters: Filter[] = [
 ];
 ---
 
-<div class="mx-auto flex flex-wrap gap-2" role="tablist">
+<div class="mx-auto flex w-full flex-wrap items-center gap-2 p-2 md:w-fit" role="tablist">
   {
     filters.map((filter) => (
       <a
         href={filter.link}
         role="tab"
-        class:list={["btn", filterStatus === filter.moderationStatus ? filter.color : "btn-ghost"]}
+        class:list={[
+          "btn",
+          filterStatus === filter.moderationStatus ? filter.color : "btn-dash md:btn-ghost",
+        ]}
       >
         {filter.label}{" "}
         <span class:list={["badge badge-xs ml-1", filter.badgeColor]}>{counts[filter.key]}</span>

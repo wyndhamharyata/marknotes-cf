@@ -16,7 +16,7 @@ const articles = (await getCollection("blog")).sort(
   description={SITE_DESCRIPTION}
   dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin/articles" }}
 >
-  <div class="flex w-3xl flex-col space-y-6">
+  <div class="mx-auto flex flex-col md:w-3xl md:space-y-6">
     <h1 class="text-2xl font-bold">Articles</h1>
     {articles.map((article) => <ArticleItem article={article} />)}
   </div>
