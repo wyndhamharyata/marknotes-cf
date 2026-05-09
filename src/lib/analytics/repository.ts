@@ -42,6 +42,46 @@ export async function getLatestAnalyticsBySlug(
   return row ? rowToAnalytics(row) : null;
 }
 
+export async function getLatestAnalyticsBySlugs(
+  slugs: string[],
+): Promise<Map<string, ArticleAnalyticsRow>> {
+  const map = new Map<string, ArticleAnalyticsRow>();
+  if (slugs.length === 0) return map;
+
+  const client = getTursoClient(getAstroCredentials());
+  const placeholders = slugs.map(() => "?").join(", ");
+
+  const result = await client.execute({
+    sql: `
+      WITH latest AS (
+        SELECT article_slug, MAX(captured_at) AS max_ts
+        FROM article_analytics_snapshots
+        WHERE article_slug IN (${placeholders})
+        GROUP BY article_slug
+      )
+      SELECT
+        s.id,
+        s.article_slug,
+        s.pageviews_24h, s.visits_24h,
+        s.pageviews_7d,  s.visits_7d,
+        s.pageviews_30d, s.visits_30d,
+        s.web_vitals_json,
+        s.captured_at
+      FROM article_analytics_snapshots s
+      INNER JOIN latest l
+        ON s.article_slug = l.article_slug
+        AND s.captured_at = l.max_ts
+    `,
+    args: slugs,
+  });
+
+  for (const row of result.rows) {
+    const analytics = rowToAnalytics(row);
+    map.set(analytics.articleSlug, analytics);
+  }
+  return map;
+}
+
 export async function getAnalyticsHistoryBySlug(
   slug: string,
   opts: HistoryOptions = {},

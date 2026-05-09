@@ -1,21 +1,20 @@
 ---
 import { getCollection } from "astro:content";
-import { getLatestAnalyticsBySlug } from "../../../lib/analytics/repository";
+import { getLatestAnalyticsBySlugs } from "../../../lib/analytics/repository";
 
 const articles = await getCollection("blog");
+const analyticsMap = await getLatestAnalyticsBySlugs(articles.map((a) => a.id));
 
-const enriched = await Promise.all(
-  articles.map(async (a) => {
-    const analytics = await getLatestAnalyticsBySlug(a.id);
-    return {
-      slug: a.id,
-      title: a.data.title,
-      pubDate: a.data.pubDate,
-      pageviews7d: analytics?.pageviews7d ?? 0,
-      visits7d: analytics?.visits7d ?? 0,
-    };
-  }),
-);
+const enriched = articles.map((a) => {
+  const analytics = analyticsMap.get(a.id);
+  return {
+    slug: a.id,
+    title: a.data.title,
+    pubDate: a.data.pubDate,
+    pageviews7d: analytics?.pageviews7d ?? 0,
+    visits7d: analytics?.visits7d ?? 0,
+  };
+});
 
 const top = enriched
   .filter((a) => a.pageviews7d > 0)

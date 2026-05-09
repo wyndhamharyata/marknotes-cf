@@ -30,7 +30,7 @@ function truncate(s: string, n: number): string {
   comments.length === 0 ? (
     <div class="text-base-content/60 py-8 text-center text-sm">No comments yet.</div>
   ) : (
-    <ul class="flex max-h-[280px] flex-col gap-3 overflow-y-auto pr-1">
+    <ul class="flex max-h-70 flex-col gap-3 overflow-y-auto pr-1">
       {comments.map((c) => {
         const articleTitle = titleMap.get(c.articleSlug) ?? c.articleSlug;
         return (
@@ -44,10 +44,10 @@ function truncate(s: string, n: number): string {
                 {formatRelative(c.createdAt)}
               </time>
             </div>
-            <p class="text-base-content/80 text-sm break-words">{truncate(c.message, 120)}</p>
+            <p class="text-base-content/80 text-sm wrap-break-word">{truncate(c.message, 120)}</p>
             <div class="flex items-center justify-between gap-2 text-xs">
               <a
-                href={`/blog/${c.articleSlug}`}
+                href={`/admin/articles/${c.articleSlug}`}
                 class="link link-hover text-base-content/60 truncate"
                 title={articleTitle}
               >
