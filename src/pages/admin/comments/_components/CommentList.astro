@@ -1,0 +1,47 @@
+---
+import { getCollection } from "astro:content";
+import { getCommentsForAdmin } from "../../../../lib/comments/admin-repository";
+import { type ModerationStatusType } from "../../../../lib/comments/types";
+import CommentModerationItem from "./CommentModerationItem.astro";
+import Pagination from "./Pagination.astro";
+
+type Props = {
+  filterStatus: ModerationStatusType | null;
+  currentPage: number;
+  limit: number;
+  baseUrl: string;
+};
+
+const { filterStatus, currentPage, limit, baseUrl } = Astro.props;
+
+const [{ comments, total }, articles] = await Promise.all([
+  getCommentsForAdmin({ status: filterStatus, page: currentPage, limit }),
+  getCollection("blog"),
+]);
+
+const totalPages = Math.ceil(total / limit);
+const articleTitleMap = new Map(articles.map((a) => [a.id, a.data.title]));
+
+const enrichedComments = comments.map((c) => ({
+  ...c,
+  articleTitle: articleTitleMap.get(c.articleSlug) || c.articleSlug,
+}));
+---
+
+{
+  totalPages > 1 && (
+    <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={baseUrl} />
+  )
+}
+
+<div id="comment-list" class="space-y-2 md:w-3xl md:space-y-4">
+  {
+    enrichedComments.length === 0 && (
+      <div class="card bg-base-100/60 p-8 text-center">
+        <p class="text-base-content/60">No comments found</p>
+      </div>
+    )
+  }
+
+  {enrichedComments.map((comment) => <CommentModerationItem comment={comment} />)}
+</div>

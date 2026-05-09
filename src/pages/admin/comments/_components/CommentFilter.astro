@@ -4,10 +4,10 @@ import {
   type CommentCounts,
   type ModerationStatusType,
 } from "../../../../lib/comments/types";
+import { getCommentCounts } from "../../../../lib/comments/admin-repository";
 
 type Props = {
   filterStatus: ModerationStatusType | null;
-  counts: CommentCounts;
 };
 
 type Filter = {
@@ -19,7 +19,8 @@ type Filter = {
   moderationStatus: ModerationStatusType | null;
 };
 
-const { filterStatus, counts } = Astro.props;
+const { filterStatus } = Astro.props;
+const counts = await getCommentCounts();
 
 const filters: Filter[] = [
   {
