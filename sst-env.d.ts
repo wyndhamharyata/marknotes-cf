@@ -39,9 +39,14 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "MainDOHost": import("@cloudflare/workers-types").Service
     "Max": {
       "type": "sst.cloudflare.Astro"
       "url": string
+    }
+    "MigrationToken": {
+      "type": "sst.sst.Secret"
+      "value": string
     }
     "ModerationCronHandler": import("@cloudflare/workers-types").Service
     "OpenAuthUrl": {

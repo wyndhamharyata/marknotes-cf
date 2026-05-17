@@ -3,10 +3,11 @@ import { Resource } from "sst";
 import { fetchArticleAnalytics } from "../lib/analytics/cloudflare-client";
 import { roundDownToSlot, SLOT_3H_SECONDS } from "../lib/analytics/timeslot";
 import { fetchArticleSlugs, insertAnalyticsSnapshot } from "./analytics-repository";
+import type { EnvWithMainDo } from "../lib/db/do-client";
 
-const handler: ExportedHandler = {
-  async scheduled(_event, _env, ctx) {
-    ctx.waitUntil(runAnalyticsPoll());
+const handler: ExportedHandler<EnvWithMainDo> = {
+  async scheduled(_event, env, ctx) {
+    ctx.waitUntil(runAnalyticsPoll(env));
   },
 };
 
@@ -14,7 +15,7 @@ export default handler;
 
 const CONCURRENCY = 5;
 
-async function runAnalyticsPoll(): Promise<void> {
+async function runAnalyticsPoll(env: EnvWithMainDo): Promise<void> {
   console.log("Starting analytics poll...");
 
   const accountTag = Resource.CfAccountId.value;
@@ -51,7 +52,7 @@ async function runAnalyticsPoll(): Promise<void> {
           email,
           slug,
         });
-        await insertAnalyticsSnapshot(slug, snapshot, capturedAt);
+        await insertAnalyticsSnapshot(env, slug, snapshot, capturedAt);
         return slug;
       }),
     );

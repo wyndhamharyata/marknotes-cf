@@ -19,10 +19,69 @@ export default $config({
     const cfSiteTag = new sst.Secret("CfSiteTag");
     const cfAnalyticsToken = new sst.Secret("CfAnalyticsToken");
     const cfAnalyticsEmail = new sst.Secret("CfAnalyticsEmail");
+    const migrationToken = new sst.Secret("MigrationToken");
+
+    // Host worker that owns the MainDO Durable Object class.
+    // The Astro worker and both cron workers bind to MAIN_DO via scriptName.
+    //
+    // The migration block (newSqliteClasses) is a one-shot operation that
+    // Cloudflare rejects on re-send. Gate it on INIT_DO=1 so it only runs on
+    // the first deploy of each stage:
+    //   INIT_DO=1 sst deploy --stage <stage>
+    // Subsequent deploys must be run WITHOUT INIT_DO so the migration block
+    // is omitted.
+    const initDo = process.env.INIT_DO === "1";
+    const mainDoHost = new sst.cloudflare.Worker("MainDOHost", {
+      handler: "src/do/host.ts",
+      build: {
+        loader: {
+          ".sql": "text",
+        },
+      },
+      transform: {
+        worker(args) {
+          if (initDo) {
+            args.migrations = {
+              newSqliteClasses: ["MainDO"],
+              newTag: "v1",
+            };
+          }
+        },
+      },
+    });
+
+    const mainDoScriptName = mainDoHost.nodes.worker.scriptName;
+
+    function appendMainDoBinding(args: { bindings?: any; compatibilityFlags?: any }) {
+      args.bindings = $resolve([args.bindings, mainDoScriptName]).apply(
+        ([existing, scriptName]) => [
+          ...((existing as any[]) ?? []),
+          {
+            type: "durable_object_namespace",
+            name: "MAIN_DO",
+            className: "MainDO",
+            scriptName,
+          },
+        ],
+      );
+      args.compatibilityFlags = $resolve([args.compatibilityFlags]).apply(
+        ([flags]) => {
+          const list = (flags as string[]) ?? [];
+          return list.includes("nodejs_compat") ? list : [...list, "nodejs_compat"];
+        },
+      );
+    }
 
     new sst.cloudflare.Astro("Max", {
       domain: $app.stage === "production" ? "mwyndham.dev" : "devread.mwyndham.dev",
-      link: [libsqlUrl, libsqlAuthToken, geminiApiKey, openAuthUrl, baseUrl],
+      link: [
+        libsqlUrl,
+        libsqlAuthToken,
+        geminiApiKey,
+        openAuthUrl,
+        baseUrl,
+        migrationToken,
+      ],
       environment: {
         LIBSQL_URL: libsqlUrl.value,
         LIBSQL_AUTH_TOKEN: libsqlAuthToken.value,
@@ -46,6 +105,7 @@ export default $config({
                   invocationLogs: true,
                 },
               };
+              appendMainDoBinding(args);
             },
           };
         },
@@ -55,30 +115,38 @@ export default $config({
     new sst.x.DevCommand("LocalDev", {
       dev: {
         autostart: false,
-        command: "npm run dev"
-      }
-    })
+        command: "npm run dev",
+      },
+    });
 
     new sst.cloudflare.Cron("ModerationCron", {
-      job: {
+      worker: {
         handler: "src/workers/moderation-cron.ts",
-        link: [libsqlUrl, libsqlAuthToken, geminiApiKey],
+        link: [geminiApiKey],
+        transform: {
+          worker(args) {
+            appendMainDoBinding(args);
+          },
+        },
       },
       schedules: ["*/10 * * * *"],
     });
 
     new sst.cloudflare.Cron("AnalyticsCron", {
-      job: {
+      worker: {
         handler: "src/workers/analytics-cron.ts",
         link: [
-          libsqlUrl,
-          libsqlAuthToken,
           cfAccountId,
           cfSiteTag,
           cfAnalyticsToken,
           cfAnalyticsEmail,
           baseUrl,
         ],
+        transform: {
+          worker(args) {
+            appendMainDoBinding(args);
+          },
+        },
       },
       schedules: ["0 */3 * * *"],
     });

@@ -1,24 +1,12 @@
 /**
  * Worker-specific repository for analytics polling.
- * Uses SST Resource directly to avoid `astro:env/server` import issues.
+ * Targets the MainDO Durable Object via the env-bound stub.
  */
-import { Resource } from "sst";
-import { getTursoClient, type TursoCredentials } from "../lib/db/turso";
+import { getDoStubFromEnv, type EnvWithMainDo } from "../lib/db/do-client";
 import type { AnalyticsSnapshot } from "../lib/analytics/types";
 
 interface SlugListEntry {
   slug: string;
-}
-
-function getWorkerCredentials(): TursoCredentials {
-  const url = Resource.LibsqlUrl.value;
-  const authToken = Resource.LibsqlAuthToken.value;
-
-  if (!url || !authToken) {
-    throw new Error("Database credentials not configured via SST secrets");
-  }
-
-  return { url, authToken };
 }
 
 export async function fetchArticleSlugs(baseUrl: string): Promise<string[]> {
@@ -35,39 +23,26 @@ export async function fetchArticleSlugs(baseUrl: string): Promise<string[]> {
 }
 
 export async function insertAnalyticsSnapshot(
+  env: EnvWithMainDo,
   slug: string,
   snapshot: AnalyticsSnapshot,
   capturedAt: Date,
 ): Promise<void> {
-  const client = getTursoClient(getWorkerCredentials());
-
   const webVitals = {
     "24h": snapshot.webVital24h,
     "7d": snapshot.webVital7d,
     "30d": snapshot.webVital30d,
   };
 
-  await client.execute({
-    sql: `
-      INSERT OR IGNORE INTO article_analytics_snapshots (
-        article_slug,
-        pageviews_24h, visits_24h,
-        pageviews_7d,  visits_7d,
-        pageviews_30d, visits_30d,
-        web_vitals_json,
-        captured_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `,
-    args: [
-      slug,
-      snapshot.pageVisit24h.pageviews,
-      snapshot.pageVisit24h.visits,
-      snapshot.pageVisit7d.pageviews,
-      snapshot.pageVisit7d.visits,
-      snapshot.pageVisit30d.pageviews,
-      snapshot.pageVisit30d.visits,
-      JSON.stringify(webVitals),
-      Math.floor(capturedAt.getTime() / 1000),
-    ],
+  return getDoStubFromEnv(env).insertAnalyticsSnapshot({
+    slug,
+    pageviews24h: snapshot.pageVisit24h.pageviews,
+    visits24h: snapshot.pageVisit24h.visits,
+    pageviews7d: snapshot.pageVisit7d.pageviews,
+    visits7d: snapshot.pageVisit7d.visits,
+    pageviews30d: snapshot.pageVisit30d.pageviews,
+    visits30d: snapshot.pageVisit30d.visits,
+    webVitalsJson: JSON.stringify(webVitals),
+    capturedAtSec: Math.floor(capturedAt.getTime() / 1000),
   });
 }

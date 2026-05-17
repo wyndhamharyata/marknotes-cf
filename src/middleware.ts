@@ -1,5 +1,12 @@
 import { defineMiddleware, sequence } from "astro:middleware";
 import { client, subjects, setTokensFromCookies, isAdmin } from "./lib/auth";
+import { runtimeAls, type EnvWithMainDo } from "./lib/db/do-client";
+
+const runtimeMiddleware = defineMiddleware(async (context, next) => {
+  const env = (context.locals as unknown as { runtime: { env: EnvWithMainDo } })
+    .runtime.env;
+  return runtimeAls.run({ env }, () => next());
+});
 
 const authMiddleware = defineMiddleware(async (context, next) => {
   const { pathname } = context.url;
@@ -73,4 +80,4 @@ const authMiddleware = defineMiddleware(async (context, next) => {
   return context.redirect(url, 302);
 });
 
-export const onRequest = sequence(authMiddleware);
+export const onRequest = sequence(runtimeMiddleware, authMiddleware);

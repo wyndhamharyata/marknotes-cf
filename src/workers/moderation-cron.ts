@@ -1,20 +1,21 @@
 /// <reference types="@cloudflare/workers-types" />
 import { getUnmoderatedComments, updateModerationStatus } from "./repository";
 import { moderateComments } from "../lib/moderation/gemini-service";
+import type { EnvWithMainDo } from "../lib/db/do-client";
 
-const handler: ExportedHandler = {
-  async scheduled(_event, _env, ctx) {
-    ctx.waitUntil(runModeration());
+const handler: ExportedHandler<EnvWithMainDo> = {
+  async scheduled(_event, env, ctx) {
+    ctx.waitUntil(runModeration(env));
   },
 };
 
 export default handler;
 
-async function runModeration(): Promise<void> {
+async function runModeration(env: EnvWithMainDo): Promise<void> {
   console.log("Starting AI moderation job...");
 
   try {
-    const comments = await getUnmoderatedComments(50);
+    const comments = await getUnmoderatedComments(env, 50);
 
     if (comments.length === 0) {
       console.log("No comments to moderate");
@@ -41,7 +42,7 @@ async function runModeration(): Promise<void> {
       }
 
       if (results.length > 0) {
-        await updateModerationStatus(results);
+        await updateModerationStatus(env, results);
         totalProcessed += results.length;
       }
 
