@@ -36,6 +36,10 @@ declare module "sst" {
       "type": "sst.cloudflare.Astro"
       "url": string
     }
+    "MigrationToken": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
     "ModerationCronHandler": import("@cloudflare/workers-types").Service
     "OpenAuthUrl": {
       "type": "sst.sst.Secret"

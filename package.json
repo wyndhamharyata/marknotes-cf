@@ -43,6 +43,8 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251231.0",
     "@types/bad-words": "^3.0.3",
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^12.10.0",
     "drizzle-kit": "^0.31.10",
     "prettier": "3.7.4",
     "prettier-plugin-astro": "0.14.1",

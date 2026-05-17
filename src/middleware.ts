@@ -1,11 +1,34 @@
 import { defineMiddleware, sequence } from "astro:middleware";
 import { client, subjects, setTokensFromCookies, isAdmin } from "./lib/auth";
-import { runtimeAls, type EnvWithMainDo } from "./lib/db/do-client";
+import {
+  getDoStubFromEnv,
+  runtimeAls,
+  type EnvWithMainDo,
+  type StubLike,
+} from "./lib/db/do-client";
+
+// @vite-ignore + import.meta.env.DEV guard keep dev-fallback (and
+// better-sqlite3) out of Workers prod bundles via DCE.
+let cachedDevStubPromise: Promise<StubLike> | null = null;
 
 const runtimeMiddleware = defineMiddleware(async (context, next) => {
-  const env = (context.locals as unknown as { runtime: { env: EnvWithMainDo } })
-    .runtime.env;
-  return runtimeAls.run({ env }, () => next());
+  const env = (
+    context.locals as unknown as { runtime?: { env?: EnvWithMainDo } }
+  ).runtime?.env;
+
+  let stub: StubLike | null = null;
+  if (env?.MAIN_DO !== undefined) {
+    stub = getDoStubFromEnv(env);
+  } else if (import.meta.env.DEV) {
+    if (!cachedDevStubPromise) {
+      cachedDevStubPromise = import(
+        /* @vite-ignore */ "./lib/db/dev-fallback"
+      ).then((mod) => mod.devStub as unknown as StubLike);
+    }
+    stub = await cachedDevStubPromise;
+  }
+
+  return runtimeAls.run({ env: env ?? {}, stub }, () => next());
 });
 
 const authMiddleware = defineMiddleware(async (context, next) => {

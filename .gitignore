@@ -25,3 +25,13 @@ pnpm-debug.log*
 
 # sst
 .sst
+
+# Miniflare local DO storage + dev artifacts
+.wrangler/
+
+# Dev-only artifacts:
+#   - .dev/wrangler.jsonc — emitted by sst.config.ts during `sst dev` for
+#     @astrojs/cloudflare platformProxy (kept outside project root so SST
+#     doesn't see it; SST manages its own wrangler configs internally).
+#   - .dev/seed.sql — produced by `npm run dump:staging`.
+.dev/

@@ -17,16 +17,10 @@ export default $config({
     const cfSiteTag = new sst.Secret("CfSiteTag");
     const cfAnalyticsToken = new sst.Secret("CfAnalyticsToken");
     const cfAnalyticsEmail = new sst.Secret("CfAnalyticsEmail");
+    const migrationToken = new sst.Secret("MigrationToken");
 
-    // Host worker that owns the MainDO Durable Object class.
-    // The Astro worker and both cron workers bind to MAIN_DO via scriptName.
-    //
-    // The migration block (newSqliteClasses) is a one-shot operation that
-    // Cloudflare rejects on re-send. Gate it on INIT_DO=1 so it only runs on
-    // the first deploy of each stage:
-    //   INIT_DO=1 sst deploy --stage <stage>
-    // Subsequent deploys must be run WITHOUT INIT_DO so the migration block
-    // is omitted.
+    // Gate the newSqliteClasses migration on INIT_DO=1 — CF rejects re-sends.
+    // First deploy per stage: `INIT_DO=1 sst deploy --stage <stage>`.
     const initDo = process.env.INIT_DO === "1";
     const mainDoHost = new sst.cloudflare.Worker("MainDOHost", {
       handler: "src/do/host.ts",
@@ -71,8 +65,9 @@ export default $config({
 
     new sst.cloudflare.Astro("Max", {
       domain: $app.stage === "production" ? "mwyndham.dev" : "devread.mwyndham.dev",
-      link: [geminiApiKey, openAuthUrl, baseUrl],
+      link: [geminiApiKey, openAuthUrl, baseUrl, migrationToken],
       environment: {
+        STAGE: $app.stage,
         GEMINI_API_KEY: geminiApiKey.value,
         OPEN_AUTH_URL: openAuthUrl.value,
         BASE_URL: baseUrl.value,

@@ -5,17 +5,14 @@ import migrations from "./drizzle/migrations";
 import * as schema from "./schema";
 import * as commentsQ from "../lib/comments/queries";
 import * as analyticsQ from "../lib/analytics/queries";
+import { dumpSqlImpl } from "../lib/seed/dump";
 import type { CreateCommentInput, ModerationResult } from "../lib/comments/types";
 
 export type { GetCommentsForAdminInput } from "../lib/comments/queries";
 export type { SiteWideTotals, SiteWidePageviewSeries, AnalyticsSnapshotInput } from "../lib/analytics/queries";
 
-// NOTE: methods on MainDO must be declared as real prototype methods. DO RPC
-// checks the class prototype to determine which calls are dispatchable; arrow
-// class fields are instance properties and will fail with "RPC receiver does
-// not implement the method". Keep these as method declarations, not fields.
-// This file is opt-out of prettier (see .prettierignore) so each shim stays
-// on one line.
+// RPC requires prototype methods, not arrow class fields. File is in
+// .prettierignore so the one-line shims survive formatting.
 export class MainDO extends DurableObject {
   private db: DrizzleSqliteDODatabase<typeof schema>;
 
@@ -51,4 +48,7 @@ export class MainDO extends DurableObject {
 
   // Analytics (cron write)
   insertAnalyticsSnapshot(input: analyticsQ.AnalyticsSnapshotInput) { return analyticsQ.insertAnalyticsSnapshot(this.db, input); }
+
+  // Dump (dev seed via /api/dump-do)
+  dumpSql() { return dumpSqlImpl(this.db); }
 }

@@ -1,5 +1,5 @@
 import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
-import type { DrizzleSqliteDODatabase } from "drizzle-orm/durable-sqlite";
+import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import * as schema from "../../do/schema";
 import {
   EMPTY_WEB_VITAL_GROUP,
@@ -8,7 +8,7 @@ import {
   type WebVitalGroup,
 } from "./types";
 
-type DB = DrizzleSqliteDODatabase<typeof schema>;
+type DB = BaseSQLiteDatabase<"sync", unknown, typeof schema>;
 
 export interface SiteWideTotals {
   pageviews24h: number;
