@@ -4,3 +4,7 @@ node_modules/
 .sst/
 pnpm-lock.yaml
 package-lock.json
+# MainDO uses one-line method bodies (DO RPC requires real prototype methods,
+# not arrow class fields). Prettier can't express compact `{ return ... }`
+# bodies at any printWidth, so opt this file out.
+src/do/main-do.ts

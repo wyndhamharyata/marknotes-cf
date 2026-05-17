@@ -1,5 +1,6 @@
 import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import type { DrizzleSqliteDODatabase } from "drizzle-orm/durable-sqlite";
+import { alias } from "drizzle-orm/sqlite-core";
 import * as schema from "../../do/schema";
 import {
   ModerationStatus,
@@ -24,22 +25,10 @@ export interface GetCommentsForAdminInput {
 
 export async function getCommentsBySlug(db: DB, articleSlug: string): Promise<Reply[]> {
   const rows = await db
-    .select({
-      id: schema.replies.id,
-      createdAt: schema.replies.createdAt,
-      message: schema.replies.message,
-      alias: schema.replies.alias,
-      parentId: schema.replies.parentId,
-      articleSlug: schema.replies.articleSlug,
-      moderationStatus: schema.replies.moderationStatus,
-      hidePublicity: schema.replies.hidePublicity,
-    })
+    .select()
     .from(schema.replies)
     .where(
-      and(
-        eq(schema.replies.articleSlug, articleSlug),
-        isNull(schema.replies.deletedAt),
-      ),
+      and(eq(schema.replies.articleSlug, articleSlug), isNull(schema.replies.deletedAt)),
     )
     .orderBy(desc(schema.replies.createdAt));
 
@@ -105,64 +94,24 @@ export async function getCommentsForAdmin(
     .where(baseWhere);
   const total = Number(countRow[0]?.count ?? 0);
 
-  const parents = schema.replies;
-  const r = schema.replies;
-  // Drizzle doesn't allow joining a table to itself with the same alias; use a raw SQL select.
-  const rowsResult = await db.all<{
-    id: number;
-    created_at: string;
-    message: string;
-    alias: string;
-    parent_id: number | null;
-    article_slug: string;
-    moderation_status: number;
-    hide_publicity: number;
-    moderation_reason: string | null;
-    last_moderated_at: string | null;
-    p_id: number | null;
-    p_created_at: string | null;
-    p_message: string | null;
-    p_alias: string | null;
-    p_parent_id: number | null;
-    p_article_slug: string | null;
-    p_moderation_status: number | null;
-    p_hide_publicity: number | null;
-  }>(sql`
-    SELECT
-      r.id, r.created_at, r.message, r.alias, r.parent_id, r.article_slug,
-      r.moderation_status, r.hide_publicity, r.moderation_reason, r.last_moderated_at,
-      p.id AS p_id, p.created_at AS p_created_at, p.message AS p_message,
-      p.alias AS p_alias, p.parent_id AS p_parent_id, p.article_slug AS p_article_slug,
-      p.moderation_status AS p_moderation_status, p.hide_publicity AS p_hide_publicity
-    FROM ${r} r
-    LEFT JOIN ${parents} p ON r.parent_id = p.id
-    WHERE r.deleted_at IS NULL
-      AND r.hide_publicity = 0
-      ${status !== null ? sql`AND r.moderation_status = ${status}` : sql``}
-    ORDER BY r.created_at DESC
-    LIMIT ${limit} OFFSET ${offset}
-  `);
+  const parents = alias(schema.replies, "parents");
+  const commentsWithParent = await db
+    .select({ comment: schema.replies, parent: parents })
+    .from(schema.replies)
+    .leftJoin(parents, eq(schema.replies.parentId, parents.id))
+    .where(baseWhere)
+    .orderBy(desc(schema.replies.createdAt))
+    .limit(limit)
+    .offset(offset);
 
-  const commentIds = rowsResult.map((row) => row.id);
+  const commentIds = commentsWithParent.map((row) => row.comment.id);
   const childrenMap = new Map<number, Reply[]>();
   if (commentIds.length > 0) {
     const childrenRows = await db
-      .select({
-        id: schema.replies.id,
-        createdAt: schema.replies.createdAt,
-        message: schema.replies.message,
-        alias: schema.replies.alias,
-        parentId: schema.replies.parentId,
-        articleSlug: schema.replies.articleSlug,
-        moderationStatus: schema.replies.moderationStatus,
-        hidePublicity: schema.replies.hidePublicity,
-      })
+      .select()
       .from(schema.replies)
       .where(
-        and(
-          inArray(schema.replies.parentId, commentIds),
-          isNull(schema.replies.deletedAt),
-        ),
+        and(inArray(schema.replies.parentId, commentIds), isNull(schema.replies.deletedAt)),
       )
       .orderBy(asc(schema.replies.createdAt));
 
@@ -173,49 +122,25 @@ export async function getCommentsForAdmin(
     }
   }
 
-  const comments: AdminComment[] = rowsResult.map((row) => {
-    const parent: Reply | null = row.p_id
-      ? {
-          id: row.p_id,
-          createdAt: new Date(row.p_created_at as string),
-          message: row.p_message as string,
-          alias: row.p_alias as string,
-          parentId: row.p_parent_id,
-          articleSlug: row.p_article_slug as string,
-          moderationStatus: ((row.p_moderation_status as number) ??
-            ModerationStatus.UNVERIFIED) as ModerationStatusType,
-          hidePublicity: Boolean(row.p_hide_publicity),
-        }
-      : null;
-
-    return {
-      id: row.id,
-      createdAt: new Date(row.created_at),
-      message: row.message,
-      alias: row.alias,
-      parentId: row.parent_id,
-      articleSlug: row.article_slug,
-      moderationStatus: ((row.moderation_status as number) ??
-        ModerationStatus.UNVERIFIED) as ModerationStatusType,
-      hidePublicity: Boolean(row.hide_publicity),
-      moderationReason: row.moderation_reason ?? null,
-      lastModeratedAt: row.last_moderated_at ? new Date(row.last_moderated_at) : null,
-      parent,
-      children: childrenMap.get(row.id) ?? [],
-      articleTitle: "",
-    };
-  });
+  const comments: AdminComment[] = commentsWithParent.map(({ comment, parent }) => ({
+    ...rowToReply(comment),
+    moderationReason: comment.moderationReason ?? null,
+    lastModeratedAt: comment.lastModeratedAt ? new Date(comment.lastModeratedAt) : null,
+    parent: parent ? rowToReply(parent) : null,
+    children: childrenMap.get(comment.id) ?? [],
+    articleTitle: "",
+  }));
 
   return { comments, total };
 }
 
 export async function getCommentCounts(db: DB): Promise<CommentCounts> {
-  const rows = await db.all<{
-    all_count: number;
-    unverified: number;
-    ok: number;
-    warning: number;
-    dangerous: number;
+  const rows = db.all<{
+      all_count: number;
+      unverified: number;
+      ok: number;
+      warning: number;
+      dangerous: number;
   }>(sql`
     SELECT
       COUNT(*) AS all_count,
@@ -298,18 +223,7 @@ export async function updateModerationStatus(
 
 // ---------- File-local helpers ----------
 
-interface ReplyRowLike {
-  id: number;
-  createdAt: string;
-  message: string;
-  alias: string;
-  parentId: number | null;
-  articleSlug: string;
-  moderationStatus: number;
-  hidePublicity: number;
-}
-
-function rowToReply(row: ReplyRowLike): Reply {
+function rowToReply(row: typeof schema.replies.$inferSelect): Reply {
   return {
     id: row.id,
     createdAt: new Date(row.createdAt),

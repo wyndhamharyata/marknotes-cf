@@ -10,6 +10,12 @@ import type { CreateCommentInput, ModerationResult } from "../lib/comments/types
 export type { GetCommentsForAdminInput } from "../lib/comments/queries";
 export type { SiteWideTotals, SiteWidePageviewSeries, AnalyticsSnapshotInput } from "../lib/analytics/queries";
 
+// NOTE: methods on MainDO must be declared as real prototype methods. DO RPC
+// checks the class prototype to determine which calls are dispatchable; arrow
+// class fields are instance properties and will fail with "RPC receiver does
+// not implement the method". Keep these as method declarations, not fields.
+// This file is opt-out of prettier (see .prettierignore) so each shim stays
+// on one line.
 export class MainDO extends DurableObject {
   private db: DrizzleSqliteDODatabase<typeof schema>;
 
@@ -22,27 +28,27 @@ export class MainDO extends DurableObject {
   }
 
   // Comments (public)
-  getCommentsBySlug = (slug: string) => commentsQ.getCommentsBySlug(this.db, slug);
-  createComment = (input: CreateCommentInput) => commentsQ.createComment(this.db, input);
-  createCommentWithModeration = (input: CreateCommentInput, moderationStatus: number) => commentsQ.createCommentWithModeration(this.db, input, moderationStatus);
+  getCommentsBySlug(slug: string) { return commentsQ.getCommentsBySlug(this.db, slug); }
+  createComment(input: CreateCommentInput) { return commentsQ.createComment(this.db, input); }
+  createCommentWithModeration(input: CreateCommentInput, moderationStatus: number) { return commentsQ.createCommentWithModeration(this.db, input, moderationStatus); }
 
   // Comments (admin)
-  getCommentsForAdmin = (opts: commentsQ.GetCommentsForAdminInput) => commentsQ.getCommentsForAdmin(this.db, opts);
-  getCommentCounts = () => commentsQ.getCommentCounts(this.db);
-  markCommentSafe = (id: number) => commentsQ.markCommentSafe(this.db, id);
-  hideComment = (id: number) => commentsQ.hideComment(this.db, id);
+  getCommentsForAdmin(opts: commentsQ.GetCommentsForAdminInput) { return commentsQ.getCommentsForAdmin(this.db, opts); }
+  getCommentCounts() { return commentsQ.getCommentCounts(this.db); }
+  markCommentSafe(id: number) { return commentsQ.markCommentSafe(this.db, id); }
+  hideComment(id: number) { return commentsQ.hideComment(this.db, id); }
 
   // Comments (cron)
-  getUnmoderatedComments = (limit: number) => commentsQ.getUnmoderatedComments(this.db, limit);
-  updateModerationStatus = (results: ModerationResult[]) => commentsQ.updateModerationStatus(this.db, results);
+  getUnmoderatedComments(limit: number) { return commentsQ.getUnmoderatedComments(this.db, limit); }
+  updateModerationStatus(results: ModerationResult[]) { return commentsQ.updateModerationStatus(this.db, results); }
 
   // Analytics (read)
-  getLatestAnalyticsBySlug = (slug: string) => analyticsQ.getLatestAnalyticsBySlug(this.db, slug);
-  getLatestAnalyticsBySlugs = (slugs: string[]) => analyticsQ.getLatestAnalyticsBySlugs(this.db, slugs);
-  getAnalyticsHistoryBySlug = (slug: string, opts: { sinceUnixSec?: number; limit?: number } = {}) => analyticsQ.getAnalyticsHistoryBySlug(this.db, slug, opts);
-  getSiteWideTotals = () => analyticsQ.getSiteWideTotals(this.db);
-  getSiteWidePageviewHistory = (days: number) => analyticsQ.getSiteWidePageviewHistory(this.db, days);
+  getLatestAnalyticsBySlug(slug: string) { return analyticsQ.getLatestAnalyticsBySlug(this.db, slug); }
+  getLatestAnalyticsBySlugs(slugs: string[]) { return analyticsQ.getLatestAnalyticsBySlugs(this.db, slugs); }
+  getAnalyticsHistoryBySlug(slug: string, opts: { sinceUnixSec?: number; limit?: number } = {}) { return analyticsQ.getAnalyticsHistoryBySlug(this.db, slug, opts); }
+  getSiteWideTotals() { return analyticsQ.getSiteWideTotals(this.db); }
+  getSiteWidePageviewHistory(days: number) { return analyticsQ.getSiteWidePageviewHistory(this.db, days); }
 
   // Analytics (cron write)
-  insertAnalyticsSnapshot = (input: analyticsQ.AnalyticsSnapshotInput) => analyticsQ.insertAnalyticsSnapshot(this.db, input);
+  insertAnalyticsSnapshot(input: analyticsQ.AnalyticsSnapshotInput) { return analyticsQ.insertAnalyticsSnapshot(this.db, input); }
 }

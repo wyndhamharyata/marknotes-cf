@@ -197,19 +197,9 @@ export async function insertAnalyticsSnapshot(
 
 // ---------- File-local helpers ----------
 
-interface AnalyticsRowLike {
-  articleSlug: string;
-  pageviews24h: number;
-  visits24h: number;
-  pageviews7d: number;
-  visits7d: number;
-  pageviews30d: number;
-  visits30d: number;
-  webVitalsJson: string;
-  capturedAt: number;
-}
-
-function rowToAnalytics(row: AnalyticsRowLike): ArticleAnalyticsRow {
+function rowToAnalytics(
+  row: typeof schema.articleAnalyticsSnapshots.$inferSelect,
+): ArticleAnalyticsRow {
   return {
     articleSlug: row.articleSlug,
     pageviews24h: Number(row.pageviews24h ?? 0),

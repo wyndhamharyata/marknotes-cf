@@ -33,14 +33,13 @@ const baseUrl =
   <div class="mx-auto flex flex-col space-y-6 md:w-3xl">
     <h1 class="p-4 text-2xl font-bold">Comment Moderation</h1>
 
-    <CommentFilter server:defer filterStatus={filterStatus}>
+    <CommentFilter filterStatus={filterStatus}>
       <div slot="fallback" class="text-base-content/60 flex min-h-12 items-center justify-center">
         Loading filters…
       </div>
     </CommentFilter>
 
     <CommentList
-      server:defer
       filterStatus={filterStatus}
       currentPage={currentPage}
       limit={limit}
