@@ -1,8 +1,8 @@
 import { getTableColumns, type Table } from "drizzle-orm";
-import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
+import type { DrizzleSqliteDODatabase } from "drizzle-orm/durable-sqlite";
 import * as schema from "../../do/schema";
 
-type DB = BaseSQLiteDatabase<"sync", unknown, typeof schema>;
+type DB = DrizzleSqliteDODatabase<typeof schema>;
 
 export async function dumpSqlImpl(db: DB): Promise<string> {
   const [replies, snapshots] = await Promise.all([

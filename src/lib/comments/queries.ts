@@ -1,5 +1,6 @@
 import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
-import { alias, type BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
+import type { DrizzleSqliteDODatabase } from "drizzle-orm/durable-sqlite";
+import { alias } from "drizzle-orm/sqlite-core";
 import * as schema from "../../do/schema";
 import {
   ModerationStatus,
@@ -12,8 +13,7 @@ import {
   type Reply,
 } from "./types";
 
-// Common base accepts both DO drizzle (prod) and better-sqlite3 drizzle (dev).
-type DB = BaseSQLiteDatabase<"sync", unknown, typeof schema>;
+type DB = DrizzleSqliteDODatabase<typeof schema>;
 
 export interface GetCommentsForAdminInput {
   status: ModerationStatusType | null;

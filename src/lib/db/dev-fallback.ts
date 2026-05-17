@@ -7,6 +7,7 @@ import path from "node:path";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { migrate } from "drizzle-orm/better-sqlite3/migrator";
+import type { DrizzleSqliteDODatabase } from "drizzle-orm/durable-sqlite";
 import * as schema from "../../do/schema";
 import * as commentsQ from "../comments/queries";
 import * as analyticsQ from "../analytics/queries";
@@ -24,18 +25,17 @@ async function initLocalDb() {
   const sqlite = new Database(DB_PATH);
   sqlite.pragma("journal_mode = WAL");
   const db = drizzle(sqlite, { schema });
-
-  // Read .sql from disk rather than the bundled migrations module — bundling
-  // pulls .sql text-loader imports through Vite which we don't configure here.
   migrate(db, { migrationsFolder: "src/do/drizzle" });
 
-  if (!isFresh) return db;
+  const dbForQueries = db as unknown as DrizzleSqliteDODatabase<typeof schema>;
+
+  if (!isFresh) return { sqlite, dbForQueries };
 
   if (!MIGRATION_TOKEN) {
     console.log(
       `[dev-fallback] Created empty ${DB_PATH}. Set MIGRATION_TOKEN in .env to auto-seed from staging on next dev start.`,
     );
-    return db;
+    return { sqlite, dbForQueries };
   }
 
   try {
@@ -64,10 +64,10 @@ async function initLocalDb() {
     );
   }
 
-  return db;
+  return { sqlite, dbForQueries };
 }
 
-const db = await initLocalDb();
+const { dbForQueries: db } = await initLocalDb();
 
 // Mirrors MainDO's RPC surface; cast in do-client.ts.
 export const devStub = {
