@@ -30,7 +30,7 @@ function truncate(s: string, n: number): string {
   comments.length === 0 ? (
     <div class="text-base-content/60 py-8 text-center text-sm">No comments yet.</div>
   ) : (
-    <ul class="flex max-h-70 flex-col gap-3 overflow-y-auto pr-1">
+    <ul class="flex max-h-80 flex-col gap-3 overflow-y-auto pr-1">
       {comments.map((c) => {
         const articleTitle = titleMap.get(c.articleSlug) ?? c.articleSlug;
         return (

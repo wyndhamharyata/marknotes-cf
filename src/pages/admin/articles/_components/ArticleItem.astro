@@ -1,13 +1,17 @@
 ---
+import type { AnalyticsSnapshot, ArticleAnalyticsRow } from "../../../../lib/analytics/types";
+import { getDoStub } from "../../../../lib/db/do-client";
 import FormattedDate from "../../../articles/_components/FormattedDate.astro";
 import { type CollectionEntry } from "astro:content";
 
 type Props = {
   article: CollectionEntry<"blog">;
+  analytic: ArticleAnalyticsRow;
 };
-const prop: Props = Astro.props;
 
-const { article } = prop;
+const prop: Props = Astro.props;
+const { article, analytic } = prop;
+const comments = await getDoStub().getCommentsBySlug(article.id);
 ---
 
 <a
@@ -23,5 +27,11 @@ const { article } = prop;
         <FormattedDate date={article.data.pubDate} />
       </span>
     </p>
+  </div>
+  <div class="m-auto my-auto hidden min-w-36 flex-col sm:block sm:flex">
+    <p class="text-xs">Views</p>
+    <p class="text-primary text-xl">{analytic.pageviews7d}</p>
+    <p class="decoration-base-content text-xs">Comments</p>
+    <p class="text-primary text-xl">{comments.length}</p>
   </div>
 </a>

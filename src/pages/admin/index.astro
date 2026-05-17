@@ -16,7 +16,7 @@ import HomeTopArticles from "./_components/HomeTopArticles.astro";
   dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin" }}
   maxWidthClass="max-w-6xl"
 >
-  <div class="mx-auto flex w-full flex-col gap-6 px-4 md:px-0">
+  <div class="mx-auto flex w-full flex-col gap-6 px-4 pt-4 md:px-0 md:pt-0">
     <HomeModerationAlert server:defer />
 
     <HomeKpiStrip server:defer />
@@ -37,7 +37,7 @@ import HomeTopArticles from "./_components/HomeTopArticles.astro";
         </HomeTrendChart>
       </section>
 
-      <section class="md:col-span-1">
+      <section class="card bg-base-100/60 px-4 py-4 md:col-span-1">
         <h3 class="card-title">Recent comments</h3>
         <p class="text-base-content/60 text-sm">Newest first across all articles.</p>
         <div class="mt-3">

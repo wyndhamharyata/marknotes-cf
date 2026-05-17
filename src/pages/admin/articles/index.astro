@@ -5,10 +5,13 @@ import BaseAdminLayout from "../../../layouts/BaseAdminLayout.astro";
 import { SITE_DESCRIPTION, SITE_TITLE, ADMIN_DOCK } from "../../../consts";
 import { getCollection } from "astro:content";
 import ArticleItem from "./_components/ArticleItem.astro";
+import { getDoStub } from "../../../lib/db/do-client";
 
 const articles = (await getCollection("blog")).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
+
+const analyticsMap = await getDoStub().getLatestAnalyticsBySlugs(articles.map((a) => a.id));
 ---
 
 <BaseAdminLayout
@@ -19,7 +22,11 @@ const articles = (await getCollection("blog")).sort(
   <div class="mx-auto flex flex-col py-4 md:w-3xl">
     <h1 class="mx-4 text-2xl font-bold md:mx-0">Articles</h1>
     <div class="mt-4 md:mt-0">
-      {articles.map((article) => <ArticleItem article={article} />)}
+      {
+        articles.map((article) => (
+          <ArticleItem article={article} analytic={analyticsMap.get(article.id)!} />
+        ))
+      }
     </div>
   </div>
 </BaseAdminLayout>

@@ -24,7 +24,7 @@ const top = enriched
 const fmt = new Intl.NumberFormat();
 ---
 
-<section>
+<section class="card bg-base-100/60 px-4 py-2">
   <h3 class="card-title">Top articles</h3>
   <p class="text-base-content/60 text-sm">Last 7 days, ranked by pageviews.</p>
 
@@ -35,7 +35,7 @@ const fmt = new Intl.NumberFormat();
       </div>
     ) : (
       <div class="overflow-x-auto">
-        <table class="table table-zebra mt-3">
+        <table class="table-zebra mt-3 table">
           <thead>
             <tr>
               <th>Article</th>
@@ -47,10 +47,7 @@ const fmt = new Intl.NumberFormat();
             {top.map((a) => (
               <tr>
                 <td>
-                  <a
-                    href={`/admin/articles/${a.slug}`}
-                    class="link link-hover font-medium"
-                  >
+                  <a href={`/admin/articles/${a.slug}`} class="link link-hover font-medium">
                     {a.title}
                   </a>
                 </td>
