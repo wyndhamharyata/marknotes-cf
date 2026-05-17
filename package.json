@@ -8,8 +8,6 @@
     "dev": "astro dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "migrate": "node --env-file=.env scripts/migrate.mjs",
-    "backfill": "node --env-file=.env --import tsx scripts/backfill-analytics.ts",
     "db:generate": "drizzle-kit generate",
     "preview": "astro preview"
   },
@@ -23,7 +21,6 @@
     "@google/genai": "^1.34.0",
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/simple-icons": "^1.2.64",
-    "@libsql/client": "^0.15.15",
     "@openauthjs/openauth": "^0.4.3",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.18",

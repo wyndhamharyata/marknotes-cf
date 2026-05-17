@@ -53,35 +53,6 @@ export interface AnalyticsSnapshotInput {
   capturedAtSec: number;
 }
 
-export interface ReplyImportRow {
-  id: number;
-  createdAt: string;
-  updatedAt: string;
-  articleSlug: string;
-  message: string;
-  alias: string;
-  parentId: number | null;
-  moderationStatus: number;
-  hidePublicity: number;
-  moderationReason: string | null;
-  lastModeratedAt: string | null;
-  deletedAt: string | null;
-}
-
-export interface SnapshotImportRow {
-  id: number;
-  articleSlug: string;
-  pageviews24h: number;
-  visits24h: number;
-  pageviews7d: number;
-  visits7d: number;
-  pageviews30d: number;
-  visits30d: number;
-  webVitalsJson: string;
-  capturedAt: number;
-  createdAt: number;
-}
-
 export class MainDO extends DurableObject {
   private db: DrizzleSqliteDODatabase<typeof schema>;
 
@@ -509,85 +480,6 @@ export class MainDO extends DurableObject {
       .onConflictDoNothing();
   }
 
-  // ---------- One-shot migration ----------
-
-  async bulkImport(payload: {
-    wipe?: boolean;
-    replies?: ReplyImportRow[];
-    snapshots?: SnapshotImportRow[];
-  }): Promise<{ replies: number; snapshots: number }> {
-    if (payload.wipe) {
-      this.ctx.storage.sql.exec("DELETE FROM replies");
-      this.ctx.storage.sql.exec("DELETE FROM article_analytics_snapshots");
-    }
-
-    let repliesCount = 0;
-    let snapshotsCount = 0;
-
-    this.ctx.storage.transactionSync(() => {
-      if (payload.replies) {
-        for (const r of payload.replies) {
-          this.ctx.storage.sql.exec(
-            `INSERT INTO replies (
-              id, created_at, updated_at, article_slug, message, alias,
-              parent_id, moderation_status, hide_publicity,
-              moderation_reason, last_moderated_at, deleted_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            r.id,
-            r.createdAt,
-            r.updatedAt,
-            r.articleSlug,
-            r.message,
-            r.alias,
-            r.parentId,
-            r.moderationStatus,
-            r.hidePublicity,
-            r.moderationReason,
-            r.lastModeratedAt,
-            r.deletedAt,
-          );
-          repliesCount++;
-        }
-      }
-      if (payload.snapshots) {
-        for (const s of payload.snapshots) {
-          this.ctx.storage.sql.exec(
-            `INSERT INTO article_analytics_snapshots (
-              id, article_slug,
-              pageviews_24h, visits_24h,
-              pageviews_7d, visits_7d,
-              pageviews_30d, visits_30d,
-              web_vitals_json, captured_at, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            s.id,
-            s.articleSlug,
-            s.pageviews24h,
-            s.visits24h,
-            s.pageviews7d,
-            s.visits7d,
-            s.pageviews30d,
-            s.visits30d,
-            s.webVitalsJson,
-            s.capturedAt,
-            s.createdAt,
-          );
-          snapshotsCount++;
-        }
-      }
-    });
-
-    return { replies: repliesCount, snapshots: snapshotsCount };
-  }
-
-  async getDebugCounts(): Promise<{ replies: number; snapshots: number }> {
-    const r = this.ctx.storage.sql
-      .exec("SELECT COUNT(*) AS c FROM replies")
-      .one() as { c: number };
-    const s = this.ctx.storage.sql
-      .exec("SELECT COUNT(*) AS c FROM article_analytics_snapshots")
-      .one() as { c: number };
-    return { replies: Number(r.c), snapshots: Number(s.c) };
-  }
 }
 
 interface ReplyRowLike {

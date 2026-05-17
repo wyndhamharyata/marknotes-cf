@@ -10,8 +10,6 @@ export default $config({
     };
   },
   async run() {
-    const libsqlUrl = new sst.Secret("LibsqlUrl");
-    const libsqlAuthToken = new sst.Secret("LibsqlAuthToken");
     const geminiApiKey = new sst.Secret("GeminiApiKey");
     const openAuthUrl = new sst.Secret("OpenAuthUrl");
     const baseUrl = new sst.Secret("BaseUrl");
@@ -19,7 +17,6 @@ export default $config({
     const cfSiteTag = new sst.Secret("CfSiteTag");
     const cfAnalyticsToken = new sst.Secret("CfAnalyticsToken");
     const cfAnalyticsEmail = new sst.Secret("CfAnalyticsEmail");
-    const migrationToken = new sst.Secret("MigrationToken");
 
     // Host worker that owns the MainDO Durable Object class.
     // The Astro worker and both cron workers bind to MAIN_DO via scriptName.
@@ -74,17 +71,8 @@ export default $config({
 
     new sst.cloudflare.Astro("Max", {
       domain: $app.stage === "production" ? "mwyndham.dev" : "devread.mwyndham.dev",
-      link: [
-        libsqlUrl,
-        libsqlAuthToken,
-        geminiApiKey,
-        openAuthUrl,
-        baseUrl,
-        migrationToken,
-      ],
+      link: [geminiApiKey, openAuthUrl, baseUrl],
       environment: {
-        LIBSQL_URL: libsqlUrl.value,
-        LIBSQL_AUTH_TOKEN: libsqlAuthToken.value,
         GEMINI_API_KEY: geminiApiKey.value,
         OPEN_AUTH_URL: openAuthUrl.value,
         BASE_URL: baseUrl.value,

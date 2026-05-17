@@ -29,16 +29,6 @@ export default defineConfig({
   },
   env: {
     schema: {
-      LIBSQL_URL: envField.string({
-        context: "server",
-        access: "secret",
-        optional: true, // optional since SST is primary
-      }),
-      LIBSQL_AUTH_TOKEN: envField.string({
-        context: "server",
-        access: "secret",
-        optional: true,
-      }),
       OPEN_AUTH_URL: envField.string({
         context: "server",
         access: "secret",
