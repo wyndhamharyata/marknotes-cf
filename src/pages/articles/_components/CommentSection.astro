@@ -1,5 +1,6 @@
 ---
-import { getCommentsBySlug, buildCommentTree } from "../../../lib/comments/repository";
+import { getDoStub } from "../../../lib/db/do-client";
+import { buildCommentTree } from "../../../lib/comments/tree";
 import { getOrCreateAlias } from "../../../lib/comments/diceware";
 import CommentTree from "./comments/CommentTree";
 
@@ -18,7 +19,7 @@ try {
   alias = getOrCreateAlias(Astro.cookies);
 
   // Fetch comments from database
-  const comments = await getCommentsBySlug(articleSlug);
+  const comments = await getDoStub().getCommentsBySlug(articleSlug);
   const commentTree = buildCommentTree(comments);
 
   // Serialize dates to ISO strings for Preact

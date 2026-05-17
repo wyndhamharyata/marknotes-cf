@@ -4,7 +4,7 @@ import {
   type CommentCounts,
   type ModerationStatusType,
 } from "../../../../lib/comments/types";
-import { getCommentCounts } from "../../../../lib/comments/admin-repository";
+import { getDoStub } from "../../../../lib/db/do-client";
 
 type Props = {
   filterStatus: ModerationStatusType | null;
@@ -20,7 +20,7 @@ type Filter = {
 };
 
 const { filterStatus } = Astro.props;
-const counts = await getCommentCounts();
+const counts = await getDoStub().getCommentCounts();
 
 const filters: Filter[] = [
   {

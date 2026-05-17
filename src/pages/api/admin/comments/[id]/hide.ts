@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { hideComment } from "../../../../../lib/comments/admin-repository";
+import { getDoStub } from "../../../../../lib/db/do-client";
 
 export const POST: APIRoute = async ({ params, redirect }) => {
   const id = parseInt(params.id || "", 10);
@@ -8,7 +8,7 @@ export const POST: APIRoute = async ({ params, redirect }) => {
     return new Response("Invalid comment ID", { status: 400 });
   }
 
-  await hideComment(id);
+  await getDoStub().hideComment(id);
 
   // Redirect back to refresh the list
   return redirect("/admin/comments");

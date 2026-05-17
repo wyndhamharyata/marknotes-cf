@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { createCommentWithModeration } from "../../../lib/comments/repository";
+import { getDoStub } from "../../../lib/db/do-client";
 import { getOrCreateAlias } from "../../../lib/comments/diceware";
 import { ModerationStatus } from "../../../lib/comments/types";
 import { hasProfanity } from "../../../lib/moderation/profanity-filter";
@@ -25,7 +25,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   // Profanity is now rejected in assertValidRequest, so all comments reaching here are clean
   const moderationStatus = ModerationStatus.UNVERIFIED;
 
-  const newId = await createCommentWithModeration(
+  const newId = await getDoStub().createCommentWithModeration(
     {
       articleSlug,
       message: trimmedMessage,

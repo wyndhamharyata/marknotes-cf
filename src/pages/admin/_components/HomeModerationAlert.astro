@@ -1,8 +1,8 @@
 ---
 import { Icon } from "astro-icon/components";
-import { getCommentCounts } from "../../../lib/comments/admin-repository";
+import { getDoStub } from "../../../lib/db/do-client";
 
-const counts = await getCommentCounts();
+const counts = await getDoStub().getCommentCounts();
 const pending = counts.unverified + counts.warning;
 ---
 

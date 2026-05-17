@@ -1,9 +1,9 @@
 ---
-import { getLatestAnalyticsBySlug } from "../../../../lib/analytics/repository";
+import { getDoStub } from "../../../../lib/db/do-client";
 
 const { slug } = Astro.props;
 
-const analytics = await getLatestAnalyticsBySlug(slug);
+const analytics = await getDoStub().getLatestAnalyticsBySlug(slug);
 ---
 
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">

@@ -1,20 +1,4 @@
-import { getDoStub } from "../db/do-client";
-import type { Reply, CommentNode, CreateCommentInput } from "./types";
-
-export async function getCommentsBySlug(articleSlug: string): Promise<Reply[]> {
-  return getDoStub().getCommentsBySlug(articleSlug);
-}
-
-export async function createComment(input: CreateCommentInput): Promise<number> {
-  return getDoStub().createComment(input);
-}
-
-export async function createCommentWithModeration(
-  input: CreateCommentInput,
-  moderationStatus: number,
-): Promise<number> {
-  return getDoStub().createCommentWithModeration(input, moderationStatus);
-}
+import type { CommentNode, Reply } from "./types";
 
 export function buildCommentTree(comments: Reply[]): CommentNode[] {
   const commentMap = new Map<number, CommentNode>();

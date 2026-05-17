@@ -1,12 +1,12 @@
 ---
 import { getCollection } from "astro:content";
-import { getSiteWideTotals } from "../../../lib/analytics/repository";
-import { getCommentCounts } from "../../../lib/comments/admin-repository";
+import { getDoStub } from "../../../lib/db/do-client";
 
+const stub = getDoStub();
 const [articles, totals, counts] = await Promise.all([
   getCollection("blog"),
-  getSiteWideTotals(),
-  getCommentCounts(),
+  stub.getSiteWideTotals(),
+  stub.getCommentCounts(),
 ]);
 
 const pending = counts.unverified + counts.warning;

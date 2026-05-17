@@ -2,7 +2,7 @@
 import StatSnapshot from "./StatSnapshot.astro";
 import PageviewsChart from "./PageviewsChart.tsx";
 import WebVitalsChart from "./WebVitalsChart.tsx";
-import { getAnalyticsHistoryBySlug } from "../../../../lib/analytics/repository";
+import { getDoStub } from "../../../../lib/db/do-client";
 import {
   hasAnyWebVitalSamples,
   toPageviewsSeries,
@@ -11,8 +11,10 @@ import {
 
 const { slug } = Astro.props;
 
-const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-const history = await getAnalyticsHistoryBySlug(slug, { since: sevenDaysAgo });
+const sevenDaysAgoSec = Math.floor((Date.now() - 7 * 24 * 60 * 60 * 1000) / 1000);
+const history = await getDoStub().getAnalyticsHistoryBySlug(slug, {
+  sinceUnixSec: sevenDaysAgoSec,
+});
 const hasChartData = history.length >= 2;
 const pv = hasChartData ? toPageviewsSeries(history) : null;
 const vitals = hasChartData ? toWebVitalRatioSeries(history) : null;

@@ -1,6 +1,6 @@
 ---
 import { getCollection } from "astro:content";
-import { getCommentsForAdmin } from "../../../../lib/comments/admin-repository";
+import { getDoStub } from "../../../../lib/db/do-client";
 import { type ModerationStatusType } from "../../../../lib/comments/types";
 import CommentModerationItem from "./CommentModerationItem.astro";
 import Pagination from "./Pagination.astro";
@@ -15,7 +15,7 @@ type Props = {
 const { filterStatus, currentPage, limit, baseUrl } = Astro.props;
 
 const [{ comments, total }, articles] = await Promise.all([
-  getCommentsForAdmin({ status: filterStatus, page: currentPage, limit }),
+  getDoStub().getCommentsForAdmin({ status: filterStatus, page: currentPage, limit }),
   getCollection("blog"),
 ]);
 

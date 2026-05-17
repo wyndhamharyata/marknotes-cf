@@ -1,8 +1,8 @@
 ---
-import { getSiteWidePageviewHistory } from "../../../lib/analytics/repository";
+import { getDoStub } from "../../../lib/db/do-client";
 import HomeTrendChartCanvas from "./HomeTrendChartCanvas.tsx";
 
-const trend = await getSiteWidePageviewHistory(30);
+const trend = await getDoStub().getSiteWidePageviewHistory(30);
 const hasTrendData = trend.ts.length >= 2;
 ---
 

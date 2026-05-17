@@ -1,10 +1,10 @@
 ---
 import { getCollection } from "astro:content";
-import { getCommentsForAdmin } from "../../../lib/comments/admin-repository";
+import { getDoStub } from "../../../lib/db/do-client";
 import { getModerationBadgeClass, getModerationLabel } from "../../../lib/comments/types";
 
 const [{ comments }, articles] = await Promise.all([
-  getCommentsForAdmin({ limit: 20, page: 1 }),
+  getDoStub().getCommentsForAdmin({ status: null, limit: 20, page: 1 }),
   getCollection("blog"),
 ]);
 

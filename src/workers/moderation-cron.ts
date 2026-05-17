@@ -1,7 +1,7 @@
 /// <reference types="@cloudflare/workers-types" />
-import { getUnmoderatedComments, updateModerationStatus } from "./repository";
 import { moderateComments } from "../lib/moderation/gemini-service";
-import type { EnvWithMainDo } from "../lib/db/do-client";
+import { getDoStubFromEnv, type EnvWithMainDo } from "../lib/db/do-client";
+import type { ModerationInput } from "../lib/comments/types";
 
 const handler: ExportedHandler<EnvWithMainDo> = {
   async scheduled(_event, env, ctx) {
@@ -15,7 +15,8 @@ async function runModeration(env: EnvWithMainDo): Promise<void> {
   console.log("Starting AI moderation job...");
 
   try {
-    const comments = await getUnmoderatedComments(env, 50);
+    const stub = getDoStubFromEnv(env);
+    const comments = await stub.getUnmoderatedComments(50);
 
     if (comments.length === 0) {
       console.log("No comments to moderate");
@@ -25,7 +26,7 @@ async function runModeration(env: EnvWithMainDo): Promise<void> {
     console.log(`Found ${comments.length} comments to moderate`);
 
     const BATCH_SIZE = 10;
-    const batches: (typeof comments)[] = [];
+    const batches: ModerationInput[][] = [];
 
     for (let i = 0; i < comments.length; i += BATCH_SIZE) {
       batches.push(comments.slice(i, i + BATCH_SIZE));
@@ -42,7 +43,7 @@ async function runModeration(env: EnvWithMainDo): Promise<void> {
       }
 
       if (results.length > 0) {
-        await updateModerationStatus(env, results);
+        await stub.updateModerationStatus(results);
         totalProcessed += results.length;
       }
 

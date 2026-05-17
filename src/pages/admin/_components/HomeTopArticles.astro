@@ -1,9 +1,9 @@
 ---
 import { getCollection } from "astro:content";
-import { getLatestAnalyticsBySlugs } from "../../../lib/analytics/repository";
+import { getDoStub } from "../../../lib/db/do-client";
 
 const articles = await getCollection("blog");
-const analyticsMap = await getLatestAnalyticsBySlugs(articles.map((a) => a.id));
+const analyticsMap = await getDoStub().getLatestAnalyticsBySlugs(articles.map((a) => a.id));
 
 const enriched = articles.map((a) => {
   const analytics = analyticsMap.get(a.id);

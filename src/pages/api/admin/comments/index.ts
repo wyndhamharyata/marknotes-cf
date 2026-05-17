@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { getCommentsForAdmin, getCommentCounts } from "../../../../lib/comments/admin-repository";
+import { getDoStub } from "../../../../lib/db/do-client";
 import { ModerationStatus, type ModerationStatusType } from "../../../../lib/comments/types";
 
 export const GET: APIRoute = async ({ url }) => {
@@ -23,9 +23,10 @@ export const GET: APIRoute = async ({ url }) => {
     }
   }
 
+  const stub = getDoStub();
   const [commentsResult, counts] = await Promise.all([
-    getCommentsForAdmin({ status, page, limit }),
-    getCommentCounts(),
+    stub.getCommentsForAdmin({ status, page, limit }),
+    stub.getCommentCounts(),
   ]);
 
   return new Response(
