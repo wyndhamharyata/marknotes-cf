@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluasi Efektivitas Bug Fix — Laporan ALP Statistika</title>
+<meta name="description" content="Laporan ALP Statistika dan Probabilitas: evaluasi efektivitas bug fix terhadap tingkat crash background upload service. M Wyndham Haryata Permana.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* palette matched to mwyndham.dev */
+    --bg:      #161B26;
+    --card:    #1D2431;
+    --card2:   #242C3C;
+    --line:    #2E3749;
+    --ink:     #E7EAF0;
+    --mute:    #97A1B2;
+    --amber:   #EF6B66;   /* blog coral-red — emphasis */
+    --teal:    #6FA8F5;   /* blog blue — interactive */
+    --blue:    #6FA8F5;
+    --rose:    #EF6B66;
+    --red:     #F07D78;   /* fase sebelum rilis */
+    --yellow:  #F2B02C;   /* fase staged rollout */
+    --green:   #37C68F;   /* fase full rollout */
+    --serif:   "JetBrains Mono", "Courier New", monospace;
+    --sans:    "JetBrains Mono", "Courier New", monospace;
+    --mono:    "JetBrains Mono", "Courier New", monospace;
+    --ease:    cubic-bezier(.22,.9,.3,1);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; }
+  body {
+    background-color: var(--bg);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Crect x='24' y='27' width='9' height='2' rx='1' fill='%23E7EAF0' fill-opacity='0.055'/%3E%3C/svg%3E");
+    color: var(--ink);
+    font-family: var(--sans);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--amber); color: var(--bg); }
+
+  /* ---------- deck scaffolding ---------- */
+  .deck { position: fixed; inset: 0; }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: clamp(1.2rem, 4vw, 3.5rem) clamp(1.1rem, 6vw, 6rem) clamp(4.2rem, 8vh, 5.2rem);
+    opacity: 0; visibility: hidden;
+    transform: translateY(7vh);
+    transition: opacity .55s var(--ease), transform .55s var(--ease), visibility 0s linear .55s;
+    overflow-y: auto;
+  }
+  .slide > * { flex-shrink: 0; }
+  .slide.above { transform: translateY(-7vh); }
+  .slide.active {
+    opacity: 1; visibility: visible;
+    transform: translateY(0);
+    transition: opacity .55s var(--ease) .1s, transform .55s var(--ease) .1s, visibility 0s;
+    z-index: 2;
+  }
+  [data-a] {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity .6s var(--ease), transform .6s var(--ease);
+  }
+  .slide.active [data-a] {
+    opacity: 1; transform: translateY(0);
+    transition-delay: calc(.18s + var(--i, 0) * .09s);
+  }
+
+  /* ---------- shared typography ---------- */
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: clamp(.62rem, 1.4vw, .78rem);
+    font-weight: 700;
+    letter-spacing: .32em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  h1, h2 { font-family: var(--serif); font-weight: 800; line-height: 1.15; }
+  h1 { font-size: clamp(1.7rem, 5vw, 3.1rem); letter-spacing: -0.01em; }
+  h2 { font-size: clamp(1.2rem, 2.9vw, 1.9rem); margin-bottom: clamp(1rem, 2.6vh, 1.8rem); }
+  .lead { color: var(--mute); font-size: clamp(.95rem, 2vw, 1.15rem); max-width: 46em; line-height: 1.55; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 1.3rem 1.4rem;
+  }
+  .chip-ic {
+    width: 2.6rem; height: 2.6rem; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+  .chip-ic svg { width: 1.2rem; height: 1.2rem; stroke: var(--bg); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- slide 1 ---------- */
+  .backdrop { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:-1; }
+  .s1 .orb { position:absolute; border-radius:50%; background:var(--card); }
+  .s1 .orb.a { width:38vmax; height:38vmax; top:-18vmax; right:-12vmax; }
+  .s1 .orb.b { width:22vmax; height:22vmax; bottom:-10vmax; left:-8vmax; }
+  .s1 h1 { max-width: 17em; margin-bottom: 1.2rem; }
+  .presenter {
+    align-self: flex-start;
+    display:inline-flex; align-items:center; gap:.9rem;
+    background: var(--card2); border:1px solid var(--line); border-radius:14px;
+    padding:.8rem 1.4rem .8rem .9rem; margin-top: clamp(1.4rem, 4vh, 2.6rem);
+  }
+  .mono-avatar {
+    width:2.9rem; height:2.9rem; border-radius:50%; background:var(--amber);
+    color:var(--bg); font-family:var(--serif); font-weight:700; font-size:1rem;
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .presenter b { display:block; font-size:.95rem; }
+  .presenter span { color:var(--mute); font-size:.82rem; }
+  .lecturer { margin-top:.9rem; color:var(--mute); font-size:.8rem; font-family:var(--mono); }
+
+  /* ---------- problem cards (slide 2) ---------- */
+  .trio { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+  .trio .card { display:flex; flex-direction:column; gap:.75rem; }
+  .trio h3 { font-family:var(--serif); font-size:1.06rem; }
+  .trio p { font-size:.85rem; line-height:1.55; color:var(--ink); opacity:.92; }
+  .trio .card.q { background:var(--card2); }
+  .trio .masalah h3{color:var(--red);} .trio .fix h3{color:var(--yellow);} .trio .q h3{color:var(--teal);}
+  .signal { margin-top:1.1rem; padding:.85rem 1.2rem; font-size:.88rem; line-height:1.55; }
+  .signal b { color:var(--amber); }
+
+  /* ---------- data & phase strip (slide 3) ---------- */
+  .datagrid { display:grid; grid-template-columns:minmax(240px, 340px) 1fr; gap:1.1rem; align-items:stretch; }
+  .datagrid .src-card ul { list-style:none; display:grid; gap:.5rem; margin-top:.7rem; }
+  .datagrid .src-card li { color:var(--mute); font-size:.82rem; padding-left:1.1rem; position:relative; line-height:1.5; }
+  .datagrid .src-card li::before { content:""; position:absolute; left:0; top:.5em; width:.4rem; height:.4rem; border-radius:50%; background:var(--teal); }
+  .datagrid .src-card b { color:var(--ink); }
+  .phase-wrap { display:flex; flex-direction:column; justify-content:center; gap:.9rem; }
+  .phase-strip { display:flex; gap:.45rem; width:100%; }
+  .phase {
+    border-radius:12px; padding:.85rem .9rem; color:var(--bg);
+    display:flex; flex-direction:column; gap:.15rem; min-width:0;
+  }
+  .phase b { font-size:clamp(.72rem, 1.6vw, .95rem); line-height:1.2; }
+  .phase .days { font-family:var(--mono); font-size:.68rem; opacity:.8; }
+  .phase .avg { font-family:var(--serif); font-weight:800; font-size:clamp(.95rem, 2.4vw, 1.5rem); margin-top:.3rem; }
+  .phase .avg small { font-size:.6em; font-weight:500; }
+  .phase.p1 { flex:23; background:var(--red); }
+  .phase.p2 { flex:9;  background:var(--yellow); }
+  .phase.p3 { flex:26; background:var(--green); }
+  .phase-note { color:var(--mute); font-size:.82rem; line-height:1.55; }
+  .phase-note b { color:var(--ink); }
+
+  /* ---------- figure slides ---------- */
+  .fig-card { padding:.8rem; line-height:0; }
+  .fig-card img { width:100%; height:auto; max-height:56vh; object-fit:contain; border-radius:8px; display:block; }
+  .chips { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1rem; }
+  .chips li {
+    list-style:none; font-family:var(--mono); font-size:.74rem; color:var(--ink);
+    background:var(--card2); border:1px solid var(--line); border-radius:999px; padding:.42rem .9rem;
+  }
+  .chips li b { color:var(--amber); }
+  .chips li.g b { color:var(--green); } .chips li.y b { color:var(--yellow); } .chips li.t b { color:var(--teal); }
+
+  /* ---------- hypothesis card (slide 6) ---------- */
+  .hyp { display:grid; grid-template-columns:auto 1fr; gap:.4rem 1rem; align-items:baseline;
+    padding:.95rem 1.25rem; margin-bottom:1rem; }
+  .hyp .tag { font-family:var(--mono); font-weight:800; font-size:.9rem; color:var(--red); }
+  .hyp .tag.alt { color:var(--green); }
+  .hyp p { font-size:.86rem; color:var(--ink); line-height:1.5; }
+  .hyp p b { color:var(--ink); }
+  .hyp .sub { grid-column:1 / -1; color:var(--mute); font-family:var(--mono); font-size:.72rem; margin-top:.15rem; }
+
+  /* ---------- test table (slide 6) ---------- */
+  .plan { border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+  .p-row { display:grid; grid-template-columns: 1fr 9rem 8.5rem 8rem; gap:0; }
+  .p-row > div { padding:.72rem .95rem; font-size:.82rem; line-height:1.45; border-top:1px solid var(--line); }
+  .p-row.head > div { border-top:none; background:var(--card2);
+    font-family:var(--mono); font-size:.64rem; letter-spacing:.24em; font-weight:700; color:var(--amber); }
+  .p-row:nth-child(even):not(.head) { background:rgba(20,31,51,.55); }
+  .p-row .st { font-family:var(--mono); font-size:.76rem; color:var(--teal); }
+  .p-row .pv { font-family:var(--mono); font-size:.76rem; color:var(--ink); }
+  .p-row .dec { color:var(--green); font-weight:700; }
+
+  /* ---------- model duo (slide 7) ---------- */
+  .duo { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .duo h3 { font-family:var(--serif); font-size:1.05rem; margin-bottom:.6rem; }
+  .duo .m1 h3 { color:var(--amber); } .duo .m2 h3 { color:var(--teal); }
+  .duo ul { list-style:none; display:grid; gap:.5rem; }
+  .duo li { color:var(--mute); font-size:.84rem; line-height:1.5; padding-left:1.1rem; position:relative; }
+  .duo li::before { content:""; position:absolute; left:0; top:.5em; width:.4rem; height:.4rem; border-radius:50%; background:var(--line); }
+  .duo .m1 li::before { background:var(--amber); } .duo .m2 li::before { background:var(--teal); }
+  .duo li b { color:var(--ink); }
+  .duo .tagline { margin-top:.7rem; font-size:.78rem; font-style:italic; color:var(--mute); }
+
+  /* ---------- conclusion (slide 9) ---------- */
+  .concl { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .concl h3 { font-family:var(--serif); font-size:1.08rem; margin-bottom:.8rem; display:flex; gap:.7rem; align-items:center; }
+  .concl .yes h3 { color:var(--green); } .concl .next h3 { color:var(--teal); }
+  .concl ul { list-style:none; display:grid; gap:.7rem; }
+  .concl li { display:block; position:relative; padding-left:1.5rem; font-size:.86rem; line-height:1.5; color:var(--ink); }
+  .concl li::before { font-family:var(--mono); font-weight:700; position:absolute; left:0; top:0; }
+  .concl .yes li::before  { content:"✓"; color:var(--green); }
+  .concl .next li::before { content:"→"; color:var(--teal); }
+  .concl li b { color:var(--amber); }
+
+  /* ---------- end slide ---------- */
+  .end { text-align:center; align-items:center; }
+  .end h1 { margin-bottom:1rem; }
+  .end .lead { margin:0 auto; }
+  .end .hint { margin-top:2.2rem; font-family:var(--mono); font-size:.74rem; color:var(--mute); letter-spacing:.12em; }
+  .end .hint b { color:var(--amber); }
+
+  /* ---------- appendix ---------- */
+  .apx-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+  .apx-grid .card h3 { font-family:var(--serif); font-size:.98rem; margin-bottom:.45rem; }
+  .apx-grid .card p { font-size:.8rem; line-height:1.5; color:var(--mute); }
+  .apx-grid .card .num { font-family:var(--mono); font-size:.8rem; color:var(--teal); display:block; margin-top:.45rem; }
+  .apx-grid .ok h3 { color:var(--green); } .apx-grid .warn h3 { color:var(--yellow); } .apx-grid .info h3 { color:var(--teal); }
+
+  /* ---------- HUD ---------- */
+  .hud {
+    position:fixed; left:0; right:0; bottom:0; z-index:10;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.9rem clamp(1.1rem, 6vw, 6rem);
+    background: linear-gradient(to top, rgba(11,18,32,.95) 40%, transparent);
+    pointer-events:none;
+  }
+  .hud > * { pointer-events:auto; }
+  .counter { font-family:var(--mono); font-size:.72rem; color:var(--mute); letter-spacing:.2em; min-width:5.5rem; }
+  .counter b { color:var(--amber); }
+  .dots {
+    position:fixed; right:clamp(.8rem, 2vw, 1.6rem); top:50%;
+    transform:translateY(-50%);
+    display:flex; flex-direction:column; gap:.6rem; z-index:10;
+  }
+  .dots button {
+    width:.55rem; height:.55rem; border-radius:50%; border:none; cursor:pointer;
+    background:var(--line); padding:0; transition:background .25s, transform .25s;
+  }
+  .dots button[aria-current="true"] { background:var(--amber); transform:scale(1.35); }
+  .dots button:focus-visible { outline:2px solid var(--teal); outline-offset:3px; }
+  .keys { display:flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.68rem; color:var(--mute); }
+  .keys kbd {
+    border:1px solid var(--line); border-bottom-width:2px; border-radius:6px;
+    background:var(--card); padding:.18rem .5rem; font-family:inherit; font-size:.7rem;
+    cursor:pointer; color:var(--ink); transition:border-color .2s, color .2s;
+  }
+  .keys kbd:hover { border-color:var(--amber); color:var(--amber); }
+  .progress { position:fixed; top:0; left:0; height:3px; background:var(--amber); z-index:11;
+    transition:width .5s var(--ease); }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 860px) {
+    .trio, .duo, .concl, .apx-grid { grid-template-columns:1fr; }
+    .datagrid { grid-template-columns:1fr; }
+    .phase-strip { flex-direction:column; }
+    .phase.p1, .phase.p2, .phase.p3 { flex:none; }
+    .p-row { grid-template-columns:1fr; }
+    .p-row.head { display:none; }
+    .p-row > div { border-top:none; padding:.3rem 1rem; }
+    .p-row:not(.head) { border-top:1px solid var(--line); padding:.6rem 0; }
+    .keys { display:none; }
+    .dots { right:auto; left:50%; top:auto; bottom:1rem; transform:translateX(-50%); flex-direction:row; }
+    .slide { justify-content:flex-start; padding-top:2.2rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .slide, [data-a], .progress, .dots button { transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<main class="deck" id="deck" aria-live="polite">
+
+  <!-- ============ TITLE ============ -->
+  <section class="slide s1" data-title="Judul">
+    <div class="backdrop"><div class="orb a"></div><div class="orb b"></div></div>
+    <p class="eyebrow" data-a style="--i:0">Laporan ALP · Statistika dan Probabilitas · UC Online</p>
+    <h1 data-a style="--i:1">Evaluasi Efektivitas Bug Fix<br>terhadap Tingkat Crash</h1>
+    <p class="lead" data-a style="--i:2">Studi kasus background upload service pada aplikasi mobile pengumpulan data lapangan — 58 hari data produksi, dianalisis pada taraf signifikansi α&nbsp;=&nbsp;5%.</p>
+    <div class="presenter" data-a style="--i:3">
+      <div class="mono-avatar">MW</div>
+      <div><b>Muhammad Wyndham Haryata Permana</b><span>NIM 1076012524906 · Program Studi Informatika</span></div>
+    </div>
+    <p class="lecturer" data-a style="--i:4">Dosen Pengampu: Christopher Andreas, S.Stat., M.Stat., CDSS.</p>
+  </section>
+
+  <!-- ============ 01 · MASALAH ============ -->
+  <section class="slide" data-title="Latar Belakang">
+    <p class="eyebrow" data-a style="--i:0">01 · Latar Belakang &amp; Pertanyaan Bisnis</p>
+    <h2 data-a style="--i:1">Crash upload menghantam ratusan user, lalu sebuah bug fix dirilis bertahap</h2>
+    <div class="trio">
+      <div class="card masalah" data-a style="--i:2">
+        <span class="chip-ic" style="background:var(--red)"><svg viewBox="0 0 24 24"><path d="M12 3L2 20h20L12 3z M12 10v4 M12 17.5v.1"/></svg></span>
+        <h3>Masalahnya</h3>
+        <p>Pembatasan foreground service Android membuat background upload service kerap gagal dan crash: sinkronisasi tertunda, ada risiko data lapangan hilang, dan jenis crash ini paling sering muncul di dashboard monitoring.</p>
+      </div>
+      <div class="card fix" data-a style="--i:3">
+        <span class="chip-ic" style="background:var(--yellow)"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7 M14 20a7 7 0 004-4"/></svg></span>
+        <h3>Perbaikannya</h3>
+        <p>Tim developer merilis bug fix lewat staged rollout: mulai 13 Mei 2026 ke 1% user, naik bertahap 2%&nbsp;→&nbsp;5%&nbsp;→&nbsp;10%&nbsp;→&nbsp;20%&nbsp;→&nbsp;50%, hingga mencapai 100% pada 21 Mei 2026.</p>
+      </div>
+      <div class="card q" data-a style="--i:4">
+        <span class="chip-ic" style="background:var(--teal)"><svg viewBox="0 0 24 24"><path d="M9 9a3 3 0 116 0c0 2-3 2.5-3 5 M12 18v.1"/></svg></span>
+        <h3>Pertanyaan bisnis</h3>
+        <p>Benarkah bug fix menurunkan tingkat crash secara signifikan, ataukah penurunan yang teramati hanya fluktuasi harian biasa? Dirumuskan sebagai hipotesis: H<sub>0</sub> bug fix tidak menurunkan crash vs H<sub>1</sub> bug fix menurunkannya, diuji pada α&nbsp;=&nbsp;5%.</p>
+      </div>
+    </div>
+    <div class="card signal" data-a style="--i:5"><b>Kenapa penting:</b> jawabannya menjadi dasar menutup issue, mengomunikasikan hasil ke stakeholder, dan menetapkan standar evaluasi untuk bug fix berikutnya.</div>
+  </section>
+
+  <!-- ============ 02 · DATA & FASE ============ -->
+  <section class="slide" data-title="Data & Fase">
+    <p class="eyebrow" data-a style="--i:0">02 · Data &amp; Tiga Fase Rollout</p>
+    <h2 data-a style="--i:1">58 hari data produksi, terbagi tiga fase mengikuti jadwal rollout</h2>
+    <div class="datagrid">
+      <aside class="card src-card" data-a style="--i:2">
+        <h3 style="font-family:var(--serif); font-size:1.02rem;">Sumber data</h3>
+        <ul>
+          <li><b>Crash monitoring production</b> sebuah aplikasi mobile, telah dianonimkan</li>
+          <li>Time series harian <b>20 April – 16 Juni 2026</b> untuk satu jenis crash</li>
+          <li>Kolom: tanggal, jumlah kejadian (<b>events</b>), user terdampak (<b>users</b>)</li>
+          <li>Unit analisis: <b>hari</b> · tanpa missing value</li>
+        </ul>
+      </aside>
+      <div class="phase-wrap">
+        <div class="phase-strip" data-a style="--i:3">
+          <div class="phase p1"><b>Sebelum rilis</b><span class="days">23 hari · 20 Apr–12 Mei</span><span class="avg">36,83 <small>crash/hari</small></span></div>
+          <div class="phase p2"><b>Staged</b><span class="days">9 hari</span><span class="avg">15,67</span></div>
+          <div class="phase p3"><b>Full rollout</b><span class="days">26 hari · 22 Mei–16 Jun</span><span class="avg">1,08 <small>crash/hari</small></span></div>
+        </div>
+        <p class="phase-note" data-a style="--i:4">Pada fase staged rollout populasi user <b>tercampur</b> antara yang sudah dan belum menerima perbaikan, sehingga fase ini dipisahkan. Perbandingan utama: <b>fase sebelum rilis vs fase full rollout</b>. Lebar balok di atas proporsional terhadap jumlah hari.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 03 · DESKRIPTIF ============ -->
+  <section class="slide" data-title="Statistika Deskriptif">
+    <p class="eyebrow" data-a style="--i:0">03 · Statistika Deskriptif</p>
+    <h2 data-a style="--i:1">Crash harian anjlok 97,1% setelah rollout mencapai 100%</h2>
+    <div class="card fig-card" data-a style="--i:2">
+      <img src="ts-dark.png" alt="Time series crash harian sepanjang tiga fase rollout: rata-rata 36,8 per hari sebelum rilis, menurun selama staged rollout, lalu 1,1 per hari setelah full rollout." width="1802" height="884">
+    </div>
+    <ul class="chips">
+      <li data-a style="--i:3">median <b>39 → 0</b></li>
+      <li data-a style="--i:4" class="g">total events <b>847 → 28</b></li>
+      <li data-a style="--i:5" class="t">user terdampak <b>362 → 16</b></li>
+      <li data-a style="--i:6" class="y">17 dari 26 hari terakhir <b>nol crash</b></li>
+    </ul>
+  </section>
+
+  <!-- ============ 04 · DOSE-RESPONSE ============ -->
+  <section class="slide" data-title="Dose-Response">
+    <p class="eyebrow" data-a style="--i:0">04 · Pola Dose-Response</p>
+    <h2 data-a style="--i:1">Makin luas rollout, makin rendah crash: median 39 → 14 → 0</h2>
+    <div class="card fig-card" data-a style="--i:2">
+      <img src="box-dark.png" alt="Boxplot crash harian per fase rollout dengan median 39, 14, dan 0." width="1666" height="850">
+    </div>
+    <div class="card signal" data-a style="--i:3"><b>Kenapa ini penting:</b> penurunan yang mengikuti persentase rollout adalah pola dose-response, bukti kausal yang jauh lebih kuat daripada sekadar perbandingan sebelum-sesudah.</div>
+  </section>
+
+  <!-- ============ 05 · UJI HIPOTESIS ============ -->
+  <section class="slide" data-title="Uji Hipotesis">
+    <p class="eyebrow" data-a style="--i:0">05 · Statistika Inferensi · α = 5%</p>
+    <h2 data-a style="--i:1">Empat pengujian, satu keputusan: tolak H<sub>0</sub></h2>
+    <div class="card hyp" data-a style="--i:2">
+      <span class="tag">H&#8320;</span><p>μ<sub>penuh</sub> ≥ μ<sub>sebelum</sub> — bug fix <b>tidak</b> menurunkan rata-rata crash harian</p>
+      <span class="tag alt">H&#8321;</span><p>μ<sub>penuh</sub> &lt; μ<sub>sebelum</sub> — bug fix menurunkan rata-rata crash harian (uji satu arah)</p>
+      <span class="sub">hipotesis pendukung: staged rollout &lt; sebelum · μ_penuh &lt; 5 (threshold toleransi operasional)</span>
+    </div>
+    <div class="plan" data-a style="--i:3">
+      <div class="p-row head"><div>Uji</div><div>Statistik</div><div>p-value</div><div>Keputusan</div></div>
+      <div class="p-row"><div>Uji t Welch satu arah (full &lt; sebelum)</div><div class="st">t = −6,42</div><div class="pv">9,0×10⁻⁷</div><div class="dec">Tolak H0</div></div>
+      <div class="p-row"><div>Mann-Whitney U satu arah (full &lt; sebelum)</div><div class="st">U = 13</div><div class="pv">2,5×10⁻⁹</div><div class="dec">Tolak H0</div></div>
+      <div class="p-row"><div>Uji t Welch satu arah (staged &lt; sebelum)</div><div class="st">t = −3,48</div><div class="pv">8,1×10⁻⁴</div><div class="dec">Tolak H0</div></div>
+      <div class="p-row"><div>Uji t satu sampel (μ<sub>penuh</sub> &lt; 5)</div><div class="st">t = −11,49</div><div class="pv">9,1×10⁻¹²</div><div class="dec">Tolak H0</div></div>
+    </div>
+    <div class="card signal" data-a style="--i:4"><b>Dalam bahasa sehari-hari:</b> peluang penurunan sebesar ini terjadi karena kebetulan kurang dari 1 banding sejuta. Selisih 35,75 crash/hari (CI 95%: 24,20–47,30) dengan effect size sangat besar (Glass's delta 1,34 · rank-biserial 0,96).</div>
+  </section>
+
+  <!-- ============ 06 · REGRESI ============ -->
+  <section class="slide" data-title="Regresi">
+    <p class="eyebrow" data-a style="--i:0">06 · Analisis Regresi Variabel Dummy</p>
+    <h2 data-a style="--i:1">Efek bug fix tetap signifikan setelah tren waktu dikontrol</h2>
+    <div class="duo">
+      <div class="card m1" data-a style="--i:2">
+        <h3>M1 · events ~ fase (skala mentah)</h3>
+        <ul>
+          <li>R² = <b>0,49</b> · koefisien = selisih rata-rata antar fase</li>
+          <li>Staged rollout: <b>−21,16 crash/hari</b> (p = 0,0027)</li>
+          <li>Full rollout: <b>−35,75 crash/hari</b> (p = 1,3×10⁻⁹)</li>
+        </ul>
+        <p class="tagline">Model interpretatif: dampak tiap fase terbaca langsung.</p>
+      </div>
+      <div class="card m2" data-a style="--i:3">
+        <h3>M2 · log(events+1) ~ fase + hari</h3>
+        <ul>
+          <li>R² = <b>0,76</b> pada skala log · varians distabilkan</li>
+          <li>Efek full rollout tetap signifikan: <b>−79%</b> (p = 0,008)</li>
+          <li>Residual normal (Shapiro p = 0,172) · model sehat</li>
+        </ul>
+        <p class="tagline">Robustness test: tren waktu ikut dikontrol.</p>
+      </div>
+    </div>
+    <div class="card signal" data-a style="--i:4"><b>Tidak ada tren penurunan alami:</b> slope di dalam fase sebelum rilis p = 0,993, dan menambahkan variabel tren tidak memperbaiki model (uji F, p = 0,755). Penurunan pertengahan Mei adalah efek rollout, bukan tren.</div>
+  </section>
+
+  <!-- ============ 07 · COUNTERFACTUAL ============ -->
+  <section class="slide" data-title="Counterfactual">
+    <p class="eyebrow" data-a style="--i:0">07 · Simulasi What-If</p>
+    <h2 data-a style="--i:1">Tanpa bug fix diprediksi ±1.289 crash — kenyataannya hanya 169</h2>
+    <div class="card fig-card" data-a style="--i:2">
+      <img src="cf-dark.png" alt="Skenario counterfactual: baseline rata-rata fase sebelum rilis dibandingkan data aktual sejak rollout, sekitar 1.120 kejadian crash tercegah." width="1802" height="850">
+    </div>
+    <ul class="chips">
+      <li data-a style="--i:3">≈ <b>1.120 crash tercegah</b> dalam 35 hari</li>
+      <li data-a style="--i:4" class="t">baseline: rata-rata fase sebelum rilis (tanpa tren, p = 0,993)</li>
+    </ul>
+  </section>
+
+  <!-- ============ 08 · KESIMPULAN ============ -->
+  <section class="slide" data-title="Kesimpulan">
+    <p class="eyebrow" data-a style="--i:0">08 · Kesimpulan &amp; Rekomendasi</p>
+    <h2 data-a style="--i:1">Bug fix efektif — issue layak ditutup</h2>
+    <div class="concl">
+      <div class="card yes" data-a style="--i:2">
+        <h3>Kesimpulan</h3>
+        <ul>
+          <li>Rata-rata crash turun <b>97,1%</b> (36,83 → 1,08 per hari), signifikan pada α = 5%.</li>
+          <li>Level crash sudah di bawah threshold toleransi 5/hari (p = 9,1×10⁻¹²), praktis <b>mendekati nol</b>.</li>
+          <li>Tiga jalur analisis (deskriptif, inferensi, regresi) <b>konvergen</b>, diperkuat pola dose-response.</li>
+        </ul>
+      </div>
+      <div class="card next" data-a style="--i:3">
+        <h3>Rekomendasi</h3>
+        <ul>
+          <li>Pasang <b>monitoring alert</b>: crash harian &gt; 6, atau ≥ 5 selama dua hari berturut-turut.</li>
+          <li>Formalisasi alur analisis ini sebagai <b>template evaluasi bug fix</b> berskala besar.</li>
+          <li>Pengembangan: regresi <b>Poisson / negative binomial</b> dan interrupted time series.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TERIMA KASIH ============ -->
+  <section class="slide end" data-title="Terima Kasih">
+    <p class="eyebrow" data-a style="--i:0">Laporan ALP · Statistika dan Probabilitas</p>
+    <h1 data-a style="--i:1">Terima kasih.</h1>
+    <p class="lead" data-a style="--i:2">Muhammad Wyndham Haryata Permana · 1076012524906<br>Laporan lengkap, notebook analisis, dan data tersedia untuk ditinjau.</p>
+    <p class="hint" data-a style="--i:3">Lampiran teknis untuk sesi tanya jawab ada di slide berikutnya <b>↓</b></p>
+  </section>
+
+  <!-- ============ LAMPIRAN A ============ -->
+  <section class="slide" data-title="Lampiran A">
+    <p class="eyebrow" data-a style="--i:0">Lampiran A · Uji Asumsi &amp; Sensitivitas</p>
+    <h2 data-a style="--i:1">Asumsi diperiksa, kesimpulan tahan digoyang</h2>
+    <div class="apx-grid">
+      <div class="card ok" data-a style="--i:2">
+        <h3>Shapiro-Wilk · sebelum rilis</h3>
+        <p>Konsisten dengan distribusi normal.</p>
+        <span class="num">p = 0,125 → Normal</span>
+      </div>
+      <div class="card warn" data-a style="--i:3">
+        <h3>Shapiro-Wilk · full rollout</h3>
+        <p>Tidak normal karena nilai menumpuk di nol → gunakan Welch + Mann-Whitney.</p>
+        <span class="num">p = 1,7×10⁻⁶ → Tidak normal</span>
+      </div>
+      <div class="card warn" data-a style="--i:4">
+        <h3>Levene · kesamaan varians</h3>
+        <p>Varians kedua fase sangat timpang → koreksi Welch diperlukan.</p>
+        <span class="num">p = 4,4×10⁻⁸ → Tidak homogen</span>
+      </div>
+      <div class="card info" data-a style="--i:5">
+        <h3>Sensitivitas batas fase</h3>
+        <p>Batas full rollout digeser ±3 hari (19–25 Mei): seluruh p-value tetap jauh di bawah 5%.</p>
+        <span class="num">semua p Welch ≤ 1,6×10⁻⁶</span>
+      </div>
+      <div class="card info" data-a style="--i:6">
+        <h3>Framing lama</h3>
+        <p>Bila fase staged digabung ke kelompok sebelum, kesimpulan tidak berubah.</p>
+        <span class="num">p = 6,2×10⁻⁸ → tetap tolak H0</span>
+      </div>
+      <div class="card info" data-a style="--i:7">
+        <h3>Effect size</h3>
+        <p>Selisih 35,75 crash/hari dengan CI 95% [24,20 ; 47,30].</p>
+        <span class="num">Glass's Δ = 1,34 · rank-biserial = 0,96</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LAMPIRAN B ============ -->
+  <section class="slide" data-title="Lampiran B">
+    <p class="eyebrow" data-a style="--i:0">Lampiran B · Kesehatan Model &amp; Keterbatasan</p>
+    <h2 data-a style="--i:1">Residual M2 tersebar acak di sekitar nol</h2>
+    <div class="card fig-card" data-a style="--i:2">
+      <img src="resid-dark.png" alt="Residual model M2 terhadap nilai fitted dan terhadap waktu, tersebar acak di sekitar nol." width="1734" height="663">
+    </div>
+    <ul class="chips">
+      <li data-a style="--i:3" class="g">Shapiro residual <b>p = 0,172</b> → normal</li>
+      <li data-a style="--i:4" class="y">Durbin-Watson <b>1,45</b> → autokorelasi ringan</li>
+      <li data-a style="--i:5">garis diagonal = artefak hari bernilai <b>nol</b> pada data hitungan</li>
+    </ul>
+    <div class="card signal" data-a style="--i:6"><b>Keterbatasan:</b> data hitungan didekati transformasi log (bukan Poisson) · desain kuasi-eksperimen tanpa control group · satu jenis crash pada satu aplikasi · tanggal per tahap persentase rollout tidak tersedia.</div>
+  </section>
+
+</main>
+
+<!-- ---------- HUD ---------- -->
+<nav class="hud" aria-label="Slide navigation">
+  <div class="counter"><b id="cur">01</b> / <span id="tot">12</span></div>
+  <div class="dots" id="dots" role="tablist"></div>
+  <div class="keys">
+    <kbd id="kPrev" title="Slide sebelumnya">↑</kbd>
+    <kbd id="kNext" title="Slide berikutnya">↓</kbd>
+    <span>navigasi · scroll juga bisa</span>
+  </div>
+</nav>
+
+<script>
+(function () {
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const dotsEl = document.getElementById('dots');
+  const curEl  = document.getElementById('cur');
+  const totEl  = document.getElementById('tot');
+  const prog   = document.getElementById('progress');
+  const N = slides.length;
+  totEl.textContent = String(N).padStart(2, '0');
+
+  slides.forEach(s => s.querySelectorAll('[data-a][data-i]')
+    .forEach(el => el.style.setProperty('--i', el.dataset.i)));
+
+  slides.forEach((s, i) => {
+    const b = document.createElement('button');
+    b.setAttribute('role', 'tab');
+    b.setAttribute('aria-label', `Slide ${i + 1}: ${s.dataset.title}`);
+    b.addEventListener('click', () => go(i));
+    dotsEl.appendChild(b);
+  });
+  const dots = Array.from(dotsEl.children);
+
+  let idx = 0;
+  let locked = false;
+  const LOCK_MS = 620;
+
+  function render(prev) {
+    slides.forEach((s, i) => {
+      s.classList.toggle('active', i === idx);
+      s.classList.toggle('above', i < idx);
+    });
+    dots.forEach((d, i) => d.setAttribute('aria-current', i === idx ? 'true' : 'false'));
+    curEl.textContent = String(idx + 1).padStart(2, '0');
+    prog.style.width = ((idx + 1) / N * 100) + '%';
+    if (history.replaceState) history.replaceState(null, '', '#' + (idx + 1));
+    slides[idx].scrollTop = 0;
+  }
+
+  function go(n) {
+    if (locked) return;
+    const next = Math.max(0, Math.min(N - 1, n));
+    if (next === idx) return;
+    locked = true;
+    const prev = idx;
+    idx = next;
+    render(prev);
+    setTimeout(() => { locked = false; }, LOCK_MS);
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if (e.repeat) return;
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+        e.preventDefault(); go(idx + 1); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        e.preventDefault(); go(idx - 1); break;
+      case 'Home': e.preventDefault(); go(0); break;
+      case 'End':  e.preventDefault(); go(N - 1); break;
+    }
+  });
+
+  document.getElementById('kNext').addEventListener('click', () => go(idx + 1));
+  document.getElementById('kPrev').addEventListener('click', () => go(idx - 1));
+
+  function edges(s) {
+    const scrollable = s.scrollHeight - s.clientHeight > 24;
+    return {
+      scrollable,
+      atTop: s.scrollTop <= 4,
+      atBottom: s.scrollTop + s.clientHeight >= s.scrollHeight - 4,
+    };
+  }
+
+  let tx = null, ty = null, tTop = false, tBottom = false, tScrollable = false;
+  window.addEventListener('touchstart', (e) => {
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY;
+    const st = edges(slides[idx]);
+    tScrollable = st.scrollable; tTop = st.atTop; tBottom = st.atBottom;
+  }, { passive: true });
+  window.addEventListener('touchend', (e) => {
+    if (ty === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    const dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dy) > 70 && Math.abs(dy) > Math.abs(dx) * 1.4) {
+      const fwd = dy < 0;
+      if (!tScrollable || (fwd && tBottom) || (!fwd && tTop)) go(fwd ? idx + 1 : idx - 1);
+    }
+    tx = ty = null;
+  }, { passive: true });
+
+  let acc = 0, lastWheel = 0, cooldownUntil = 0;
+  window.addEventListener('wheel', (e) => {
+    const now = Date.now();
+    const st = edges(slides[idx]);
+    if (st.scrollable) {
+      const fwd = e.deltaY > 0;
+      if ((fwd && !st.atBottom) || (!fwd && !st.atTop)) { acc = 0; return; }
+    }
+    if (now < cooldownUntil) return;
+    if (now - lastWheel > 300) acc = 0;
+    lastWheel = now;
+    acc += e.deltaY;
+    if (Math.abs(acc) < 40) return;
+    cooldownUntil = now + 900;
+    const dir = acc > 0 ? 1 : -1;
+    acc = 0;
+    go(idx + dir);
+  }, { passive: true });
+
+  function fromHash() {
+    const h = parseInt(location.hash.slice(1), 10);
+    return (!isNaN(h) && h >= 1 && h <= N) ? h - 1 : null;
+  }
+  window.addEventListener('hashchange', () => {
+    const h = fromHash();
+    if (h !== null && h !== idx) go(h);
+  });
+  const h0 = fromHash();
+  if (h0 !== null) idx = h0;
+  render();
+})();
+</script>
+</body>
+</html>

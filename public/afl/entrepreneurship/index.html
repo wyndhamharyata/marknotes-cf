@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Portfolio — M Wyndham Haryata Permana</title>
+<meta name="description" content="Career portfolio: the deep-IC path to Principal & Distinguished Engineer. M Wyndham Haryata Permana.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* palette matched to mwyndham.dev */
+    --bg:      #161B26;
+    --card:    #1D2431;
+    --card2:   #242C3C;
+    --line:    #2E3749;
+    --ink:     #E7EAF0;
+    --mute:    #97A1B2;
+    --amber:   #EF6B66;   /* blog coral-red — emphasis */
+    --teal:    #6FA8F5;   /* blog blue — interactive */
+    --blue:    #6FA8F5;
+    --rose:    #EF6B66;
+    --serif:   "JetBrains Mono", "Courier New", monospace;
+    --sans:    "JetBrains Mono", "Courier New", monospace;
+    --mono:    "JetBrains Mono", "Courier New", monospace;
+    --ease:    cubic-bezier(.22,.9,.3,1);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { height:100%; }
+  body {
+    background-color: var(--bg);
+    /* the blog's dashed-grid texture */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Crect x='24' y='27' width='9' height='2' rx='1' fill='%23E7EAF0' fill-opacity='0.055'/%3E%3C/svg%3E");
+    color: var(--ink);
+    font-family: var(--sans);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--amber); color: var(--bg); }
+
+  /* ---------- deck scaffolding ---------- */
+  .deck { position: fixed; inset: 0; }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: clamp(1.2rem, 4vw, 3.5rem) clamp(1.1rem, 6vw, 6rem) clamp(4.2rem, 8vh, 5.2rem);
+    opacity: 0; visibility: hidden;
+    transform: translateY(7vh);              /* waiting below */
+    transition: opacity .55s var(--ease), transform .55s var(--ease), visibility 0s linear .55s;
+    overflow-y: auto;
+  }
+  .slide > * { flex-shrink: 0; }
+  .slide.above { transform: translateY(-7vh); }  /* already passed — parked above */
+  .slide.active {
+    opacity: 1; visibility: visible;
+    transform: translateY(0);
+    transition: opacity .55s var(--ease) .1s, transform .55s var(--ease) .1s, visibility 0s;
+    z-index: 2;
+  }
+
+  /* staggered element entrances */
+  [data-a] {
+    opacity: 0;
+    transform: translateY(18px);
+    transition: opacity .6s var(--ease), transform .6s var(--ease);
+  }
+  .slide.active [data-a] {
+    opacity: 1; transform: translateY(0);
+    transition-delay: calc(.18s + var(--i, 0) * .09s);
+  }
+
+  /* ---------- shared typography ---------- */
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: clamp(.62rem, 1.4vw, .78rem);
+    font-weight: 700;
+    letter-spacing: .32em;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  h1, h2 { font-family: var(--serif); font-weight: 800; line-height: 1.15; }
+  h1 { font-size: clamp(1.7rem, 5vw, 3.3rem); letter-spacing: -0.01em; }
+  h2 { font-size: clamp(1.25rem, 3vw, 1.95rem); margin-bottom: clamp(1.1rem, 3vh, 2rem); }
+  .lead { color: var(--mute); font-size: clamp(.95rem, 2vw, 1.15rem); max-width: 42em; line-height: 1.55; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 1.3rem 1.4rem;
+  }
+  .chip-ic {
+    width: 2.6rem; height: 2.6rem; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+  .chip-ic svg { width: 1.2rem; height: 1.2rem; stroke: var(--bg); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* ---------- slide 1 ---------- */
+  .backdrop { position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:-1; }
+  .s1 .orb { position:absolute; border-radius:50%; background:var(--card); }
+  .s1 .orb.a { width:38vmax; height:38vmax; top:-18vmax; right:-12vmax; }
+  .s1 .orb.b { width:22vmax; height:22vmax; bottom:-10vmax; left:-8vmax; }
+  .s1 h1 { max-width: 12em; margin-bottom: 1.2rem; }
+  .presenter {
+    align-self: flex-start;
+    display:inline-flex; align-items:center; gap:.9rem;
+    background: var(--card2); border:1px solid var(--line); border-radius:14px;
+    padding:.8rem 1.4rem .8rem .9rem; margin-top: clamp(1.4rem, 4vh, 2.6rem);
+  }
+  .mono-avatar {
+    width:2.9rem; height:2.9rem; border-radius:50%; background:var(--amber);
+    color:var(--bg); font-family:var(--serif); font-weight:700; font-size:1rem;
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  .presenter b { display:block; font-size:.95rem; }
+  .presenter span { color:var(--mute); font-size:.82rem; }
+
+  /* ---------- slide 2 ---------- */
+  .cv-grid { display:grid; grid-template-columns: minmax(230px, 300px) 1fr; gap:1.1rem; align-items:start; }
+  .profile-card { text-align:center; padding:1.6rem 1.2rem; }
+  .profile-card .mono-avatar { width:3.6rem; height:3.6rem; margin:0 auto .8rem; font-size:1.15rem; }
+  .profile-card b { display:block; font-size:1.02rem; }
+  .profile-card .role { color:var(--amber); font-size:.85rem; font-weight:600; }
+  .profile-card .loc { color:var(--mute); font-size:.8rem; margin-bottom:1rem; }
+  .contact { list-style:none; text-align:left; display:grid; gap:.45rem; }
+  .contact a {
+    font-family:var(--mono); font-size:.72rem; color:var(--mute);
+    text-decoration:none; display:flex; gap:.55rem; align-items:center;
+    transition: color .2s;
+  }
+  .contact a:hover, .contact a:focus-visible { color:var(--teal); }
+  .contact svg { width:.85rem; height:.85rem; stroke:currentColor; fill:none; stroke-width:2; flex:none; }
+  .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:.9rem; margin-bottom:1rem; }
+  .stat { text-align:center; padding:.9rem .5rem; background:var(--card2); border:1px solid var(--line); border-radius:12px; }
+  .stat b { font-family:var(--serif); font-size:clamp(1.3rem, 2.6vw, 1.8rem); display:block; }
+  .stat.gold b{color:var(--amber);} .stat.teal b{color:var(--teal);} .stat.blue b{color:var(--blue);}
+  .stat span { color:var(--mute); font-size:.72rem; }
+  .timeline { display:grid; gap: .85rem; }
+  .t-item { display:grid; grid-template-columns: 1.1rem 5.2rem 1fr; gap:.7rem; align-items:start; }
+  .t-item .dot { width:.62rem; height:.62rem; border-radius:50%; background:var(--amber); margin-top:.3rem; position:relative; }
+  .t-item:not(:last-child) .dot::after { content:""; position:absolute; left:50%; top:.85rem; width:2px; height:2.6rem; background:var(--line); transform:translateX(-50%); }
+  .t-item .yr { font-family:var(--mono); font-size:.68rem; color:var(--amber); padding-top:.18rem; }
+  .t-item b { font-size:.9rem; display:block; }
+  .t-item p { color:var(--mute); font-size:.78rem; line-height:1.45; }
+  .skills { display:flex; flex-wrap:wrap; gap:.5rem; margin-top:1.1rem; }
+  .skills li { list-style:none; font-family:var(--mono); font-size:.68rem; color:var(--teal);
+    background:var(--card2); border:1px solid var(--line); border-radius:999px; padding:.32rem .75rem; }
+
+  /* ---------- slide 3 ---------- */
+  .ikigai { position:relative; display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .ik-card { display:flex; gap:.9rem; align-items:flex-start; }
+  .ik-card h3 { font-family:var(--serif); font-size:1.08rem; margin-bottom:.3rem; }
+  .ik-card p { color:var(--ink); font-size:.85rem; line-height:1.5; opacity:.92; }
+  .ik-card.love  h3{color:var(--amber);} .ik-card.good h3{color:var(--teal);}
+  .ik-card.need  h3{color:var(--blue);}  .ik-card.paid h3{color:var(--rose);}
+  .ik-center {
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%) scale(.6);
+    width:5.4rem; height:5.4rem; border-radius:50%;
+    background:var(--amber); color:var(--bg);
+    font-family:var(--serif); font-weight:700; letter-spacing:.12em; font-size:.82rem;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 10px 34px rgba(0,0,0,.5);
+    opacity:0; transition: opacity .6s var(--ease), transform .6s var(--ease);
+    z-index:3;
+  }
+  .slide.active .ik-center { opacity:1; transform:translate(-50%,-50%) scale(1); transition-delay:.68s; }
+  .reflection { margin-top:1.2rem; font-style:italic; font-size:.9rem; line-height:1.55; color:var(--ink); max-width:62em; }
+  .reflection b { color:var(--amber); font-style:normal; }
+
+  /* ---------- slide 4 ---------- */
+  .mbti { display:grid; grid-template-columns: minmax(230px, 320px) 1fr; gap:1.1rem; align-items:stretch; }
+  .mbti-hero { text-align:center; display:flex; flex-direction:column; justify-content:center; padding:2rem 1.4rem; }
+  .mbti-hero .chip-ic { width:3.4rem; height:3.4rem; margin:0 auto 1rem; background:var(--amber); }
+  .mbti-hero .type { font-family:var(--serif); font-size:clamp(2.2rem,4.5vw,3rem); font-weight:700; }
+  .mbti-hero .alias { color:var(--amber); font-style:italic; margin:.2rem 0 1rem; }
+  .mbti-hero p { color:var(--mute); font-size:.85rem; line-height:1.55; }
+  .dims { display:grid; gap:.6rem; margin-bottom:1rem; }
+  .dim { display:flex; gap:.8rem; align-items:center; }
+  .dim .ltr { width:2.1rem; height:2.1rem; border-radius:50%; flex:none;
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif); font-weight:700; color:var(--bg); }
+  .dim b { font-size:.92rem; margin-right:.4rem; }
+  .dim span { color:var(--mute); font-size:.82rem; }
+  .fit { background:var(--card2); }
+  .fit p { font-size:.86rem; line-height:1.55; }
+  .fit b { color:var(--amber); }
+
+  /* ---------- slide 5 ---------- */
+  .trend { display:grid; grid-template-columns: 1.15fr 1fr; gap:1.1rem; }
+  .news .src { font-family:var(--mono); font-size:.68rem; letter-spacing:.22em; color:var(--amber); font-weight:700; }
+  .news blockquote { font-family:var(--serif); font-style:italic; font-weight:600; font-size:clamp(1.05rem,2vw,1.3rem); line-height:1.35; margin:.45rem 0 .7rem; }
+  .news ul { list-style:none; display:grid; gap:.55rem; }
+  .news li { color:var(--mute); font-size:.85rem; padding-left:1.1rem; position:relative; line-height:1.45; }
+  .news li::before { content:""; position:absolute; left:0; top:.5em; width:.4rem; height:.4rem; border-radius:50%; background:var(--amber); }
+  .news-shot { display:flex; justify-content:center; margin:.4rem 0 .1rem; line-height:0; }
+  .news-shot img { max-width:100%; max-height:clamp(150px,26vh,280px); width:auto; height:auto; display:block; border-radius:10px; border:1px solid var(--line); transition: transform .3s var(--ease), box-shadow .3s var(--ease); }
+  .news-shot:hover img { transform:translateY(-2px); box-shadow:0 12px 32px rgba(0,0,0,.5); border-color:var(--amber); }
+  .news-link { display:inline-flex; align-items:center; gap:.35rem; margin-top:.7rem; font-family:var(--mono); font-size:.72rem; letter-spacing:.06em; font-weight:700; color:var(--teal); text-decoration:none; }
+  .news-link:hover { text-decoration:underline; }
+  .imply { background:var(--card2); display:flex; flex-direction:column; gap:.9rem; }
+  .imply h3 { font-family:var(--serif); color:var(--teal); font-size:1.15rem; display:flex; align-items:center; gap:.7rem; }
+  .imply h3 .chip-ic { width:2.2rem; height:2.2rem; background:var(--teal); }
+  .imply p { font-size:.88rem; line-height:1.55; }
+  .imply .move { color:var(--mute); font-style:italic; font-size:.84rem; }
+  .signal { margin-top:1.1rem; padding:.85rem 1.2rem; font-size:.88rem; }
+  .signal b { color:var(--amber); }
+
+  /* ---------- slide 6 : pyramid ---------- */
+  .pyr { display:flex; flex-direction:column; align-items:center; gap:.5rem; }
+  .lvl {
+    border-radius:10px; text-align:center; padding:.6rem 1rem .65rem;
+    width: var(--w); max-width: 100%;
+    border:1px solid var(--line);
+  }
+  .lvl b { font-family:var(--serif); font-size:clamp(.85rem, 1.9vw, 1.08rem); }
+  .lvl .yrs { font-family:var(--mono); font-size:.66rem; margin-left:.55rem; opacity:.85; }
+  .lvl p { font-size:clamp(.66rem, 1.4vw, .78rem); opacity:.85; margin-top:.15rem; }
+  .lvl.peak { background:var(--amber); color:var(--bg); border-color:var(--amber);
+    box-shadow:0 12px 34px rgba(239,107,102,.22); }
+  .lvl.peak .yrs { color:#5C1E1B; }
+  .lvl.l2 { background:#3E68C4; } .lvl.l3 { background:#31519C; }
+  .lvl.l4 { background:#263F7B; } .lvl.l5 { background:#1C2F5C; }
+  .lvl.l2,.lvl.l3,.lvl.l4,.lvl.l5 { color:var(--ink); border-color:transparent; }
+  .lvl.l2 .yrs,.lvl.l3 .yrs,.lvl.l4 .yrs,.lvl.l5 .yrs { color:#A9BCE0; }
+  .dream-tag { display:flex; align-items:center; gap:.5rem; justify-content:center;
+    font-family:var(--mono); font-size:.7rem; letter-spacing:.26em; font-weight:700; color:var(--amber); margin-bottom:.35rem; }
+  .dream-tag::before, .dream-tag::after { content:""; height:1px; width:2.4rem; background:var(--amber); }
+
+  /* ---------- slide 7 ---------- */
+  .fived { display:grid; grid-template-columns:repeat(6,1fr); gap:1rem; }
+  .d-card { grid-column: span 2; display:flex; flex-direction:column; gap:.7rem; }
+  .d-card.wide { grid-column: span 3; }
+  .d-card header { display:flex; align-items:center; gap:.8rem; }
+  .d-card h3 { font-family:var(--serif); font-size:1.15rem; }
+  .d-card p { font-size:.85rem; line-height:1.55; color:var(--ink); opacity:.92; }
+  .d-card.dream  { background:var(--card2); }
+  .d-card.dream h3{color:var(--amber);} .d-card.desire h3{color:var(--rose);}
+  .d-card.drive h3{color:var(--teal);}  .d-card.disc h3{color:var(--blue);}
+  .d-card.det  h3{color:var(--amber);}
+
+  /* ---------- slide 8 ---------- */
+  .plan { border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+  .p-row { display:grid; grid-template-columns: 9.5rem 10rem 1fr 13rem; gap:0; }
+  .p-row > div { padding:.72rem .95rem; font-size:.8rem; line-height:1.45; border-top:1px solid var(--line); }
+  .p-row.head > div { border-top:none; background:var(--card2);
+    font-family:var(--mono); font-size:.64rem; letter-spacing:.24em; font-weight:700; color:var(--amber); }
+  .p-row:nth-child(even):not(.head) { background:rgba(20,31,51,.55); }
+  .p-row .ph { font-family:var(--mono); font-size:.7rem; color:var(--amber); }
+  .p-row .fc { color:var(--teal); font-weight:600; }
+  .p-row .tg { color:var(--mute); }
+  .closing { margin-top:1.1rem; text-align:center; color:var(--mute); font-style:italic; font-size:.88rem; }
+
+  /* ---------- HUD ---------- */
+  .hud {
+    position:fixed; left:0; right:0; bottom:0; z-index:10;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.9rem clamp(1.1rem, 6vw, 6rem);
+    background: linear-gradient(to top, rgba(11,18,32,.95) 40%, transparent);
+    pointer-events:none;
+  }
+  .hud > * { pointer-events:auto; }
+  .counter { font-family:var(--mono); font-size:.72rem; color:var(--mute); letter-spacing:.2em; min-width:5.5rem; }
+  .counter b { color:var(--amber); }
+  .dots {
+    position:fixed; right:clamp(.8rem, 2vw, 1.6rem); top:50%;
+    transform:translateY(-50%);
+    display:flex; flex-direction:column; gap:.6rem; z-index:10;
+  }
+  .dots button {
+    width:.55rem; height:.55rem; border-radius:50%; border:none; cursor:pointer;
+    background:var(--line); padding:0; transition:background .25s, transform .25s;
+  }
+  .dots button[aria-current="true"] { background:var(--amber); transform:scale(1.35); }
+  .dots button:focus-visible { outline:2px solid var(--teal); outline-offset:3px; }
+  .keys { display:flex; align-items:center; gap:.5rem; font-family:var(--mono); font-size:.68rem; color:var(--mute); }
+  .keys kbd {
+    border:1px solid var(--line); border-bottom-width:2px; border-radius:6px;
+    background:var(--card); padding:.18rem .5rem; font-family:inherit; font-size:.7rem;
+    cursor:pointer; color:var(--ink); transition:border-color .2s, color .2s;
+  }
+  .keys kbd:hover { border-color:var(--amber); color:var(--amber); }
+  .progress { position:fixed; top:0; left:0; height:3px; background:var(--amber); z-index:11;
+    transition:width .5s var(--ease); }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 860px) {
+    .cv-grid, .mbti, .trend { grid-template-columns:1fr; }
+    .ikigai { grid-template-columns:1fr; }
+    .ik-center { display:none; }
+    .fived { grid-template-columns:1fr 1fr; }
+    .d-card, .d-card.wide { grid-column:span 1; }
+    .p-row { grid-template-columns:1fr; }
+    .p-row.head { display:none; }
+    .p-row > div { border-top:none; padding:.3rem 1rem; }
+    .p-row:not(.head) { border-top:1px solid var(--line); padding:.6rem 0; }
+    .keys { display:none; }
+    .dots { right:auto; left:50%; top:auto; bottom:1rem; transform:translateX(-50%); flex-direction:row; }
+    .slide { justify-content:flex-start; padding-top:2.2rem; }
+  }
+  @media (max-width: 560px) {
+    .fived { grid-template-columns:1fr; }
+    .stats { grid-template-columns:repeat(3,1fr); gap:.5rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .slide, [data-a], .ik-center, .progress, .dots button { transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<main class="deck" id="deck" aria-live="polite">
+
+  <!-- ============ 1 · INTRODUCTION ============ -->
+  <section class="slide s1" data-title="Introduction">
+    <div class="backdrop"><div class="orb a"></div><div class="orb b"></div></div>
+    <p class="eyebrow" data-a style="--i:0">Career Portfolio · Intrapreneurship Essentials</p>
+    <h1 data-a style="--i:1">Principal &amp;<br>Distinguished Engineer</h1>
+    <p class="lead" data-a style="--i:2">The deep individual-contributor path — hands-on technical leadership shaping products that serve 10M+ users by 2035.</p>
+    <div class="presenter" data-a style="--i:3">
+      <div class="mono-avatar">MW</div>
+      <div><b>M Wyndham Haryata Permana</b><span>Senior Full Stack Engineer · Sitemate</span></div>
+    </div>
+  </section>
+
+  <!-- ============ 2 · PROFILE & CV ============ -->
+  <section class="slide" data-title="Profile & CV">
+    <p class="eyebrow" data-a style="--i:0">Profile &amp; CV</p>
+    <h2 data-a style="--i:1">9+ years shipping software on every platform</h2>
+    <div class="cv-grid">
+      <aside class="card profile-card" data-a style="--i:2">
+        <div class="mono-avatar">MW</div>
+        <b>M Wyndham Haryata P.</b>
+        <div class="role">Senior Full Stack Engineer</div>
+        <div class="loc">Sydney, Australia</div>
+        <ul class="contact">
+          <li><a href="mailto:mwyndham.business@gmail.com"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z M4 6l8 6 8-6"/></svg>mwyndham.business@gmail.com</a></li>
+          <li><a href="https://www.linkedin.com/in/mwyndham" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z M8 10v6 M8 7v.1 M12 16v-4a2 2 0 014 0v4"/></svg>linkedin.com/in/mwyndham</a></li>
+          <li><a href="https://github.com/wyndhamharyata" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 00-3 19.5c.5.1.7-.2.7-.5v-2c-2.8.6-3.4-1.3-3.4-1.3-.4-1.1-1-1.4-1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5a4 4 0 011-2.7 3.6 3.6 0 01.1-2.7s.9-.3 2.8 1a9.5 9.5 0 015 0c2-1.3 2.8-1 2.8-1a3.6 3.6 0 01.1 2.7 4 4 0 011 2.7c0 3.9-2.4 4.7-4.6 5 .4.3.7.9.7 1.9v2.8c0 .3.2.6.7.5A10 10 0 0012 2z"/></svg>github.com/wyndhamharyata</a></li>
+          <li><a href="https://mwyndham.dev" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18 M12 3a14 14 0 010 18 M12 3a14 14 0 000 18"/></svg>mwyndham.dev</a></li>
+        </ul>
+      </aside>
+      <div>
+        <div class="stats">
+          <div class="stat gold" data-a style="--i:3"><b>9+</b><span>years of engineering</span></div>
+          <div class="stat teal" data-a style="--i:4"><b>500K+</b><span>users served</span></div>
+          <div class="stat blue" data-a style="--i:5"><b>130</b><span>GitHub stars</span></div>
+        </div>
+        <div class="timeline">
+          <div class="t-item" data-a style="--i:6"><span class="dot"></span><span class="yr">2025 –</span>
+            <div><b>Sitemate — Senior Full Stack Engineer</b><p>Blue Flame 2026 leadership fast-track · led major React Native upgrade</p></div></div>
+          <div class="t-item" data-a style="--i:7"><span class="dot"></span><span class="yr">2024 – 25</span>
+            <div><b>Tigerhall — Senior Backend Engineer</b><p>Full-stack on a 10K-MAU platform · MS Teams integration drove sales</p></div></div>
+          <div class="t-item" data-a style="--i:8"><span class="dot"></span><span class="yr">2021 – 24</span>
+            <div><b>Gravel — Senior Software Engineer</b><p>Crash-free users 95.1% → 99.3% · mobile build time cut ~250%</p></div></div>
+          <div class="t-item" data-a style="--i:9"><span class="dot"></span><span class="yr">2017 – 21</span>
+            <div><b>Earlier roles — Maukerja, CIMB Niaga, Pasienia</b><p>Android apps with 600K+ combined downloads · banking prototype</p></div></div>
+        </div>
+        <ul class="skills" data-a style="--i:10">
+          <li>Go</li><li>Kotlin</li><li>TypeScript</li><li>React Native</li><li>HTMX</li><li>AWS · GCP</li><li>PostgreSQL</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3 · IKIGAI ============ -->
+  <section class="slide" data-title="Ikigai">
+    <p class="eyebrow" data-a style="--i:0">Ikigai Analysis</p>
+    <h2 data-a style="--i:1">Where my ikigai points: build, lead, share</h2>
+    <div class="ikigai">
+      <div class="card ik-card love" data-a style="--i:2">
+        <span class="chip-ic" style="background:var(--amber)"><svg viewBox="0 0 24 24"><path d="M12 21C6 16 3 12.5 3 9a5 5 0 019-3 5 5 0 019 3c0 3.5-3 7-9 12z"/></svg></span>
+        <div><h3>What I love</h3><p>I love building tools that genuinely help people, and writing about what I learn.</p></div>
+      </div>
+      <div class="card ik-card good" data-a style="--i:3">
+        <span class="chip-ic" style="background:var(--teal)"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 00-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 005.4-5.4L15 12l-3-3z"/></svg></span>
+        <div><h3>What I'm good at</h3><p>I'm at my best doing full-stack engineering and system design across mobile, backend, and cloud.</p></div>
+      </div>
+      <div class="card ik-card need" data-a style="--i:4">
+        <span class="chip-ic" style="background:var(--blue)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18 M12 3a14 14 0 010 18"/></svg></span>
+        <div><h3>What the world needs</h3><p>The world needs reliable SaaS for traditional industries. Especially in industries like construction, legal, and health and government.</p></div>
+      </div>
+      <div class="card ik-card paid" data-a style="--i:5">
+        <span class="chip-ic" style="background:var(--rose)"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6 M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></span>
+        <div><h3>What I can be paid for</h3><p>I get paid to take on senior engineering roles, technical consulting, and end-to-end product development.</p></div>
+      </div>
+      <div class="ik-center" aria-hidden="true">IKIGAI</div>
+    </div>
+    <p class="reflection" data-a style="--i:6"><b>My ikigai:</b> I build reliable software that solves real problems, and I get paid to keep mastering a craft I genuinely love — so I show up every day, stay hands-on, and push my ceiling higher toward Staff, Principal, and Distinguished.</p>
+  </section>
+
+  <!-- ============ 4 · MBTI ============ -->
+  <section class="slide" data-title="Personality">
+    <p class="eyebrow" data-a style="--i:0">Personality · 16Personalities Test</p>
+    <h2 data-a style="--i:1">INFJ-T — The Advocate</h2>
+    <div class="mbti">
+      <aside class="card mbti-hero" data-a style="--i:2">
+        <span class="chip-ic"><svg viewBox="0 0 24 24"><path d="M9.5 3A3.5 3.5 0 006 6.5c-1.8.4-3 1.9-3 3.8 0 1.2.5 2.2 1.3 2.9A4 4 0 007 20.5c.8.9 2 1.5 3.2 1.3.7-.1 1.3-.5 1.8-1V4.6A3.5 3.5 0 009.5 3z M14.5 3A3.5 3.5 0 0118 6.5c1.8.4 3 1.9 3 3.8 0 1.2-.5 2.2-1.3 2.9A4 4 0 0117 20.5c-.8.9-2 1.5-3.2 1.3-.7-.1-1.3-.5-1.8-1V4.6A3.5 3.5 0 0114.5 3z"/></svg></span>
+        <div class="type">INFJ-T</div>
+        <div class="alias">"The Advocate"</div>
+        <p>One of the rarest types — ~1–2% of the population. Idealism paired with structured execution.</p>
+      </aside>
+      <div>
+        <div class="dims">
+          <div class="dim" data-a style="--i:3"><span class="ltr" style="background:var(--teal)">I</span><span><b>Introverted</b><span>Deep work &amp; 1-on-1 depth over crowds</span></span></div>
+          <div class="dim" data-a style="--i:4"><span class="ltr" style="background:var(--amber)">N</span><span><b>Intuitive</b><span>Big-picture, systems &amp; future patterns</span></span></div>
+          <div class="dim" data-a style="--i:5"><span class="ltr" style="background:var(--rose)">F</span><span><b>Feeling</b><span>Decisions anchored in values &amp; impact</span></span></div>
+          <div class="dim" data-a style="--i:6"><span class="ltr" style="background:var(--blue)">J</span><span><b>Judging</b><span>Structure, planning, organised delivery</span></span></div>
+          <div class="dim" data-a style="--i:7"><span class="ltr" style="background:var(--teal)">T</span><span><b>Turbulent</b><span>Perfectionist drive to keep improving</span></span></div>
+        </div>
+        <div class="card fit" data-a style="--i:8">
+          <p><b>Why it fits:</b> N + J give me the systems thinking and structured planning a principal-level architect needs, while introversion (I) favours deep technical influence over people management — the defining trait of the senior IC track. The Turbulent drive for refinement is exactly what distinguished engineering demands.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 · INDUSTRY TREND ============ -->
+  <section class="slide" data-title="Industry Trend">
+    <p class="eyebrow" data-a style="--i:0">Industry Trend Analysis</p>
+    <h2 data-a style="--i:1">AI is raising the value of engineering leaders</h2>
+    <div class="trend">
+      <article class="card news" data-a style="--i:2">
+        <div class="src">CNN Business · Apr 2026</div>
+        <a class="news-shot" href="https://edition.cnn.com/2026/04/08/tech/ai-software-developer-jobs" target="_blank" rel="noopener">
+          <img src="cnn-swe-jobs.png" width="1200" height="776" loading="lazy" alt="CNN Business article — “The demise of software engineering jobs has been greatly exaggerated”">
+        </a>
+        <blockquote>"The demise of software engineering jobs has been greatly exaggerated"</blockquote>
+        <ul>
+          <li>Developer openings are growing, not shrinking</li>
+          <li>Routine coding shifts to overseeing AI agents</li>
+          <li>Engineers spend more time on architecture &amp; product ideas</li>
+          <li>Companies covet seasoned engineers who can marshal AI</li>
+        </ul>
+        <a class="news-link" href="https://edition.cnn.com/2026/04/08/tech/ai-software-developer-jobs" target="_blank" rel="noopener">Read on CNN Business ↗</a>
+      </article>
+      <article class="card imply" data-a style="--i:3">
+        <h3><span class="chip-ic"><svg viewBox="0 0 24 24"><rect x="5" y="8" width="14" height="11" rx="2"/><path d="M12 8V4 M9 13h.1 M15 13h.1 M9 17h6"/></svg></span>What this means for my path</h3>
+        <p>The market is compressing routine coding and rewarding exactly what the deep-IC track builds: <b>architecture, technical judgment, and direction of AI agents at scale.</b></p>
+        <p class="move">My move: make AI fluency a core skill at every level — from AI-assisted delivery today to setting AI engineering standards as a Principal / Distinguished Engineer.</p>
+      </article>
+    </div>
+    <div class="card signal" data-a style="--i:4"><b>Signal:</b> senior engineers who direct AI — not compete with it — are becoming the scarcest talent in tech.</div>
+  </section>
+
+  <!-- ============ 6 · CAREER PYRAMID ============ -->
+  <section class="slide" data-title="Career Pyramid">
+    <p class="eyebrow" data-a style="--i:0">Career Pyramid · Built From Real Job Specs</p>
+    <h2 data-a style="--i:1">Five levels of the deep-IC track</h2>
+    <div class="pyr">
+      <div class="dream-tag" data-a style="--i:6">Dream</div>
+      <div class="lvl peak" style="--w:min(24rem,92vw)" data-a data-i="5"><b>Distinguished Engineer</b><span class="yrs">2034–35</span><p>Industry-level technical impact · 10M+ users served</p></div>
+      <div class="lvl l2" style="--w:min(31rem,94vw)" data-a data-i="4"><b>Principal Engineer</b><span class="yrs">2031–33</span><p>Company-wide architecture &amp; technical strategy</p></div>
+      <div class="lvl l3" style="--w:min(38rem,96vw)" data-a data-i="3"><b>Staff Engineer</b><span class="yrs">2029–30</span><p>Multi-team systems design · org-level influence &amp; RFCs</p></div>
+      <div class="lvl l4" style="--w:min(45rem,98vw)" data-a data-i="2"><b>Tech Lead</b><span class="yrs">2027–28</span><p>Team technical direction · architecture · CI/CD &amp; review standards</p></div>
+      <div class="lvl l5" style="--w:min(52rem,100%)" data-a data-i="1"><b>Senior Full Stack Engineer</b><span class="yrs">2026 · today</span><p>Cross-team project lead · mentoring · Blue Flame program</p></div>
+    </div>
+  </section>
+
+  <!-- ============ 7 · 5D CAREER PLAN ============ -->
+  <section class="slide" data-title="5D Career Plan">
+    <p class="eyebrow" data-a style="--i:0">Career Plan · The 5D Framework</p>
+    <h2 data-a style="--i:1">One unbroken line — from dream to determination</h2>
+    <div class="fived">
+      <div class="card d-card dream wide" data-a style="--i:2">
+        <header><span class="chip-ic" style="background:var(--amber)"><svg viewBox="0 0 24 24"><path d="M3 20l6-11 4 6 3-4 5 9z"/></svg></span><h3>Dream</h3></header>
+        <p>By 2035, become a Distinguished Engineer — designing the platforms that 10M+ people quietly depend on, and reaching the top of the technical ladder without ever stepping away from the code.</p>
+      </div>
+      <div class="card d-card desire wide" data-a style="--i:3">
+        <header><span class="chip-ic" style="background:var(--rose)"><svg viewBox="0 0 24 24"><path d="M12 22c4 0 7-2.7 7-6.5 0-3-2-5-3.5-7C14 6.5 13 4.5 13 2c-3 2-4.5 4.5-4.5 7C7 8 6.3 7.4 6 6.5 4.8 8 5 10.5 5 12c0 5 3 10 7 10z"/></svg></span><h3>Desire</h3></header>
+        <p>I want that summit badly — to be the engineer teams escalate to when the problem is hardest, to watch systems I architected still running years later, and to turn the juniors I mentor into the next generation of leads.</p>
+      </div>
+      <div class="card d-card drive" data-a style="--i:4">
+        <header><span class="chip-ic" style="background:var(--teal)"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8 M15 7h6v6"/></svg></span><h3>Drive</h3></header>
+        <p>So I turn that want into motion — one career-defining win every year: a system led to production, a design doc adopted org-wide, or a conference talk landed. Each one a rung from Senior → Staff → Principal.</p>
+      </div>
+      <div class="card d-card disc" data-a style="--i:5">
+        <header><span class="chip-ic" style="background:var(--blue)"><svg viewBox="0 0 24 24"><path d="M6 7v10 M18 7v10 M3 9v6 M21 9v6 M6 12h12"/></svg></span><h3>Discipline</h3></header>
+        <p>Those yearly wins are built from unbroken habits: ship code every week, publish one deep technical piece a month, dissect a large-scale system each quarter, and review my own metrics monthly.</p>
+      </div>
+      <div class="card d-card det" data-a style="--i:6">
+        <header><span class="chip-ic" style="background:var(--amber)"><svg viewBox="0 0 24 24"><path d="M5 21V4 M5 4h13l-2.5 4L18 12H5"/></svg></span><h3>Determination</h3></header>
+        <p>And when a promo slips or a project gets killed, I re-scope the timeline — never the destination. Reassess at every level, adapt the route, and keep climbing to the summit.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8 · PERSONAL BRANDING PLAN ============ -->
+  <section class="slide" data-title="Branding Plan">
+    <p class="eyebrow" data-a style="--i:0">Personal Branding Plan · 2026 → Career Peak</p>
+    <h2 data-a style="--i:1">From consistent builder to industry voice</h2>
+    <div class="plan" data-a style="--i:2">
+      <div class="p-row head"><div>Phase</div><div>Focus</div><div>Key actions</div><div>Target</div></div>
+      <div class="p-row"><div class="ph">Year 1 · 2026</div><div class="fc">Consistency (study period)</div><div>1 article/week · LinkedIn 2–3×/week · unify metrics across platforms</div><div class="tg">900 connections · 120 GitHub followers</div></div>
+      <div class="p-row"><div class="ph">Year 2 · 2027</div><div class="fc">Authority</div><div>Go &amp; HTMX deep-dive series · first meetup talks · Tech Lead brand</div><div class="tg">Recognised in Go/HTMX community</div></div>
+      <div class="p-row"><div class="ph">Year 3 · 2028</div><div class="fc">Community</div><div>Open-source maintainer · active in 3 communities · conference talk</div><div class="tg">1 conference stage · 300+ project stars</div></div>
+      <div class="p-row"><div class="ph">Year 4–5 · 2029–30</div><div class="fc">Staff+ voice</div><div>Architecture deep-dives · design docs &amp; RFCs in public · industry network</div><div class="tg">Known as a systems thinker, not just builder</div></div>
+      <div class="p-row"><div class="ph">Peak · 2031–35</div><div class="fc">Industry authority</div><div>Principal → Distinguished brand · keynotes, podcasts · open-source leadership</div><div class="tg">Personal brand = industry-wide technical credibility</div></div>
+    </div>
+    <p class="closing" data-a style="--i:3">Foundation is set — the homework is consistency, distribution, and daring to showcase the best work.</p>
+  </section>
+
+</main>
+
+<!-- ---------- HUD ---------- -->
+<nav class="hud" aria-label="Slide navigation">
+  <div class="counter"><b id="cur">01</b> / <span id="tot">08</span></div>
+  <div class="dots" id="dots" role="tablist"></div>
+  <div class="keys">
+    <kbd id="kPrev" title="Previous slide">↑</kbd>
+    <kbd id="kNext" title="Next slide">↓</kbd>
+    <span>navigate · scroll works too</span>
+  </div>
+</nav>
+
+<script>
+(function () {
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const dotsEl = document.getElementById('dots');
+  const curEl  = document.getElementById('cur');
+  const totEl  = document.getElementById('tot');
+  const prog   = document.getElementById('progress');
+  const N = slides.length;
+  totEl.textContent = String(N).padStart(2, '0');
+
+  // Pyramid levels animate bottom-up: map data-i to stagger index
+  slides.forEach(s => s.querySelectorAll('[data-a][data-i]')
+    .forEach(el => el.style.setProperty('--i', el.dataset.i)));
+
+  // dots
+  slides.forEach((s, i) => {
+    const b = document.createElement('button');
+    b.setAttribute('role', 'tab');
+    b.setAttribute('aria-label', `Slide ${i + 1}: ${s.dataset.title}`);
+    b.addEventListener('click', () => go(i));
+    dotsEl.appendChild(b);
+  });
+  const dots = Array.from(dotsEl.children);
+
+  let idx = 0;
+  let locked = false;          // transition lock: one press = one slide
+  const LOCK_MS = 620;
+
+  function render(prev) {
+    slides.forEach((s, i) => {
+      s.classList.toggle('active', i === idx);
+      s.classList.toggle('above', i < idx);
+    });
+    dots.forEach((d, i) => d.setAttribute('aria-current', i === idx ? 'true' : 'false'));
+    curEl.textContent = String(idx + 1).padStart(2, '0');
+    prog.style.width = ((idx + 1) / N * 100) + '%';
+    if (history.replaceState) history.replaceState(null, '', '#' + (idx + 1));
+    // reset scroll of newly active slide
+    slides[idx].scrollTop = 0;
+  }
+
+  function go(n) {
+    if (locked) return;
+    const next = Math.max(0, Math.min(N - 1, n));
+    if (next === idx) return;
+    locked = true;
+    const prev = idx;
+    idx = next;
+    render(prev);
+    setTimeout(() => { locked = false; }, LOCK_MS);
+  }
+
+  // keyboard — ignore auto-repeat so one press moves exactly one slide
+  window.addEventListener('keydown', (e) => {
+    if (e.repeat) return;
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+        e.preventDefault(); go(idx + 1); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        e.preventDefault(); go(idx - 1); break;
+      case 'Home': e.preventDefault(); go(0); break;
+      case 'End':  e.preventDefault(); go(N - 1); break;
+    }
+  });
+
+  // clickable kbd hints
+  document.getElementById('kNext').addEventListener('click', () => go(idx + 1));
+  document.getElementById('kPrev').addEventListener('click', () => go(idx - 1));
+
+  // ----- inner-scroll edge detection (with tolerance for fractional pixels) -----
+  function edges(s) {
+    const scrollable = s.scrollHeight - s.clientHeight > 24;
+    return {
+      scrollable,
+      atTop: s.scrollTop <= 4,
+      atBottom: s.scrollTop + s.clientHeight >= s.scrollHeight - 4,
+    };
+  }
+
+  // ----- touch: vertical swipe, but let scrollable slides scroll first -----
+  let tx = null, ty = null, tTop = false, tBottom = false, tScrollable = false;
+  window.addEventListener('touchstart', (e) => {
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY;
+    const st = edges(slides[idx]);
+    tScrollable = st.scrollable; tTop = st.atTop; tBottom = st.atBottom;
+  }, { passive: true });
+  window.addEventListener('touchend', (e) => {
+    if (ty === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    const dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dy) > 70 && Math.abs(dy) > Math.abs(dx) * 1.4) {
+      const fwd = dy < 0; // swipe up = next
+      // hand off to slide change only if the inner content couldn't scroll that way
+      if (!tScrollable || (fwd && tBottom) || (!fwd && tTop)) go(fwd ? idx + 1 : idx - 1);
+    }
+    tx = ty = null;
+  }, { passive: true });
+
+  // ----- wheel / trackpad: scroll down = next slide -----
+  // Accumulates small trackpad deltas; hands off to inner scroll unless at an edge.
+  let acc = 0, lastWheel = 0, cooldownUntil = 0;
+  window.addEventListener('wheel', (e) => {
+    const now = Date.now();
+    const st = edges(slides[idx]);
+    if (st.scrollable) {
+      const fwd = e.deltaY > 0;
+      if ((fwd && !st.atBottom) || (!fwd && !st.atTop)) { acc = 0; return; } // let it scroll
+    }
+    if (now < cooldownUntil) return;
+    if (now - lastWheel > 300) acc = 0;   // new gesture
+    lastWheel = now;
+    acc += e.deltaY;
+    if (Math.abs(acc) < 40) return;
+    cooldownUntil = now + 900;
+    const dir = acc > 0 ? 1 : -1;
+    acc = 0;
+    go(idx + dir);
+  }, { passive: true });
+
+  // deep-link via hash (#1..#8)
+  function fromHash() {
+    const h = parseInt(location.hash.slice(1), 10);
+    return (!isNaN(h) && h >= 1 && h <= N) ? h - 1 : null;
+  }
+  window.addEventListener('hashchange', () => {
+    const h = fromHash();
+    if (h !== null && h !== idx) go(h);
+  });
+  const h0 = fromHash();
+  if (h0 !== null) idx = h0;
+  render();
+})();
+</script>
+</body>
+</html>
