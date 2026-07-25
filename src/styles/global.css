@@ -98,6 +98,15 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html.dark .swap-rotate .swap-off {
+  opacity: 0 !important;
+  transform: rotate(45deg) !important;
+}
+html.dark .swap-rotate .swap-on {
+  opacity: 1 !important;
+  transform: rotate(0deg) !important;
+}
+
 html {
   font-size: 16px;
 }

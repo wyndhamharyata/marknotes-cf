@@ -1,25 +1,3 @@
-function initTheme() {
-  const toggle = document.getElementById("dark-toggle") as HTMLInputElement | null;
-
-  // Check for saved preference or system preference
-  const savedTheme = localStorage.getItem("dark-mode");
-  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const isDark = savedTheme === "true" || (savedTheme === null && prefersDark);
-
-  // Apply theme
-  updateTheme(isDark);
-
-  // If toggle exists, sync it
-  if (toggle) {
-    toggle.checked = isDark;
-    toggle.addEventListener("change", () => {
-      const isDark = toggle.checked;
-      localStorage.setItem("dark-mode", String(isDark));
-      updateTheme(isDark);
-    });
-  }
-}
-
 function updateTheme(isDark: boolean) {
   const html = document.documentElement;
   if (isDark) {
@@ -31,8 +9,22 @@ function updateTheme(isDark: boolean) {
   }
 }
 
-// Run on initial load
-initTheme();
+document.addEventListener("change", (e) => {
+  const target = e.target as HTMLInputElement;
+  if (target.id === "dark-toggle") {
+    const isDark = target.checked;
+    localStorage.setItem("dark-mode", String(isDark));
+    updateTheme(isDark);
+  }
+});
 
-// Re-run on htmx page swaps
-document.addEventListener("htmx:afterSettle", initTheme);
+function syncToggle() {
+  const toggle = document.getElementById("dark-toggle") as HTMLInputElement | null;
+  if (toggle) {
+    toggle.checked = document.documentElement.classList.contains("dark");
+  }
+}
+
+syncToggle();
+
+document.addEventListener("htmx:afterSettle", syncToggle);
