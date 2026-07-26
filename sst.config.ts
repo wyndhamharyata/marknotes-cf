@@ -13,12 +13,21 @@ export default $config({
     const geminiApiKey = new sst.Secret("GeminiApiKey");
     const openAuthUrl = new sst.Secret("OpenAuthUrl");
     const baseUrl = new sst.Secret("BaseUrl");
+
     const cfAccountId = new sst.Secret("CfAccountId");
     const cfSiteTag = new sst.Secret("CfSiteTag");
     const cfAnalyticsToken = new sst.Secret("CfAnalyticsToken");
     const cfAnalyticsEmail = new sst.Secret("CfAnalyticsEmail");
+
     const migrationToken = new sst.Secret("MigrationToken");
 
+    const githubToken = new sst.Secret("GithubToken");
+
+    const r2AccessKeyId = new sst.Secret("R2AccessKeyId");
+    const r2SecretAccessKey = new sst.Secret("R2SecretAccessKey");
+    const r2CloudflareAPIToken = new sst.Secret("R2CloudflareAPIToken");
+
+    const imageStagingBucket = new sst.cloudflare.Bucket("ImageStagingBucket");
     // Gate the newSqliteClasses migration on INIT_DO=1 — CF rejects re-sends.
     // First deploy per stage: `INIT_DO=1 sst deploy --stage <stage>`.
     const initDo = process.env.INIT_DO === "1";
@@ -53,24 +62,37 @@ export default $config({
             className: "MainDO",
             scriptName,
           },
-        ],
+        ]
       );
-      args.compatibilityFlags = $resolve([args.compatibilityFlags]).apply(
-        ([flags]) => {
-          const list = (flags as string[]) ?? [];
-          return list.includes("nodejs_compat") ? list : [...list, "nodejs_compat"];
-        },
-      );
+      args.compatibilityFlags = $resolve([args.compatibilityFlags]).apply(([flags]) => {
+        const list = (flags as string[]) ?? [];
+        return list.includes("nodejs_compat") ? list : [...list, "nodejs_compat"];
+      });
     }
 
     new sst.cloudflare.Astro("Max", {
       domain: $app.stage === "production" ? "mwyndham.dev" : "devread.mwyndham.dev",
-      link: [geminiApiKey, openAuthUrl, baseUrl, migrationToken],
+      link: [
+        geminiApiKey,
+        openAuthUrl,
+        baseUrl,
+        migrationToken,
+        githubToken,
+        r2AccessKeyId,
+        r2SecretAccessKey,
+        r2CloudflareAPIToken,
+        imageStagingBucket,
+      ],
       environment: {
         STAGE: $app.stage,
         GEMINI_API_KEY: geminiApiKey.value,
         OPEN_AUTH_URL: openAuthUrl.value,
         BASE_URL: baseUrl.value,
+        R2_BUCKET_NAME: imageStagingBucket.name,
+        GITHUB_TOKEN: githubToken.value,
+        R2_ACCESS_KEY_ID: r2AccessKeyId.value,
+        R2_SECRET_ACCESS_KEY: r2SecretAccessKey.value,
+        R2_CLOUDFLARE_API_TOKEN: r2CloudflareAPIToken.value,
       },
       dev: false,
       transform: {
@@ -118,13 +140,7 @@ export default $config({
     new sst.cloudflare.Cron("AnalyticsCron", {
       worker: {
         handler: "src/workers/analytics-cron.ts",
-        link: [
-          cfAccountId,
-          cfSiteTag,
-          cfAnalyticsToken,
-          cfAnalyticsEmail,
-          baseUrl,
-        ],
+        link: [cfAccountId, cfSiteTag, cfAnalyticsToken, cfAnalyticsEmail, baseUrl],
         transform: {
           worker(args) {
             appendMainDoBinding(args);
