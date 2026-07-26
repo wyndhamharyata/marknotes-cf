@@ -51,13 +51,16 @@ function selectedLineRange(textarea: HTMLTextAreaElement): { start: number; end:
   return { start, end: lineEnd === -1 ? value.length : lineEnd };
 }
 
-function transformLines(textarea: HTMLTextAreaElement, transform: (line: string) => string): void {
+function transformBlock(
+  textarea: HTMLTextAreaElement,
+  transform: (lines: string[]) => string[]
+): void {
   const { start, end } = selectedLineRange(textarea);
   const original = textarea.value.slice(start, end);
   const hadSelection = textarea.selectionStart !== textarea.selectionEnd;
   const caret = textarea.selectionStart;
 
-  const rewritten = original.split("\n").map(transform).join("\n");
+  const rewritten = transform(original.split("\n")).join("\n");
 
   textarea.focus();
   textarea.setSelectionRange(start, end);
@@ -76,6 +79,10 @@ function transformLines(textarea: HTMLTextAreaElement, transform: (line: string)
   }
 }
 
+function transformLines(textarea: HTMLTextAreaElement, transform: (line: string) => string): void {
+  transformBlock(textarea, (lines) => lines.map(transform));
+}
+
 /** Prefix every line the selection touches, for quotes. */
 export function prefixLines(textarea: HTMLTextAreaElement, prefix: string): void {
   transformLines(textarea, (line) => (line.startsWith(prefix) ? line : `${prefix}${line}`));
@@ -86,6 +93,115 @@ const LIST_ITEM = /^([ \t]*)([-*+]|\d+\.)([ \t]+)(.*)$/;
 const ANY_MARKER = /^[ \t]*(?:[-*+]|\d+\.)[ \t]+/;
 const INDENT = "  ";
 
+/** Everything before the item's text: indent, marker and the gap after it. */
+const LIST_PREFIX = /^([ \t]*(?:[-*+]|\d+\.)[ \t]+)/;
+
+/**
+ * Renumber every ordered item in a block, restarting the count at each level.
+ *
+ * A nested ordered list has to begin at 1 in the source. Markdown renderers set
+ * the `<ol>`'s `start` attribute from the first item, so an indented item left
+ * numbered "3." renders its sublist beginning at the third marker — which under
+ * lower-alpha styling reads as a list starting at "c".
+ *
+ * Bullets keep their own marker but still advance their level's counter, so a
+ * mixed list does not restart numbering as it passes one.
+ */
+function renumberOrderedItems(lines: string[]): string[] {
+  const counters: { indent: number; n: number }[] = [];
+
+  return lines.map((line) => {
+    const match = line.match(LIST_ITEM);
+    if (!match) return line;
+
+    const [, indent, marker, gap, content] = match;
+    const width = indent.length;
+
+    while (counters.length > 0 && counters[counters.length - 1]!.indent > width) counters.pop();
+
+    let level = counters[counters.length - 1];
+    if (!level || level.indent < width) {
+      level = { indent: width, n: 0 };
+      counters.push(level);
+    }
+    level.n += 1;
+
+    return /^\d+\.$/.test(marker) ? `${indent}${level.n}.${gap}${content}` : line;
+  });
+}
+
+function currentLine(textarea: HTMLTextAreaElement) {
+  const { start, end } = selectedLineRange(textarea);
+  return { start, end, text: textarea.value.slice(start, end) };
+}
+
+/** The unbroken run of list lines containing the caret. */
+function listBlockRange(textarea: HTMLTextAreaElement): { start: number; end: number } {
+  const { value } = textarea;
+  const line = currentLine(textarea);
+
+  let start = line.start;
+  while (start > 0) {
+    const previousStart = value.lastIndexOf("\n", start - 2) + 1;
+    if (!LIST_ITEM.test(value.slice(previousStart, start - 1))) break;
+    start = previousStart;
+  }
+
+  let end = line.end;
+  while (end < value.length) {
+    const newline = value.indexOf("\n", end + 1);
+    const nextEnd = newline === -1 ? value.length : newline;
+    if (!LIST_ITEM.test(value.slice(end + 1, nextEnd))) break;
+    end = nextEnd;
+  }
+
+  return { start, end };
+}
+
+/** Caret position measured from the start of the item's text, never negative. */
+function contentOffset(textarea: HTMLTextAreaElement, line: { start: number; text: string }) {
+  const prefix = line.text.match(LIST_PREFIX)?.[1].length ?? 0;
+  return Math.max(0, textarea.selectionStart - line.start - prefix);
+}
+
+/**
+ * Edit the caret's list block, renumber it, and write it back as one change.
+ *
+ * Writing once matters: doing the structural edit and the renumber separately
+ * would put two entries on the undo stack, so a single Tab would need two
+ * presses of Cmd+Z to reverse.
+ *
+ * `edit` mutates the lines and returns where the caret belongs afterwards, as a
+ * line index plus an offset into that line's *text*. Offsets are measured past
+ * the marker because renumbering changes its width when 9 becomes 10.
+ */
+function rewriteListBlock(
+  textarea: HTMLTextAreaElement,
+  edit: (lines: string[], index: number) => { line: number; offset: number }
+): boolean {
+  const line = currentLine(textarea);
+  const block = listBlockRange(textarea);
+  const original = textarea.value.slice(block.start, block.end);
+
+  const lines = original.split("\n");
+  const index = original.slice(0, line.start - block.start).split("\n").length - 1;
+
+  const target = edit(lines, index);
+  const rewritten = renumberOrderedItems(lines);
+
+  textarea.focus();
+  textarea.setSelectionRange(block.start, block.end);
+  insertAtCursor(textarea, rewritten.join("\n"));
+
+  const lineStart =
+    block.start + rewritten.slice(0, target.line).reduce((sum, l) => sum + l.length + 1, 0);
+  const prefix = rewritten[target.line]?.match(LIST_PREFIX)?.[1].length ?? 0;
+  const caret = lineStart + prefix + target.offset;
+
+  textarea.setSelectionRange(caret, caret);
+  return true;
+}
+
 /** Converts between list types rather than stacking markers. */
 export function toBulletList(textarea: HTMLTextAreaElement): void {
   transformLines(textarea, (line) => {
@@ -95,17 +211,14 @@ export function toBulletList(textarea: HTMLTextAreaElement): void {
 }
 
 export function toOrderedList(textarea: HTMLTextAreaElement): void {
-  let n = 0;
-  transformLines(textarea, (line) => {
-    const indent = line.match(/^[ \t]*/)?.[0] ?? "";
-    n += 1;
-    return `${indent}${n}. ${line.replace(ANY_MARKER, "").trimStart()}`;
-  });
-}
-
-function currentLine(textarea: HTMLTextAreaElement) {
-  const { start, end } = selectedLineRange(textarea);
-  return { start, end, text: textarea.value.slice(start, end) };
+  transformBlock(textarea, (lines) =>
+    renumberOrderedItems(
+      lines.map((line) => {
+        const indent = line.match(/^[ \t]*/)?.[0] ?? "";
+        return `${indent}1. ${line.replace(ANY_MARKER, "").trimStart()}`;
+      })
+    )
+  );
 }
 
 /** Rewrite the caret's line, keeping the caret at the same spot in the text. */
@@ -121,17 +234,16 @@ function replaceCurrentLine(textarea: HTMLTextAreaElement, next: string): void {
 }
 
 function shiftIndent(textarea: HTMLTextAreaElement, direction: 1 | -1): boolean {
-  const { text } = currentLine(textarea);
-  if (!LIST_ITEM.test(text)) return false;
+  const line = currentLine(textarea);
+  if (!LIST_ITEM.test(line.text)) return false;
+  if (direction === -1 && !line.text.startsWith(INDENT)) return false;
 
-  if (direction === 1) {
-    replaceCurrentLine(textarea, INDENT + text);
-    return true;
-  }
+  const offset = contentOffset(textarea, line);
 
-  if (!text.startsWith(INDENT)) return false;
-  replaceCurrentLine(textarea, text.slice(INDENT.length));
-  return true;
+  return rewriteListBlock(textarea, (lines, index) => {
+    lines[index] = direction === 1 ? INDENT + lines[index] : lines[index]!.slice(INDENT.length);
+    return { line: index, offset };
+  });
 }
 
 /**
@@ -164,10 +276,18 @@ export function handleListKey(textarea: HTMLTextAreaElement, event: KeyboardEven
       return true;
     }
 
-    const ordered = /^\d+\.$/.test(marker);
-    const nextMarker = ordered ? `${Number.parseInt(marker, 10) + 1}.` : marker;
-    insertAtCursor(textarea, `\n${indent}${nextMarker}${gap}`);
-    return true;
+    // Split at the caret so Enter mid-item carries the tail down, then let the
+    // block renumber: inserting into the middle of an ordered list shifts every
+    // marker below it.
+    const offset = contentOffset(textarea, { start, text });
+    const prefix = text.match(LIST_PREFIX)?.[1] ?? "";
+
+    return rewriteListBlock(textarea, (lines, index) => {
+      const body = lines[index]!.slice(prefix.length);
+      lines[index] = prefix + body.slice(0, offset);
+      lines.splice(index + 1, 0, `${indent}${marker}${gap}${body.slice(offset)}`);
+      return { line: index + 1, offset: 0 };
+    });
   }
 
   if (event.key === "Backspace") {
