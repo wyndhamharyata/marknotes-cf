@@ -13,16 +13,6 @@ export function stagedAssetUrl(r2Key: string): string {
   return `/api/admin/assets/object?key=${encodeURIComponent(r2Key)}`;
 }
 
-/** True when the staged object is still there — the lifecycle rule expires them. */
-export async function stagedAssetExists(r2Key: string): Promise<boolean> {
-  try {
-    const response = await fetch(stagedAssetUrl(r2Key), { method: "HEAD" });
-    return response.ok;
-  } catch {
-    return false;
-  }
-}
-
 /**
  * Compress, presign, PUT. Compression has to come first: it rewrites both the
  * filename and the MIME type, and the presigned URL signs `Content-Type`, so

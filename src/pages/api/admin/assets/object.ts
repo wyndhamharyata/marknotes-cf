@@ -31,20 +31,3 @@ export const GET: APIRoute = async ({ request }) => {
     },
   });
 };
-
-export const HEAD: APIRoute = async ({ request }) => {
-  const key = new URL(request.url).searchParams.get("key");
-  if (!key || !isSafeAssetKey(key)) return new Response(null, { status: 400 });
-
-  const object = await Resource.ImageStagingBucket.head(key);
-  if (!object) return new Response(null, { status: 404 });
-
-  return new Response(null, {
-    status: 200,
-    headers: {
-      "Content-Type": object.httpMetadata?.contentType ?? "application/octet-stream",
-      "Content-Length": object.size.toString(),
-      ETag: object.httpEtag,
-    },
-  });
-};
