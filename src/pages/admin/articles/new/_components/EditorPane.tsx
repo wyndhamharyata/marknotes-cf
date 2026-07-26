@@ -1,10 +1,14 @@
-import { useCallback, useRef, useState } from "preact/hooks";
+import { useCallback, useState } from "preact/hooks";
+import type { RefObject } from "preact";
 import {
   currentHeadingLevel,
+  handleListKey,
   imageFilesFrom,
   insertAtCursor,
   prefixLines,
   setHeadingLevel,
+  toBulletList,
+  toOrderedList,
   wrapSelection,
 } from "../../../../../lib/editor/textarea";
 
@@ -12,6 +16,8 @@ interface Props {
   body: string;
   onBody: (value: string) => void;
   onImages: (files: File[], textarea: HTMLTextAreaElement) => void;
+  /** Owned by MdxEditor so it can drive scroll sync against the preview. */
+  textareaRef: RefObject<HTMLTextAreaElement>;
 }
 
 /**
@@ -26,8 +32,7 @@ const HEADING_OPTIONS = [
   { level: 5, label: "Heading 5" },
 ];
 
-export default function EditorPane({ body, onBody, onImages }: Props) {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+export default function EditorPane({ body, onBody, onImages, textareaRef }: Props) {
   const [dragging, setDragging] = useState(false);
   const [heading, setHeading] = useState(0);
 
@@ -118,9 +123,17 @@ export default function EditorPane({ body, onBody, onImages }: Props) {
             type="button"
             class="btn btn-ghost join-item"
             title="Bullet list"
-            onClick={withTextarea((t) => prefixLines(t, "- "))}
+            onClick={withTextarea(toBulletList)}
           >
-            List
+            &bull; List
+          </button>
+          <button
+            type="button"
+            class="btn btn-ghost join-item"
+            title="Numbered list"
+            onClick={withTextarea(toOrderedList)}
+          >
+            1. List
           </button>
           <button
             type="button"
@@ -154,6 +167,15 @@ export default function EditorPane({ body, onBody, onImages }: Props) {
           onInput={(event) => {
             onBody(event.currentTarget.value);
             syncHeading();
+          }}
+          onKeyDown={(event) => {
+            const textarea = textareaRef.current;
+            // Enter continues the list, Tab nests it, Backspace at the start of
+            // an item lifts it back out.
+            if (textarea && handleListKey(textarea, event)) {
+              event.preventDefault();
+              syncHeading();
+            }
           }}
           onKeyUp={syncHeading}
           onClick={syncHeading}

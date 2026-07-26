@@ -24,9 +24,9 @@ const comments = await getDoStub().getCommentsBySlug(article.id);
   hx-boost="false"
 >
   <img src={article.data.heroImage?.src} class="aspect-video max-w-40 rounded-2xl" />
-  <div class="flex w-full flex-col">
-    <p class="line-clamp-2 flex-1 font-bold md:text-lg">{article.data.title}</p>
-    <p class="md:text-md line-clamp-2 text-sm">
+  <div class="flex w-full min-w-0 flex-col">
+    <p class="line-clamp-2 font-bold md:text-lg">{article.data.title}</p>
+    <p class="mt-1 text-sm md:text-base">
       Published at: <span>
         <FormattedDate date={article.data.pubDate} />
       </span>

@@ -22,9 +22,9 @@ const { menus, currentPath } = Astro.props;
   >
   </div>
   <!-- Dock container -->
-  <div class="relative flex justify-center pb-4">
+  <div class="relative flex justify-center pt-3 pb-7">
     <ul
-      class="menu menu-horizontal bg-base-100 relative rounded-2xl px-2 py-2 drop-shadow-2xl md:px-24 md:py-1.5"
+      class="menu menu-horizontal bg-base-content text-base-100 relative rounded-2xl px-2 py-2 drop-shadow-2xl md:px-24 md:py-1.5"
     >
       <li class="md:absolute md:top-0 md:bottom-0 md:left-6">
         <a href="/" hx-boost="false" class="btn btn-ghost btn-circle md:btn-sm my-auto">
@@ -37,7 +37,7 @@ const { menus, currentPath } = Astro.props;
             <a
               href={menu.path}
               hx-boost="false"
-              class={`${currentPath === menu.path ? "menu-active" : ""} mx-1 flex w-16 flex-col px-6 md:h-10 md:w-auto md:flex-row md:items-center md:gap-2 md:px-4`}
+              class={`${currentPath === menu.path ? "bg-base-100 text-base-content" : "hover:bg-base-100/15"} mx-1 flex w-16 flex-col px-6 md:h-10 md:w-auto md:flex-row md:items-center md:gap-2 md:px-4`}
             >
               <Icon name={menu.iconName} class="h-5 w-5" />
               <p class="hidden md:block">{menu.label}</p>

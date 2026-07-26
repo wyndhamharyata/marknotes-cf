@@ -53,16 +53,136 @@ function selectedLineRange(textarea: HTMLTextAreaElement): { start: number; end:
 
 function transformLines(textarea: HTMLTextAreaElement, transform: (line: string) => string): void {
   const { start, end } = selectedLineRange(textarea);
-  const rewritten = textarea.value.slice(start, end).split("\n").map(transform).join("\n");
+  const original = textarea.value.slice(start, end);
+  const hadSelection = textarea.selectionStart !== textarea.selectionEnd;
+  const caret = textarea.selectionStart;
+
+  const rewritten = original.split("\n").map(transform).join("\n");
 
   textarea.focus();
   textarea.setSelectionRange(start, end);
   insertAtCursor(textarea, rewritten);
+
+  // Restoring the selection is what makes consecutive toolbar clicks work.
+  // Without it the caret collapses to the end of the block, so converting a
+  // multi-line list from bullets to numbers and back would only touch the last
+  // line the second time. A collapsed caret stays collapsed, shifted by the
+  // length the line grew or shrank.
+  if (hadSelection) {
+    textarea.setSelectionRange(start, start + rewritten.length);
+  } else {
+    const moved = Math.max(start, caret + (rewritten.length - original.length));
+    textarea.setSelectionRange(moved, moved);
+  }
 }
 
-/** Prefix every line the selection touches, for quotes and lists. */
+/** Prefix every line the selection touches, for quotes. */
 export function prefixLines(textarea: HTMLTextAreaElement, prefix: string): void {
   transformLines(textarea, (line) => (line.startsWith(prefix) ? line : `${prefix}${line}`));
+}
+
+/** indent, marker, gap, content — the four parts of a list line. */
+const LIST_ITEM = /^([ \t]*)([-*+]|\d+\.)([ \t]+)(.*)$/;
+const ANY_MARKER = /^[ \t]*(?:[-*+]|\d+\.)[ \t]+/;
+const INDENT = "  ";
+
+/** Converts between list types rather than stacking markers. */
+export function toBulletList(textarea: HTMLTextAreaElement): void {
+  transformLines(textarea, (line) => {
+    const indent = line.match(/^[ \t]*/)?.[0] ?? "";
+    return `${indent}- ${line.replace(ANY_MARKER, "").trimStart()}`;
+  });
+}
+
+export function toOrderedList(textarea: HTMLTextAreaElement): void {
+  let n = 0;
+  transformLines(textarea, (line) => {
+    const indent = line.match(/^[ \t]*/)?.[0] ?? "";
+    n += 1;
+    return `${indent}${n}. ${line.replace(ANY_MARKER, "").trimStart()}`;
+  });
+}
+
+function currentLine(textarea: HTMLTextAreaElement) {
+  const { start, end } = selectedLineRange(textarea);
+  return { start, end, text: textarea.value.slice(start, end) };
+}
+
+/** Rewrite the caret's line, keeping the caret at the same spot in the text. */
+function replaceCurrentLine(textarea: HTMLTextAreaElement, next: string): void {
+  const { start, end, text } = currentLine(textarea);
+  const caret = textarea.selectionStart;
+
+  textarea.setSelectionRange(start, end);
+  insertAtCursor(textarea, next);
+
+  const moved = Math.max(start, caret + (next.length - text.length));
+  textarea.setSelectionRange(moved, moved);
+}
+
+function shiftIndent(textarea: HTMLTextAreaElement, direction: 1 | -1): boolean {
+  const { text } = currentLine(textarea);
+  if (!LIST_ITEM.test(text)) return false;
+
+  if (direction === 1) {
+    replaceCurrentLine(textarea, INDENT + text);
+    return true;
+  }
+
+  if (!text.startsWith(INDENT)) return false;
+  replaceCurrentLine(textarea, text.slice(INDENT.length));
+  return true;
+}
+
+/**
+ * List behaviour on Enter, Tab and Backspace.
+ *
+ * Returns true when it handled the key, so the caller can preventDefault. Every
+ * path that isn't clearly a list operation returns false and lets the textarea
+ * behave normally — Backspace especially, since hijacking it away from plain
+ * deletion would be far worse than not indenting.
+ */
+export function handleListKey(textarea: HTMLTextAreaElement, event: KeyboardEvent): boolean {
+  if (event.metaKey || event.ctrlKey || event.altKey) return false;
+
+  const { start, text } = currentLine(textarea);
+  const match = text.match(LIST_ITEM);
+
+  if (event.key === "Tab") {
+    // Only inside a list; elsewhere Tab stays a focus move.
+    return shiftIndent(textarea, event.shiftKey ? -1 : 1);
+  }
+
+  if (!match) return false;
+  const [, indent, marker, gap, content] = match;
+
+  if (event.key === "Enter") {
+    if (content.trim() === "") {
+      // An empty item means "done with this level": outdent, then leave the list.
+      if (indent.length >= INDENT.length) return shiftIndent(textarea, -1);
+      replaceCurrentLine(textarea, "");
+      return true;
+    }
+
+    const ordered = /^\d+\.$/.test(marker);
+    const nextMarker = ordered ? `${Number.parseInt(marker, 10) + 1}.` : marker;
+    insertAtCursor(textarea, `\n${indent}${nextMarker}${gap}`);
+    return true;
+  }
+
+  if (event.key === "Backspace") {
+    const contentStart = start + indent.length + marker.length + gap.length;
+    const collapsed = textarea.selectionStart === textarea.selectionEnd;
+
+    // Only at the very start of the item's text, so mid-word deletion is normal.
+    if (!collapsed || textarea.selectionStart !== contentStart) return false;
+
+    if (indent.length >= INDENT.length) return shiftIndent(textarea, -1);
+    replaceCurrentLine(textarea, content);
+    return true;
+  }
+
+  return false;
 }
 
 /**

@@ -46,6 +46,8 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
   const [isWide, setIsWide] = useState(false);
 
   const splitRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   // Restore before first paint of the real UI, so the fields never flash empty
   // and then fill in.
@@ -75,6 +77,52 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
     query.addEventListener("change", sync);
     return () => query.removeEventListener("change", sync);
   }, []);
+
+  /**
+   * Proportional scroll sync between the two panes.
+   *
+   * Position is matched by fraction of scrollable height rather than by source
+   * mapping — the two sides have different heights per line once images and
+   * code blocks render, so this drifts on long documents, but it tracks well
+   * enough to keep the right region in view and costs nothing.
+   *
+   * `driver` stops the echo: scrolling one pane moves the other, which fires
+   * that pane's own scroll event, which would scroll the first one back.
+   */
+  useEffect(() => {
+    const editor = textareaRef.current;
+    const preview = previewRef.current;
+    // Only one pane is on screen below md, so there is nothing to sync.
+    if (!isWide || !editor || !preview) return;
+
+    let driver: EventTarget | null = null;
+    let release: ReturnType<typeof setTimeout>;
+
+    const mirror = (from: HTMLElement, to: HTMLElement) => () => {
+      if (driver && driver !== from) return;
+      driver = from;
+      clearTimeout(release);
+      release = setTimeout(() => (driver = null), 120);
+
+      const fromMax = from.scrollHeight - from.clientHeight;
+      const toMax = to.scrollHeight - to.clientHeight;
+      if (fromMax <= 0 || toMax <= 0) return;
+
+      to.scrollTop = (from.scrollTop / fromMax) * toMax;
+    };
+
+    const onEditor = mirror(editor, preview);
+    const onPreview = mirror(preview, editor);
+
+    editor.addEventListener("scroll", onEditor, { passive: true });
+    preview.addEventListener("scroll", onPreview, { passive: true });
+
+    return () => {
+      clearTimeout(release);
+      editor.removeEventListener("scroll", onEditor);
+      preview.removeEventListener("scroll", onPreview);
+    };
+  }, [isWide]);
 
   // Autosave covers navigation, but an in-flight upload really would be lost.
   useEffect(() => {
@@ -338,7 +386,12 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
             onTitle={(title) => update({ title })}
             onDescription={(description) => update({ description })}
           />
-          <EditorPane body={draft.body} onBody={(body) => update({ body })} onImages={onImages} />
+          <EditorPane
+            body={draft.body}
+            onBody={(body) => update({ body })}
+            onImages={onImages}
+            textareaRef={textareaRef}
+          />
         </div>
 
         <div
@@ -358,6 +411,7 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
             proseClass={proseClass}
             title={draft.title}
             pubDate={pubDate}
+            scrollRef={previewRef}
             hero={
               <HeroImagePicker
                 file={draft.heroFile}

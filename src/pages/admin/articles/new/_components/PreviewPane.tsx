@@ -1,5 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
-import type { ComponentChildren } from "preact";
+import type { ComponentChildren, RefObject } from "preact";
 import { renderPreview } from "../../../../../lib/editor/preview-render";
 import type { InlineAsset } from "../../../../../lib/editor/types";
 
@@ -11,13 +11,23 @@ interface Props {
   pubDate: string;
   /** The hero picker, rendered where the real article puts its hero image. */
   hero: ComponentChildren;
+  /** Owned by MdxEditor so it can drive scroll sync against the textarea. */
+  scrollRef: RefObject<HTMLDivElement>;
 }
 
 /** Long enough to skip a burst of keystrokes, short enough to feel live. */
 const RENDER_DEBOUNCE_MS = 200;
 
 /** Mirrors the structure of BlogPost.astro: hero, date, title, divider, prose. */
-export default function PreviewPane({ body, assets, proseClass, title, pubDate, hero }: Props) {
+export default function PreviewPane({
+  body,
+  assets,
+  proseClass,
+  title,
+  pubDate,
+  hero,
+  scrollRef,
+}: Props) {
   const [html, setHtml] = useState("");
 
   useEffect(() => {
@@ -40,7 +50,7 @@ export default function PreviewPane({ body, assets, proseClass, title, pubDate, 
   }, [body, assets]);
 
   return (
-    <div class="h-full min-h-[60vh] overflow-y-auto md:min-h-0">
+    <div ref={scrollRef} class="h-full min-h-[60vh] overflow-y-auto md:min-h-0">
       {hero}
 
       <div class="p-4 md:p-6">
