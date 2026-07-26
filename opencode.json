@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["@khalilgharbaoui/opencode-claude-code-plugin"],
+  "provider": {
+    "claude-code": {
+      "options": {
+        "ignoreAnthropicApiKey": true
+      }
+    }
+  }
+}

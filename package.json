@@ -23,6 +23,7 @@
     "@google/genai": "^1.34.0",
     "@iconify-json/heroicons": "^1.2.3",
     "@iconify-json/simple-icons": "^1.2.64",
+    "@khalilgharbaoui/opencode-claude-code-plugin": "^0.11.0",
     "@maxmorozoff/try-catch-tuple": "^0.1.2",
     "@openauthjs/openauth": "^0.4.3",
     "@tailwindcss/typography": "^0.5.19",

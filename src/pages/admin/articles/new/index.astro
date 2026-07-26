@@ -1,0 +1,16 @@
+---
+import BaseAdminLayout from "../../../../layouts/BaseAdminLayout.astro";
+import { SITE_DESCRIPTION, SITE_TITLE, ADMIN_DOCK } from "../../../../consts";
+export const prerender = false;
+---
+
+<BaseAdminLayout
+  title={SITE_TITLE}
+  description={SITE_DESCRIPTION}
+  dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin/articles" }}
+>
+  <div class="mx-auto flex flex-col py-4 md:w-3xl">
+    <h1 class="mx-4 text-2xl font-bold md:mx-0">Articles</h1>
+    <div class="mt-4 md:mt-0"></div>
+  </div>
+</BaseAdminLayout>
