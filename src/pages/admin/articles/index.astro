@@ -31,7 +31,7 @@ const analyticsMap = await getDoStub().getLatestAnalyticsBySlugs(articles.map((a
     <div class="mt-4 md:mt-0">
       {
         articles.map((article) => (
-          <ArticleItem article={article} analytic={analyticsMap.get(article.id)!} />
+          <ArticleItem article={article} analytic={analyticsMap.get(article.id)} />
         ))
       }
     </div>

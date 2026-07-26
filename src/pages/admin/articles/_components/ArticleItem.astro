@@ -1,12 +1,16 @@
 ---
-import type { AnalyticsSnapshot, ArticleAnalyticsRow } from "../../../../lib/analytics/types";
+import type { ArticleAnalyticsRow } from "../../../../lib/analytics/types";
 import { getDoStub } from "../../../../lib/db/do-client";
 import FormattedDate from "../../../articles/_components/FormattedDate.astro";
 import { type CollectionEntry } from "astro:content";
 
 type Props = {
   article: CollectionEntry<"blog">;
-  analytic: ArticleAnalyticsRow;
+  /**
+   * Absent until the analytics cron has captured a snapshot for this slug,
+   * which is every three hours — so a freshly published article has none.
+   */
+  analytic?: ArticleAnalyticsRow;
 };
 
 const prop: Props = Astro.props;
@@ -30,7 +34,7 @@ const comments = await getDoStub().getCommentsBySlug(article.id);
   </div>
   <div class="m-auto my-auto hidden min-w-36 flex-col sm:block sm:flex">
     <p class="text-xs">Views</p>
-    <p class="text-primary text-xl">{analytic.pageviews7d}</p>
+    <p class="text-primary text-xl">{analytic?.pageviews7d ?? 0}</p>
     <p class="decoration-base-content text-xs">Comments</p>
     <p class="text-primary text-xl">{comments.length}</p>
   </div>
