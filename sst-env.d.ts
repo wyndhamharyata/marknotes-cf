@@ -31,6 +31,11 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "GithubToken": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "ImageStagingBucket": import("@cloudflare/workers-types").R2Bucket
     "MainDOHost": import("@cloudflare/workers-types").Service
     "Max": {
       "type": "sst.cloudflare.Astro"
@@ -42,6 +47,18 @@ declare module "sst" {
     }
     "ModerationCronHandler": import("@cloudflare/workers-types").Service
     "OpenAuthUrl": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "R2AccessKeyId": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "R2CloudflareAPIToken": {
+      "type": "sst.sst.Secret"
+      "value": string
+    }
+    "R2SecretAccessKey": {
       "type": "sst.sst.Secret"
       "value": string
     }

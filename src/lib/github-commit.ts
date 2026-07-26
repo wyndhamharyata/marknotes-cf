@@ -1,11 +1,13 @@
 async function ghApi(path: string, init?: RequestInit): Promise<Response> {
-  const token = import.meta.env.GITHUB_TOKEN; // will generate on deployment
+  const token = import.meta.env.GITHUB_TOKEN;
   if (!token) throw new Error("GITHUB_TOKEN not configured");
 
   const url = `https://api.github.com/repos/wyndhamharyata/marknotes-cf/git${path}`;
+
   const resp = await fetch(url, {
     ...init,
     headers: {
+      "User-Agent": "marknotes-cf/1.0",
       Accept: "application/vnd.github+json",
       Authorization: `Bearer ${token}`,
       "X-Github-Api-Version": "2022-11-28",
@@ -14,8 +16,8 @@ async function ghApi(path: string, init?: RequestInit): Promise<Response> {
   });
 
   if (!resp.ok) {
-    const err = (await resp.json().catch(() => ({}))) as { message?: string };
-    throw new Error(`Github API error; Status: ${resp.status}; Error: ${err.message ?? "none"}`);
+    const body = await resp.text().catch(() => "unreadable");
+    throw new Error(`Github API error: ${resp.status}: ${body.slice(0, 200)}`);
   }
 
   return resp;
@@ -44,17 +46,23 @@ export async function commitMdx(input: CommitInput): Promise<{ ok: boolean }> {
   const baseCommit = (await baseCommitResp.json()) as { tree: { sha: string } };
   const baseTreeSHA = baseCommit.tree.sha;
 
+  // GitHub Git Data API expects blobs as JSON with base64-encoded content.
+  // Sending raw text or binary body with a non-JSON Content-Type causes 403.
   const [mdxBlob, imageBlob] = await Promise.all([
     ghApi("/blobs", {
       method: "POST",
-      headers: { "Content-Type": "text/plain" },
-      body: input.mdxContent,
+      body: JSON.stringify({
+        content: btoa(unescape(encodeURIComponent(input.mdxContent))),
+        encoding: "base64",
+      }),
     }),
-    (input.imageBuffer?.byteLength ?? 0 > 0)
+    input.imageBuffer && input.imageBuffer.byteLength > 0
       ? ghApi("/blobs", {
           method: "POST",
-          headers: { "Content-Type": "application/octet-stream" },
-          body: input.imageBuffer,
+          body: JSON.stringify({
+            content: btoa(arrayBufferToBase64(input.imageBuffer)),
+            encoding: "base64",
+          }),
         })
       : null,
   ]);
@@ -98,7 +106,7 @@ export async function commitMdx(input: CommitInput): Promise<{ ok: boolean }> {
   const newCommitResp = await ghApi("/commits", {
     method: "POST",
     body: JSON.stringify({
-      message: `Edit: ${title}`,
+      message: title,
       tree: newTree.sha,
       parents: [headSHA],
     }),
@@ -112,4 +120,13 @@ export async function commitMdx(input: CommitInput): Promise<{ ok: boolean }> {
   });
 
   return { ok: true };
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return binary;
 }

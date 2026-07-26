@@ -15,6 +15,7 @@ export default defineConfig({
     "/resume": "/articles/m-wyndham-haryata-permana-sr-full-stack-engineer/",
   },
   adapter: cloudflare({
+    configPath: process.env.SST_WRANGLER_PATH,
     platformProxy: {
       enabled: true,
     },

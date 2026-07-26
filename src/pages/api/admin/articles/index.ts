@@ -11,6 +11,7 @@ import {
   safeParse,
   instance,
 } from "valibot";
+import { Resource } from "sst/resource";
 import { commitMdx } from "../../../../lib/github-commit";
 
 export const prerender = false;
@@ -34,9 +35,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   let imageBuffer = new ArrayBuffer(0);
 
   if (imageKey) {
-    const bucket = getBucket(locals);
-
-    if (!bucket) return jsonErr("Image bucket not available", 500);
+    const bucket = Resource.ImageStagingBucket;
 
     const imageObject = await bucket.get(imageKey);
     if (!imageObject) return jsonErr(`Iamge not found in the bucket: ${imageKey}`, 404);
@@ -62,11 +61,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
     JSON.stringify({ ok: commitRes.ok, message: "Saved! Site will update in ~3 minutes" })
   );
 };
-
-function getBucket(locals: App.Locals): R2Bucket | undefined {
-  const env = (locals as unknown as { runtime?: { env?: Record<string, unknown> } }).runtime?.env;
-  return env?.IMAGE_STAGING_BUCKET as R2Bucket | undefined;
-}
 
 function jsonErr(message: string, status: number) {
   return new Response(JSON.stringify({ error: message }), {

@@ -82,6 +82,7 @@ export default $config({
         r2SecretAccessKey,
         r2CloudflareAPIToken,
         imageStagingBucket,
+        cfAccountId,
       ],
       environment: {
         STAGE: $app.stage,
@@ -93,6 +94,7 @@ export default $config({
         R2_ACCESS_KEY_ID: r2AccessKeyId.value,
         R2_SECRET_ACCESS_KEY: r2SecretAccessKey.value,
         R2_CLOUDFLARE_API_TOKEN: r2CloudflareAPIToken.value,
+        CF_ACCOUNT_ID: cfAccountId.value,
       },
       dev: false,
       transform: {
