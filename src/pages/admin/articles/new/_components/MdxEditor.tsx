@@ -256,37 +256,37 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
   const paneStyle = (share: number) => (isWide ? { width: `${share * 100}%` } : undefined);
 
   return (
-    <div class="flex flex-col gap-3 px-4 pb-4">
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <h1 class="text-xl font-bold">New article</h1>
+    <div class="flex flex-col gap-3 px-4 md:min-h-0 md:flex-1">
+      <div class="flex flex-wrap items-center justify-between gap-2 px-4 md:px-0">
+        <h1 class="text-2xl font-bold">New article</h1>
         <div class="flex items-center gap-2">
           {pendingUploads > 0 && (
-            <span class="badge badge-neutral gap-2">
+            <span class="badge badge-neutral badge-lg gap-2">
               <span class="loading loading-spinner loading-xs" />
               {pendingUploads} uploading
             </span>
           )}
-          <a href="/admin/articles" class="btn btn-ghost btn-sm">
+          <a href="/admin/articles" class="btn btn-ghost">
             Cancel
           </a>
           <button
             type="button"
-            class="btn btn-primary btn-sm"
+            class="btn btn-primary"
             disabled={busy || pendingUploads > 0}
             onClick={publish}
           >
-            {busy && <span class="loading loading-spinner loading-xs" />}
+            {busy && <span class="loading loading-spinner loading-sm" />}
             Publish
           </button>
         </div>
       </div>
 
       {status.kind === "error" && (
-        <div class="alert alert-error py-2">
-          <span class="text-sm">{status.message}</span>
+        <div class="alert alert-error">
+          <span>{status.message}</span>
           <button
             type="button"
-            class="btn btn-ghost btn-xs"
+            class="btn btn-ghost btn-sm"
             onClick={() => setStatus({ kind: "idle" })}
           >
             Dismiss
@@ -294,12 +294,12 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
         </div>
       )}
       {busy && (
-        <div class="alert alert-info py-2">
-          <span class="text-sm">{status.message}</span>
+        <div class="alert alert-info">
+          <span>{status.message}</span>
         </div>
       )}
 
-      <div role="tablist" class="tabs tabs-box self-start md:hidden">
+      <div role="tablist" class="tabs tabs-lift tabs-lg md:hidden">
         <button
           type="button"
           role="tab"
@@ -319,10 +319,11 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
       </div>
 
       {/* A bounded height is what lets the two panes scroll independently;
-          without it `overflow-y-auto` never engages and they grow forever. */}
+          without it `overflow-y-auto` never engages and they grow forever.
+          The bound comes from the page wrapper via flex, not a magic number. */}
       <div
         ref={splitRef}
-        class="card bg-base-100 flex flex-col overflow-hidden shadow-sm md:h-[calc(100vh-13rem)] md:min-h-[32rem] md:flex-row"
+        class="card bg-base-100 border-base-300 md:rounded-t-box flex flex-col overflow-hidden rounded-t-none border shadow-sm md:min-h-0 md:flex-1 md:flex-row md:border-0"
       >
         <div
           class={`flex flex-col ${view === "write" ? "min-w-0" : "hidden min-w-0 md:flex"}`}

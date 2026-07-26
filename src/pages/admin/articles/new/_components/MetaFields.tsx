@@ -19,10 +19,10 @@ export default function MetaFields({
   onDescription,
 }: Props) {
   return (
-    <div class="border-base-300 flex flex-col gap-1 border-b px-3 py-2">
+    <div class="border-base-300 flex flex-col gap-1 border-b px-4 py-3">
       <input
         type="text"
-        class="input input-ghost h-auto w-full border-0 px-0 py-1 text-lg font-bold focus:outline-none"
+        class="input input-ghost h-auto w-full border-0 px-0 py-1 text-2xl font-bold focus:outline-none"
         placeholder="Article title"
         value={title}
         onInput={(event) => onTitle(event.currentTarget.value)}
@@ -33,14 +33,14 @@ export default function MetaFields({
       />
 
       <textarea
-        class="textarea textarea-ghost min-h-0 w-full resize-none border-0 px-0 py-1 text-sm leading-snug focus:outline-none"
+        class="textarea textarea-ghost min-h-0 w-full resize-none border-0 px-0 py-1 text-base leading-snug focus:outline-none"
         rows={2}
         placeholder="Description — shown in listings, search results and social cards"
         value={description}
         onInput={(event) => onDescription(event.currentTarget.value)}
       />
 
-      <p class={`font-mono text-xs ${slugError ? "text-error" : "text-base-content/50"}`}>
+      <p class={`font-mono text-sm ${slugError ? "text-error" : "text-base-content/50"}`}>
         {slugError ?? `${slug || "untitled"}.mdx · ${pubDate}`}
       </p>
     </div>

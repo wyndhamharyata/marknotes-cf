@@ -55,7 +55,7 @@ export default function EditorPane({ body, onBody, onImages }: Props) {
     <div class="flex min-h-0 flex-1 flex-col">
       <div class="border-base-300 flex flex-wrap items-center gap-1 border-b p-2">
         <select
-          class="select select-sm select-bordered w-36"
+          class="select select-bordered w-40"
           value={String(heading)}
           onChange={(event) => {
             const level = Number(event.currentTarget.value);
@@ -76,7 +76,7 @@ export default function EditorPane({ body, onBody, onImages }: Props) {
         <div class="join">
           <button
             type="button"
-            class="btn btn-ghost btn-sm join-item font-bold"
+            class="btn btn-ghost join-item font-bold"
             title="Bold"
             onClick={withTextarea((t) => wrapSelection(t, "**", "**", "bold text"))}
           >
@@ -84,7 +84,7 @@ export default function EditorPane({ body, onBody, onImages }: Props) {
           </button>
           <button
             type="button"
-            class="btn btn-ghost btn-sm join-item italic"
+            class="btn btn-ghost join-item italic"
             title="Italic"
             onClick={withTextarea((t) => wrapSelection(t, "_", "_", "italic text"))}
           >
@@ -92,7 +92,7 @@ export default function EditorPane({ body, onBody, onImages }: Props) {
           </button>
           <button
             type="button"
-            class="btn btn-ghost btn-sm join-item font-mono"
+            class="btn btn-ghost join-item font-mono"
             title="Inline code"
             onClick={withTextarea((t) => wrapSelection(t, "`", "`", "code"))}
           >
@@ -100,7 +100,7 @@ export default function EditorPane({ body, onBody, onImages }: Props) {
           </button>
           <button
             type="button"
-            class="btn btn-ghost btn-sm join-item"
+            class="btn btn-ghost join-item"
             title="Link"
             onClick={withTextarea((t) => wrapSelection(t, "[", "](https://)", "label"))}
           >
@@ -108,7 +108,7 @@ export default function EditorPane({ body, onBody, onImages }: Props) {
           </button>
           <button
             type="button"
-            class="btn btn-ghost btn-sm join-item"
+            class="btn btn-ghost join-item"
             title="Quote"
             onClick={withTextarea((t) => prefixLines(t, "> "))}
           >
@@ -116,7 +116,7 @@ export default function EditorPane({ body, onBody, onImages }: Props) {
           </button>
           <button
             type="button"
-            class="btn btn-ghost btn-sm join-item"
+            class="btn btn-ghost join-item"
             title="Bullet list"
             onClick={withTextarea((t) => prefixLines(t, "- "))}
           >
@@ -124,7 +124,7 @@ export default function EditorPane({ body, onBody, onImages }: Props) {
           </button>
           <button
             type="button"
-            class="btn btn-ghost btn-sm join-item"
+            class="btn btn-ghost join-item"
             title="Code block"
             onClick={withTextarea((t) => insertAtCursor(t, "\n```\n\n```\n"))}
           >
@@ -148,7 +148,7 @@ export default function EditorPane({ body, onBody, onImages }: Props) {
       >
         <textarea
           ref={textareaRef}
-          class="textarea h-full min-h-[50vh] w-full resize-none overflow-y-auto rounded-none border-0 font-mono text-sm leading-relaxed focus:outline-none md:min-h-0"
+          class="textarea h-full min-h-[55vh] w-full resize-none overflow-y-auto rounded-none border-0 font-mono text-base leading-relaxed focus:outline-none md:min-h-0"
           placeholder="Write in Markdown. Drop or paste an image to upload it."
           value={body}
           onInput={(event) => {
