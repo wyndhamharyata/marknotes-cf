@@ -13,6 +13,16 @@ type Menu = {
 };
 
 const { menus, currentPath } = Astro.props;
+
+/**
+ * Hairline rule separating utility actions from navigation.
+ *
+ * This replaces the absolutely-positioned edge buttons the dock used to have,
+ * which needed 6rem of side padding to reserve room for a 2rem button and so
+ * left a wide gap on either side of the nav items. A divider groups them just
+ * as clearly without reserving empty space.
+ */
+const DIVIDER = "bg-base-content/15 mx-1 hidden h-6 w-px p-0 md:block";
 ---
 
 <div class="fixed right-0 bottom-0 left-0 z-40">
@@ -21,23 +31,37 @@ const { menus, currentPath } = Astro.props;
     class="from-base-200/80 dark:from-base-300/80 pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-linear-to-t to-transparent md:h-24"
   >
   </div>
+
   <!-- Dock container -->
   <div class="relative flex justify-center pt-3 pb-7">
+    {
+      /*
+      Translucent glass: the page sits behind a grid pattern, so blurring it
+      actually reads as depth rather than as a flat tint. `supports-` keeps a
+      near-opaque fallback for anything without backdrop-filter, where 65%
+      would just look washed out. shadow, not drop-shadow — the latter is a
+      filter, and stacking it with backdrop-filter on one element is asking
+      for compositing trouble.
+    */
+    }
     <ul
-      class="menu menu-horizontal bg-base-content text-base-100 relative rounded-2xl px-2 py-2 drop-shadow-2xl md:px-24 md:py-1.5"
+      class="menu menu-horizontal bg-base-100/90 supports-[backdrop-filter]:bg-base-100/65 border-base-content/10 items-center gap-1 rounded-2xl border px-2 py-2 shadow-2xl backdrop-blur-xl backdrop-saturate-150 md:py-1.5"
     >
-      <li class="md:absolute md:top-0 md:bottom-0 md:left-6">
-        <a href="/" hx-boost="false" class="btn btn-ghost btn-circle md:btn-sm my-auto">
+      <li>
+        <a href="/" hx-boost="false" class="btn btn-ghost btn-circle md:btn-sm">
           <Icon name="heroicons:arrow-uturn-left" class="h-5 w-5 fill-current" />
         </a>
       </li>
+
+      <li class={DIVIDER} aria-hidden="true"></li>
+
       {
         menus.map((menu) => (
           <li>
             <a
               href={menu.path}
               hx-boost="false"
-              class={`${currentPath === menu.path ? "bg-base-100 text-base-content" : "hover:bg-base-100/15"} mx-1 flex w-16 flex-col px-6 md:h-10 md:w-auto md:flex-row md:items-center md:gap-2 md:px-4`}
+              class={`${currentPath === menu.path ? "menu-active" : ""} flex w-16 flex-col px-6 md:h-10 md:w-auto md:flex-row md:items-center md:gap-2 md:px-4`}
             >
               <Icon name={menu.iconName} class="h-5 w-5" />
               <p class="hidden md:block">{menu.label}</p>
@@ -46,8 +70,10 @@ const { menus, currentPath } = Astro.props;
         ))
       }
 
-      <li class="md:absolute md:top-0 md:right-6 md:bottom-0">
-        <button class="btn btn-ghost btn-circle md:btn-sm my-auto">
+      <li class={DIVIDER} aria-hidden="true"></li>
+
+      <li>
+        <button class="btn btn-ghost btn-circle md:btn-sm">
           <label class="swap swap-rotate" for="dark-toggle">
             <span class="hidden">Theme Switcher</span>
             <input type="checkbox" id="dark-toggle" class="theme-controller" />
