@@ -41,23 +41,47 @@ export function wrapSelection(
   }
 }
 
-/** Prefix every line the selection touches, for headings, quotes and lists. */
-export function prefixLines(textarea: HTMLTextAreaElement, prefix: string): void {
+const HEADING_PREFIX = /^(#{1,6})\s+/;
+
+/** The selection expanded outwards to whole lines. */
+function selectedLineRange(textarea: HTMLTextAreaElement): { start: number; end: number } {
   const { selectionStart, selectionEnd, value } = textarea;
+  const start = value.lastIndexOf("\n", selectionStart - 1) + 1;
+  const lineEnd = value.indexOf("\n", selectionEnd);
+  return { start, end: lineEnd === -1 ? value.length : lineEnd };
+}
 
-  const lineStart = value.lastIndexOf("\n", selectionStart - 1) + 1;
-  const lineEndIndex = value.indexOf("\n", selectionEnd);
-  const lineEnd = lineEndIndex === -1 ? value.length : lineEndIndex;
-
-  const block = value.slice(lineStart, lineEnd);
-  const prefixed = block
-    .split("\n")
-    .map((line) => (line.startsWith(prefix) ? line : `${prefix}${line}`))
-    .join("\n");
+function transformLines(textarea: HTMLTextAreaElement, transform: (line: string) => string): void {
+  const { start, end } = selectedLineRange(textarea);
+  const rewritten = textarea.value.slice(start, end).split("\n").map(transform).join("\n");
 
   textarea.focus();
-  textarea.setSelectionRange(lineStart, lineEnd);
-  insertAtCursor(textarea, prefixed);
+  textarea.setSelectionRange(start, end);
+  insertAtCursor(textarea, rewritten);
+}
+
+/** Prefix every line the selection touches, for quotes and lists. */
+export function prefixLines(textarea: HTMLTextAreaElement, prefix: string): void {
+  transformLines(textarea, (line) => (line.startsWith(prefix) ? line : `${prefix}${line}`));
+}
+
+/**
+ * Set the heading level of the selected lines, 0 meaning body text.
+ *
+ * Any existing marker is stripped first — switching H2 to H3 has to replace the
+ * hashes, not stack them into an H5.
+ */
+export function setHeadingLevel(textarea: HTMLTextAreaElement, level: number): void {
+  const marker = level > 0 ? `${"#".repeat(level)} ` : "";
+  transformLines(textarea, (line) => `${marker}${line.replace(HEADING_PREFIX, "")}`);
+}
+
+/** Heading level of the line holding the caret; 0 for body text. */
+export function currentHeadingLevel(textarea: HTMLTextAreaElement): number {
+  const { start } = selectedLineRange(textarea);
+  const lineEnd = textarea.value.indexOf("\n", start);
+  const line = textarea.value.slice(start, lineEnd === -1 ? undefined : lineEnd);
+  return line.match(HEADING_PREFIX)?.[1].length ?? 0;
 }
 
 /**

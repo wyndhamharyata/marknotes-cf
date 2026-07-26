@@ -49,14 +49,17 @@ export function referencedAssets(body: string, assets: InlineAsset[]): InlineAss
  * so the author never has to maintain an import block by hand. The BlogImage
  * import is emitted whenever the body mentions the component at all, which
  * covers hand-written tags with remote URLs as well as dropped images.
+ *
+ * `pubDate` is a parameter rather than a draft field because it is always the
+ * day of publishing, never the day the draft was started.
  */
-export function serializeMdx(draft: ArticleDraft): string {
+export function serializeMdx(draft: ArticleDraft, pubDate: string): string {
   const assets = referencedAssets(draft.body, draft.inlineAssets);
 
   const frontmatter = [
     `title: ${yamlString(draft.title)}`,
     `description: ${yamlString(draft.description)}`,
-    `pubDate: ${yamlString(draft.pubDate)}`,
+    `pubDate: ${yamlString(pubDate)}`,
     draft.heroKey ? `heroImage: ${yamlString(`./${draft.heroKey}`)}` : null,
   ].filter((line): line is string => line !== null);
 

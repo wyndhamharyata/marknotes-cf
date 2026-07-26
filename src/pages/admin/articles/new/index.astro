@@ -16,8 +16,9 @@ const existingSlugs = (await getCollection("blog")).map((article) => article.id)
   description={SITE_DESCRIPTION}
   dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin/articles" }}
   maxWidthClass="max-w-[110rem]"
+  mainPaddingClass="px-0 pb-28 md:px-4 md:py-3 md:pb-28"
 >
-  <div class="breadcrumbs hidden px-4 py-2 text-sm md:block">
+  <div class="breadcrumbs hidden px-4 py-1 text-sm md:block">
     <ul>
       <li><a href="/admin/articles">Articles</a></li>
       <li>New</li>

@@ -14,12 +14,14 @@ export interface InlineAsset {
   alt: string;
 }
 
+/**
+ * Only authored fields live here. The slug is always `slugifyTitle(title)` and
+ * the publish date is always the day of publishing, so both are computed where
+ * they are needed rather than stored — state that cannot drift out of sync.
+ */
 export interface ArticleDraft {
   title: string;
-  slug: string;
   description: string;
-  /** Frontmatter-formatted, e.g. "Jul 26 2026". */
-  pubDate: string;
   /** Markdown only — frontmatter and imports are generated at serialize time. */
   body: string;
   /** Set once the hero has been uploaded to staging. */
@@ -33,12 +35,16 @@ export interface ArticleDraft {
   updatedAt: number;
 }
 
-export function emptyDraft(pubDate: string): ArticleDraft {
+/**
+ * A new draft starts titled rather than blank: the slug comes from the title and
+ * image keys come from the slug, so an untitled draft cannot accept an upload.
+ */
+export const DEFAULT_TITLE = "Untitled";
+
+export function emptyDraft(): ArticleDraft {
   return {
-    title: "",
-    slug: "",
+    title: DEFAULT_TITLE,
     description: "",
-    pubDate,
     body: "",
     inlineAssets: [],
     updatedAt: 0,

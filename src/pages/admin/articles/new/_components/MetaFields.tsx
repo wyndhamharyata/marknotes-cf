@@ -1,86 +1,48 @@
 interface Props {
   title: string;
-  slug: string;
   description: string;
+  /** Derived from the title; shown so the committed filename stays visible. */
+  slug: string;
   pubDate: string;
   slugError: string | null;
   onTitle: (value: string) => void;
-  onSlug: (value: string) => void;
   onDescription: (value: string) => void;
-  onPubDate: (value: string) => void;
 }
 
 export default function MetaFields({
   title,
-  slug,
   description,
+  slug,
   pubDate,
   slugError,
   onTitle,
-  onSlug,
   onDescription,
-  onPubDate,
 }: Props) {
   return (
-    <div class="grid gap-3 md:grid-cols-2">
-      <label class="form-control md:col-span-2">
-        <div class="label">
-          <span class="label-text font-semibold">Title</span>
-        </div>
-        <input
-          type="text"
-          class="input input-bordered w-full"
-          placeholder="Article title"
-          value={title}
-          onInput={(event) => onTitle(event.currentTarget.value)}
-        />
-      </label>
+    <div class="border-base-300 flex flex-col gap-1 border-b px-3 py-2">
+      <input
+        type="text"
+        class="input input-ghost h-auto w-full border-0 px-0 py-1 text-lg font-bold focus:outline-none"
+        placeholder="Article title"
+        value={title}
+        onInput={(event) => onTitle(event.currentTarget.value)}
+        // Typing over the seeded "Untitled" should not need a manual select.
+        onFocus={(event) => {
+          if (event.currentTarget.value === "Untitled") event.currentTarget.select();
+        }}
+      />
 
-      <label class="form-control md:col-span-2">
-        <div class="label">
-          <span class="label-text font-semibold">Description</span>
-        </div>
-        <textarea
-          class="textarea textarea-bordered w-full"
-          rows={2}
-          placeholder="Shown in listings, search results and social cards"
-          value={description}
-          onInput={(event) => onDescription(event.currentTarget.value)}
-        />
-      </label>
+      <textarea
+        class="textarea textarea-ghost min-h-0 w-full resize-none border-0 px-0 py-1 text-sm leading-snug focus:outline-none"
+        rows={2}
+        placeholder="Description — shown in listings, search results and social cards"
+        value={description}
+        onInput={(event) => onDescription(event.currentTarget.value)}
+      />
 
-      <label class="form-control">
-        <div class="label">
-          <span class="label-text font-semibold">Slug</span>
-        </div>
-        <input
-          type="text"
-          class={`input input-bordered w-full font-mono text-sm ${slugError ? "input-error" : ""}`}
-          placeholder="derived-from-title"
-          value={slug}
-          onInput={(event) => onSlug(event.currentTarget.value)}
-        />
-        <div class="label">
-          <span class={`label-text-alt ${slugError ? "text-error" : "text-base-content/60"}`}>
-            {slugError ?? `Commits to src/content/blog/${slug || "…"}.mdx`}
-          </span>
-        </div>
-      </label>
-
-      <label class="form-control">
-        <div class="label">
-          <span class="label-text font-semibold">Publish date</span>
-        </div>
-        <input
-          type="text"
-          class="input input-bordered w-full font-mono text-sm"
-          value={pubDate}
-          onInput={(event) => onPubDate(event.currentTarget.value)}
-        />
-        <div class="label">
-          <span class="label-text-alt text-base-content/60">Format: Jul 26 2026</span>
-        </div>
-      </label>
+      <p class={`font-mono text-xs ${slugError ? "text-error" : "text-base-content/50"}`}>
+        {slugError ?? `${slug || "untitled"}.mdx · ${pubDate}`}
+      </p>
     </div>
   );
 }

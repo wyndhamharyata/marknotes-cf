@@ -7,6 +7,13 @@ interface Props {
   onSelect: (file: File | undefined) => void;
 }
 
+const ACCEPT = "image/png,image/jpeg,image/webp,image/gif,image/avif";
+
+/**
+ * Sits at the top of the preview column, standing in for the hero on the real
+ * article page. astro-icon resolves at build time and cannot be used inside an
+ * island, so the arrow is inline (heroicons `arrow-down-tray`).
+ */
 export default function HeroImagePicker({ file, uploadedKey, onSelect }: Props) {
   const [dragging, setDragging] = useState(false);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
@@ -30,20 +37,27 @@ export default function HeroImagePicker({ file, uploadedKey, onSelect }: Props) 
     if (image) onSelect(image);
   };
 
-  return (
-    <div class="form-control">
-      <div class="label">
-        <span class="label-text font-semibold">Hero image</span>
-        {previewUrl && (
-          <button type="button" class="btn btn-ghost btn-xs" onClick={() => onSelect(undefined)}>
-            Remove
-          </button>
-        )}
+  if (previewUrl) {
+    return (
+      <div class="relative">
+        <img src={previewUrl} alt="" class="max-h-64 w-full object-cover" />
+        <button
+          type="button"
+          class="btn btn-circle btn-sm absolute top-3 right-3"
+          aria-label="Remove hero image"
+          onClick={() => onSelect(undefined)}
+        >
+          ✕
+        </button>
       </div>
+    );
+  }
 
-      <div
-        class={`rounded-box border-2 border-dashed p-4 transition-colors ${
-          dragging ? "border-primary bg-primary/5" : "border-base-300"
+  return (
+    <div class="bg-base-200 p-3">
+      <label
+        class={`flex h-56 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-colors ${
+          dragging ? "border-primary bg-primary/10" : "border-base-content/25"
         }`}
         onDragOver={(event) => {
           event.preventDefault();
@@ -56,26 +70,30 @@ export default function HeroImagePicker({ file, uploadedKey, onSelect }: Props) 
           accept(event.dataTransfer?.files ?? null);
         }}
       >
-        {previewUrl && (
-          <img
-            src={previewUrl}
-            alt="Hero preview"
-            class="rounded-box mb-3 max-h-48 w-full object-cover"
+        <svg
+          class="text-base-content/40 h-10 w-10"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
           />
-        )}
-
+        </svg>
+        <p class="text-base-content/70 mt-3 text-sm">
+          <span class="text-base-content font-semibold">Choose a file</span> or drag it here.
+        </p>
         <input
           type="file"
-          accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
-          class="file-input file-input-bordered w-full"
-          onChange={(event) => accept(event.currentTarget.files)}
+          accept={ACCEPT}
+          class="hidden"
+          onChange={(e) => accept(e.currentTarget.files)}
         />
-
-        <p class="text-base-content/60 mt-2 text-xs">
-          Drop an image here or click to browse. Uploaded when you publish.
-          {uploadedKey && " Already staged."}
-        </p>
-      </div>
+      </label>
     </div>
   );
 }

@@ -39,7 +39,6 @@ const MAX_PANE_RATIO = 0.75;
 
 export default function MdxEditor({ existingSlugs, proseClass }: Props) {
   const [draft, setDraft] = useState<ArticleDraft | null>(null);
-  const [slugTouched, setSlugTouched] = useState(false);
   const [view, setView] = useState<"write" | "preview">("write");
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [pendingUploads, setPendingUploads] = useState(0);
@@ -54,9 +53,7 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
     let cancelled = false;
 
     loadDraft().then((stored) => {
-      if (cancelled) return;
-      setDraft(stored ?? emptyDraft(formatPubDate(new Date())));
-      if (stored?.slug) setSlugTouched(true);
+      if (!cancelled) setDraft(stored ?? emptyDraft());
     });
 
     requestPersistentStorage();
@@ -91,22 +88,17 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
     setDraft((current) => (current ? { ...current, ...patch } : current));
   }, []);
 
-  const onTitle = useCallback(
-    (title: string) => {
-      setDraft((current) => {
-        if (!current) return current;
-        return { ...current, title, slug: slugTouched ? current.slug : slugifyTitle(title) };
-      });
-    },
-    [slugTouched]
-  );
+  // Both derived on every render rather than stored: the slug always follows the
+  // title, and the date is always the day of publishing.
+  const slug = useMemo(() => slugifyTitle(draft?.title ?? ""), [draft?.title]);
+  const pubDate = useMemo(() => formatPubDate(new Date()), []);
 
   const slugError = useMemo(() => {
-    if (!draft?.slug) return null;
-    if (!isSafeSlug(draft.slug)) return "Lowercase letters, numbers and hyphens only.";
-    if (existingSlugs.includes(draft.slug)) return "An article with this slug already exists.";
+    if (!slug) return "Give the article a title — the slug comes from it.";
+    if (!isSafeSlug(slug)) return "Title must contain letters or numbers.";
+    if (existingSlugs.includes(slug)) return "An article with this slug already exists.";
     return null;
-  }, [draft?.slug, existingSlugs]);
+  }, [slug, existingSlugs]);
 
   /**
    * GitHub's upload behaviour: drop a placeholder at the caret immediately, then
@@ -115,7 +107,6 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
    */
   const onImages = useCallback(
     async (files: File[], textarea: HTMLTextAreaElement) => {
-      const slug = draft?.slug || slugifyTitle(draft?.title ?? "");
       if (!slug) {
         setStatus({
           kind: "error",
@@ -175,14 +166,18 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
         })
       );
     },
-    [draft?.slug, draft?.title]
+    [slug]
   );
 
   const publish = useCallback(async () => {
     if (!draft) return;
 
-    if (!draft.title.trim() || !draft.description.trim() || !draft.slug.trim()) {
-      setStatus({ kind: "error", message: "Title, description and slug are all required." });
+    if (!draft.title.trim() || !draft.description.trim()) {
+      setStatus({ kind: "error", message: "Title and description are both required." });
+      return;
+    }
+    if (slugError) {
+      setStatus({ kind: "error", message: slugError });
       return;
     }
     // Frontmatter alone would satisfy the endpoint's non-empty `content` check,
@@ -191,17 +186,13 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
       setStatus({ kind: "error", message: "The article body is empty." });
       return;
     }
-    if (slugError) {
-      setStatus({ kind: "error", message: slugError });
-      return;
-    }
 
     try {
       let ready = draft;
 
       if (draft.heroFile && !draft.heroKey) {
         setStatus({ kind: "busy", message: "Uploading hero image…" });
-        const { key } = await uploadAsset(draft.heroFile, draft.slug, "hero");
+        const { key } = await uploadAsset(draft.heroFile, slug, "hero");
         ready = { ...draft, heroKey: key };
         setDraft(ready);
       }
@@ -211,18 +202,15 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          slug: ready.slug,
-          content: serializeMdx(ready),
+          slug,
+          // Stamped now, not when the draft was started.
+          content: serializeMdx(ready, formatPubDate(new Date())),
           imageKey: ready.heroKey,
           inlineImageKeys: referencedInlineKeys(ready),
         }),
       });
 
-      const payload = (await response.json().catch(() => null)) as {
-        error?: string;
-        message?: string;
-      } | null;
-
+      const payload = (await response.json().catch(() => null)) as { error?: string } | null;
       if (!response.ok) throw new Error(payload?.error ?? `Save failed (${response.status})`);
 
       await clearDraft();
@@ -233,7 +221,7 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
         message: error instanceof Error ? error.message : "Save failed",
       });
     }
-  }, [draft, slugError]);
+  }, [draft, slug, slugError]);
 
   const startResize = useCallback((event: PointerEvent) => {
     const container = splitRef.current;
@@ -258,9 +246,8 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
   if (!draft) {
     return (
       <div class="space-y-4 p-4">
-        <div class="skeleton h-12 w-full" />
-        <div class="skeleton h-24 w-full" />
-        <div class="skeleton h-[60vh] w-full" />
+        <div class="skeleton h-10 w-full" />
+        <div class="skeleton h-[70vh] w-full" />
       </div>
     );
   }
@@ -269,9 +256,9 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
   const paneStyle = (share: number) => (isWide ? { width: `${share * 100}%` } : undefined);
 
   return (
-    <div class="flex flex-col gap-4 p-4">
+    <div class="flex flex-col gap-3 px-4 pb-4">
       <div class="flex flex-wrap items-center justify-between gap-2">
-        <h1 class="text-2xl font-bold">New article</h1>
+        <h1 class="text-xl font-bold">New article</h1>
         <div class="flex items-center gap-2">
           {pendingUploads > 0 && (
             <span class="badge badge-neutral gap-2">
@@ -295,8 +282,8 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
       </div>
 
       {status.kind === "error" && (
-        <div class="alert alert-error">
-          <span>{status.message}</span>
+        <div class="alert alert-error py-2">
+          <span class="text-sm">{status.message}</span>
           <button
             type="button"
             class="btn btn-ghost btn-xs"
@@ -307,34 +294,10 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
         </div>
       )}
       {busy && (
-        <div class="alert alert-info">
-          <span>{status.message}</span>
+        <div class="alert alert-info py-2">
+          <span class="text-sm">{status.message}</span>
         </div>
       )}
-
-      <div class="card bg-base-100 shadow-sm">
-        <div class="card-body gap-4">
-          <MetaFields
-            title={draft.title}
-            slug={draft.slug}
-            description={draft.description}
-            pubDate={draft.pubDate}
-            slugError={slugError}
-            onTitle={onTitle}
-            onSlug={(slug) => {
-              setSlugTouched(true);
-              update({ slug });
-            }}
-            onDescription={(description) => update({ description })}
-            onPubDate={(pubDate) => update({ pubDate })}
-          />
-          <HeroImagePicker
-            file={draft.heroFile}
-            uploadedKey={draft.heroKey}
-            onSelect={(heroFile) => update({ heroFile, heroKey: undefined })}
-          />
-        </div>
-      </div>
 
       <div role="tablist" class="tabs tabs-box self-start md:hidden">
         <button
@@ -359,12 +322,21 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
           without it `overflow-y-auto` never engages and they grow forever. */}
       <div
         ref={splitRef}
-        class="card bg-base-100 flex flex-col overflow-hidden shadow-sm md:h-[70vh] md:flex-row"
+        class="card bg-base-100 flex flex-col overflow-hidden shadow-sm md:h-[calc(100vh-13rem)] md:min-h-[32rem] md:flex-row"
       >
         <div
-          class={view === "write" ? "min-w-0" : "hidden min-w-0 md:block"}
+          class={`flex flex-col ${view === "write" ? "min-w-0" : "hidden min-w-0 md:flex"}`}
           style={paneStyle(ratio)}
         >
+          <MetaFields
+            title={draft.title}
+            description={draft.description}
+            slug={slug}
+            pubDate={pubDate}
+            slugError={slugError}
+            onTitle={(title) => update({ title })}
+            onDescription={(description) => update({ description })}
+          />
           <EditorPane body={draft.body} onBody={(body) => update({ body })} onImages={onImages} />
         </div>
 
@@ -376,10 +348,23 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
         />
 
         <div
-          class={`border-base-300 ${view === "preview" ? "min-w-0" : "hidden min-w-0 md:block"} md:border-l-0`}
+          class={view === "preview" ? "min-w-0" : "hidden min-w-0 md:block"}
           style={paneStyle(1 - ratio)}
         >
-          <PreviewPane body={draft.body} assets={draft.inlineAssets} proseClass={proseClass} />
+          <PreviewPane
+            body={draft.body}
+            assets={draft.inlineAssets}
+            proseClass={proseClass}
+            title={draft.title}
+            pubDate={pubDate}
+            hero={
+              <HeroImagePicker
+                file={draft.heroFile}
+                uploadedKey={draft.heroKey}
+                onSelect={(heroFile) => update({ heroFile, heroKey: undefined })}
+              />
+            }
+          />
         </div>
       </div>
     </div>
