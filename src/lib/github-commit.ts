@@ -1,3 +1,5 @@
+import { isSafeAssetKey, isSafeSlug, repoPathForAssetKey } from "./asset-key";
+
 async function ghApi(path: string, init?: RequestInit): Promise<Response> {
   const token = import.meta.env.GITHUB_TOKEN;
   if (!token) throw new Error("GITHUB_TOKEN not configured");
@@ -23,11 +25,16 @@ async function ghApi(path: string, init?: RequestInit): Promise<Response> {
   return resp;
 }
 
+/** A staged R2 upload to be committed alongside the article. */
+export interface CommitAsset {
+  r2Key: string;
+  buffer: ArrayBuffer;
+}
+
 export interface CommitInput {
   slug: string;
   mdxContent: string;
-  imageR2Key?: string;
-  imageBuffer?: ArrayBuffer;
+  assets?: CommitAsset[];
 }
 
 interface TreeEntry {
@@ -38,6 +45,16 @@ interface TreeEntry {
 }
 
 export async function commitMdx(input: CommitInput): Promise<{ ok: boolean }> {
+  const assets = input.assets ?? [];
+
+  // These become repository paths a few lines down. The API route validates
+  // them too, but this is the actual sink, so it re-checks rather than trusting
+  // its callers.
+  if (!isSafeSlug(input.slug)) throw new Error(`Unsafe slug: ${input.slug}`);
+  for (const asset of assets) {
+    if (!isSafeAssetKey(asset.r2Key)) throw new Error(`Unsafe asset key: ${asset.r2Key}`);
+  }
+
   const lastHeadResp = await ghApi("/refs/heads/main");
   const ref = (await lastHeadResp.json()) as { object: { sha: string } };
   const headSHA = ref.object.sha;
@@ -48,28 +65,19 @@ export async function commitMdx(input: CommitInput): Promise<{ ok: boolean }> {
 
   // GitHub Git Data API expects blobs as JSON with base64-encoded content.
   // Sending raw text or binary body with a non-JSON Content-Type causes 403.
-  const [mdxBlob, imageBlob] = await Promise.all([
-    ghApi("/blobs", {
+  const createBlob = async (base64: string): Promise<string> => {
+    const resp = await ghApi("/blobs", {
       method: "POST",
-      body: JSON.stringify({
-        content: btoa(unescape(encodeURIComponent(input.mdxContent))),
-        encoding: "base64",
-      }),
-    }),
-    input.imageBuffer && input.imageBuffer.byteLength > 0
-      ? ghApi("/blobs", {
-          method: "POST",
-          body: JSON.stringify({
-            content: btoa(arrayBufferToBase64(input.imageBuffer)),
-            encoding: "base64",
-          }),
-        })
-      : null,
-  ]);
+      body: JSON.stringify({ content: base64, encoding: "base64" }),
+    });
+    const blob = (await resp.json()) as { sha: string };
+    return blob.sha;
+  };
 
-  const mdx = (await mdxBlob.json()) as { sha: string };
-  const image = imageBlob && ((await imageBlob.json()) as { sha: string });
-  const imagePath = `src/content/blog/hero-images/${input.imageR2Key?.split("/").pop() ?? input.slug + ".jpg"}`;
+  const [mdxSHA, assetSHAs] = await Promise.all([
+    createBlob(toBase64(new TextEncoder().encode(input.mdxContent))),
+    Promise.all(assets.map((asset) => createBlob(toBase64(new Uint8Array(asset.buffer))))),
+  ]);
 
   // Build Git Commit.
   // Step to create commit:
@@ -77,26 +85,26 @@ export async function commitMdx(input: CommitInput): Promise<{ ok: boolean }> {
   // - Build new tree by adding new tree node on top of main branch last commit SHA
   // - Create Commit based on the newly created tree
   // = Push new commit SHA as main branch latest ref
-  const treeEntries: Array<TreeEntry | null> = [
+  const treeEntries: TreeEntry[] = [
     {
       path: `src/content/blog/${input.slug}.mdx`,
       mode: "100644", // Non-executable file
       type: "blob",
-      sha: mdx.sha,
+      sha: mdxSHA,
     },
-    image && {
-      path: imagePath,
+    ...assets.map((asset, i) => ({
+      path: repoPathForAssetKey(asset.r2Key),
       mode: "100644",
       type: "blob",
-      sha: image.sha,
-    },
+      sha: assetSHAs[i],
+    })),
   ];
 
   const treeResp = await ghApi("/trees", {
     method: "POST",
     body: JSON.stringify({
       base_tree: baseTreeSHA,
-      tree: treeEntries.filter((v) => v && v !== null),
+      tree: treeEntries,
     }),
   });
   const newTree = (await treeResp.json()) as { sha: string };
@@ -122,11 +130,16 @@ export async function commitMdx(input: CommitInput): Promise<{ ok: boolean }> {
   return { ok: true };
 }
 
-function arrayBufferToBase64(buffer: ArrayBuffer): string {
-  const bytes = new Uint8Array(buffer);
+// btoa() only accepts a binary string, so bytes have to be widened to one
+// first. Doing that a character at a time costs a string concatenation per
+// byte, which is a real CPU-time risk on a Worker once a commit carries several
+// megabytes of images; chunking keeps it to one concat per 32 KiB.
+const BASE64_CHUNK_BYTES = 0x8000;
+
+function toBase64(bytes: Uint8Array): string {
   let binary = "";
-  for (let i = 0; i < bytes.length; i++) {
-    binary += String.fromCharCode(bytes[i]);
+  for (let i = 0; i < bytes.length; i += BASE64_CHUNK_BYTES) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + BASE64_CHUNK_BYTES));
   }
-  return binary;
+  return btoa(binary);
 }

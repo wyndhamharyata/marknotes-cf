@@ -1,8 +1,9 @@
 ---
 import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
 
 interface Props {
-  src: string;
+  src: string | ImageMetadata;
   alt: string;
   width?: number;
   height?: number;
@@ -10,18 +11,39 @@ interface Props {
   loading?: "lazy" | "eager" | null | undefined;
 }
 
-const { src, alt, width = 800, height = 600, caption, loading = "lazy" } = Astro.props;
+const { src, alt, width, height, caption, loading = "lazy" } = Astro.props;
+
+/**
+ * Remote images are just a URL, so Astro needs explicit dimensions and 800x600
+ * is the historical default. Images imported into MDX carry their intrinsic
+ * size, so they only get a width cap — passing a fixed height as well would
+ * squash every one of them into a 4:3 box.
+ */
+const MAX_IMPORTED_WIDTH = 1200;
+const imported = typeof src === "string" ? null : src;
 ---
 
 <figure class="my-6">
-  <Image
-    src={src}
-    alt={alt}
-    width={width}
-    height={height}
-    class="mx-auto max-w-full rounded-lg shadow-md"
-    loading={loading}
-  />
+  {
+    imported ? (
+      <Image
+        src={imported}
+        alt={alt}
+        width={width ?? Math.min(imported.width, MAX_IMPORTED_WIDTH)}
+        class="mx-auto max-w-full rounded-lg shadow-md"
+        loading={loading}
+      />
+    ) : (
+      <Image
+        src={src as string}
+        alt={alt}
+        width={width ?? 800}
+        height={height ?? 600}
+        class="mx-auto max-w-full rounded-lg shadow-md"
+        loading={loading}
+      />
+    )
+  }
   {
     caption && (
       <figcaption class="text-base-content/70 mt-2 text-center text-sm italic">
