@@ -20,7 +20,14 @@ const analyticsMap = await getDoStub().getLatestAnalyticsBySlugs(articles.map((a
   dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin/articles" }}
 >
   <div class="mx-auto flex flex-col py-4 md:w-3xl">
-    <h1 class="mx-4 text-2xl font-bold md:mx-0">Articles</h1>
+    <div class="mx-4 flex items-center justify-between md:mx-0">
+      <h1 class="text-2xl font-bold">Articles</h1>
+      {
+        /* hx-boost swaps the body over AJAX, which is not a reliable way to get
+          an Astro client island to hydrate. Force a real navigation. */
+      }
+      <a href="/admin/articles/new" class="btn btn-primary btn-sm" hx-boost="false">New article</a>
+    </div>
     <div class="mt-4 md:mt-0">
       {
         articles.map((article) => (

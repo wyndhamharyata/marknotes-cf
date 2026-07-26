@@ -1,16 +1,28 @@
 ---
+import { getCollection } from "astro:content";
 import BaseAdminLayout from "../../../../layouts/BaseAdminLayout.astro";
-import { SITE_DESCRIPTION, SITE_TITLE, ADMIN_DOCK } from "../../../../consts";
+import { SITE_DESCRIPTION, SITE_TITLE, ADMIN_DOCK, ARTICLE_PROSE_CLASS } from "../../../../consts";
+import MdxEditor from "./_components/MdxEditor";
+
 export const prerender = false;
+
+// Rendered on the server so the editor can warn about a slug collision without
+// a round trip; the same collection the article pages are built from.
+const existingSlugs = (await getCollection("blog")).map((article) => article.id);
 ---
 
 <BaseAdminLayout
-  title={SITE_TITLE}
+  title={`New article — ${SITE_TITLE}`}
   description={SITE_DESCRIPTION}
   dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin/articles" }}
+  maxWidthClass="max-w-[110rem]"
 >
-  <div class="mx-auto flex flex-col py-4 md:w-3xl">
-    <h1 class="mx-4 text-2xl font-bold md:mx-0">Articles</h1>
-    <div class="mt-4 md:mt-0"></div>
+  <div class="breadcrumbs hidden px-4 py-2 text-sm md:block">
+    <ul>
+      <li><a href="/admin/articles">Articles</a></li>
+      <li>New</li>
+    </ul>
   </div>
+
+  <MdxEditor client:load existingSlugs={existingSlugs} proseClass={ARTICLE_PROSE_CLASS} />
 </BaseAdminLayout>

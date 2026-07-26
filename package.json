@@ -9,6 +9,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:generate": "drizzle-kit generate",
+    "r2:cors": "tsx scripts/r2-cors.ts",
     "preview": "astro preview"
   },
   "dependencies": {
@@ -35,6 +36,7 @@
     "drizzle-orm": "^0.45.2",
     "htmx-ext-head-support": "^2.0.5",
     "htmx.org": "^2.0.8",
+    "marked": "^18.0.7",
     "minidenticons": "^4.2.1",
     "preact": "^10.28.1",
     "sharp": "^0.34.3",
