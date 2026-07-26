@@ -10,10 +10,7 @@ interface Props {
   image?: ImageMetadata;
   dockProp: ComponentProps<typeof BaseAdminDock>;
   maxWidthClass?: string;
-  /**
-   * The default reserves room for the fixed dock and its gradient. Full-height
-   * pages need that back and manage the clearance themselves.
-   */
+  /** Full-height pages reclaim the dock clearance and manage it themselves. */
   mainPaddingClass?: string;
 }
 
@@ -23,8 +20,6 @@ const {
   image,
   dockProp,
   maxWidthClass = "max-w-4xl",
-  // The dock is ~68px tall now, so 10rem of clearance is no longer needed;
-  // every admin page gets that height back.
   mainPaddingClass = "px-0 pb-32 md:px-4 md:py-8 md:pb-32",
 } = Astro.props;
 ---

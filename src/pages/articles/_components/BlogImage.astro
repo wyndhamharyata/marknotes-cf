@@ -13,12 +13,8 @@ interface Props {
 
 const { src, alt, width, height, caption, loading = "lazy" } = Astro.props;
 
-/**
- * Remote images are just a URL, so Astro needs explicit dimensions and 800x600
- * is the historical default. Images imported into MDX carry their intrinsic
- * size, so they only get a width cap — passing a fixed height as well would
- * squash every one of them into a 4:3 box.
- */
+// Imported images carry their intrinsic size, so they get a width cap only; a
+// fixed height would squash every one into the remote default's 4:3 box.
 const MAX_IMPORTED_WIDTH = 1200;
 const imported = typeof src === "string" ? null : src;
 ---

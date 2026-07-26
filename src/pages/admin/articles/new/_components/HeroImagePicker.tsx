@@ -9,16 +9,12 @@ interface Props {
 
 const ACCEPT = "image/png,image/jpeg,image/webp,image/gif,image/avif";
 
-/**
- * Sits at the top of the preview column, standing in for the hero on the real
- * article page. astro-icon resolves at build time and cannot be used inside an
- * island, so the arrow is inline (heroicons `arrow-down-tray`).
- */
+// Inline SVG because astro-icon resolves at build time and cannot run in an island.
 export default function HeroImagePicker({ file, uploadedKey, onSelect }: Props) {
   const [dragging, setDragging] = useState(false);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
 
-  // Object URLs leak until revoked, and the hero can be replaced repeatedly.
+  // Object URLs leak until revoked.
   useEffect(() => {
     if (!file) {
       setObjectUrl(null);
@@ -29,7 +25,7 @@ export default function HeroImagePicker({ file, uploadedKey, onSelect }: Props) 
     return () => URL.revokeObjectURL(url);
   }, [file]);
 
-  // A restored draft has the key but not the File, so fall back to staging.
+  // A restored draft has the key but not the File.
   const previewUrl = objectUrl ?? (uploadedKey ? stagedAssetUrl(uploadedKey) : null);
 
   const accept = (list: FileList | null) => {

@@ -5,13 +5,9 @@ import { isSafeAssetKey } from "../../../../lib/asset-key";
 export const prerender = false;
 
 /**
- * Reads a staged upload back out of R2.
- *
- * The staging bucket has no public domain — presigning only grants PUT — so the
- * editor has no other way to display an image it just uploaded. Serving it
- * through the admin-gated worker also means a draft restored from IndexedDB can
- * still render its images after the in-memory object URLs are gone, and a 404
- * here is how the editor detects an upload the R2 lifecycle rule has expired.
+ * Reads a staged upload back out of R2. Presigning only grants PUT and the
+ * bucket has no public domain, so this is the editor's only way to display an
+ * image it just uploaded.
  */
 export const GET: APIRoute = async ({ request }) => {
   const key = new URL(request.url).searchParams.get("key");
@@ -26,7 +22,7 @@ export const GET: APIRoute = async ({ request }) => {
       "Content-Type": object.httpMetadata?.contentType ?? "application/octet-stream",
       "Content-Length": object.size.toString(),
       ETag: object.httpEtag,
-      // Keys embed a random component, so a given key never changes contents.
+      // Keys embed a random component, so contents never change.
       "Cache-Control": "private, max-age=31536000, immutable",
     },
   });

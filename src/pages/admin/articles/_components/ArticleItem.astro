@@ -6,10 +6,7 @@ import { type CollectionEntry } from "astro:content";
 
 type Props = {
   article: CollectionEntry<"blog">;
-  /**
-   * Absent until the analytics cron has captured a snapshot for this slug,
-   * which is every three hours — so a freshly published article has none.
-   */
+  /** Absent until the 3-hourly analytics cron has seen this slug. */
   analytic?: ArticleAnalyticsRow;
 };
 

@@ -3,16 +3,8 @@ import { highlightCode } from "./highlight";
 import type { InlineAsset } from "./types";
 import { stagedAssetUrl } from "./upload";
 
-/**
- * Renders editor markdown to preview HTML.
- *
- * `marked` is loaded lazily so the textarea is interactive before the parser
- * chunk arrives — it is the only third-party weight on this route.
- *
- * The output is injected with dangerouslySetInnerHTML and is deliberately not
- * sanitised: this is an admin-only editor rendering the admin's own draft, and
- * the published article goes through Astro's MDX pipeline rather than this one.
- */
+// Loaded lazily so the textarea is interactive before the parser arrives.
+// Output is injected unsanitised: admin-only editor, admin's own draft.
 let markedModule: Promise<typeof import("marked")> | null = null;
 
 function loadMarked() {
@@ -20,10 +12,8 @@ function loadMarked() {
   return markedModule;
 }
 
-/** `<BlogImage ... />`, which marked would otherwise emit as an unknown element. */
 const BLOG_IMAGE_TAG = /<BlogImage\s+([^>]*?)\/>/g;
 
-/** The in-flight upload marker `EditorPane` drops at the cursor. */
 const UPLOAD_PLACEHOLDER = /!\[Uploading ([^\]]*)\]\(uploading:[^)]*\)/g;
 
 const ATTRIBUTE = /([A-Za-z]+)\s*=\s*(?:"([^"]*)"|\{([A-Za-z_$][\w$]*)\})/g;
@@ -34,8 +24,7 @@ export async function renderPreview(body: string, assets: InlineAsset[]): Promis
 
   const instance = new Marked({ gfm: true, async: false });
 
-  // Shiki is async and marked's `code` renderer is not, so every fence is
-  // highlighted up front and the renderer just looks the result up.
+  // Shiki is async and marked's `code` renderer is not.
   const highlighted = await highlightAll(instance, prepared);
 
   instance.use({
@@ -54,8 +43,8 @@ const fenceKey = (lang: string | undefined, text: string) => `${lang ?? ""}|${te
 async function highlightAll(instance: Marked, markdown: string) {
   const fences = new Map<string, { lang?: string; text: string }>();
 
-  // marked's own walker, because fences nest in places a naive `token.tokens`
-  // recursion misses — list items keep their children under `items`.
+  // marked's own walker: list items keep children under `items`, which a naive
+  // `token.tokens` recursion misses.
   instance.walkTokens(instance.lexer(markdown), (token: Token) => {
     if (token.type === "code") {
       fences.set(fenceKey(token.lang, token.text), { lang: token.lang, text: token.text });
@@ -73,13 +62,11 @@ async function highlightAll(instance: Marked, markdown: string) {
   return results;
 }
 
-/** No grammar available — keep marked's shape so the prose styles still apply. */
 function plainCode(text: string, lang?: string): string {
   const className = lang ? ` class="language-${escapeHtml(lang)}"` : "";
   return `<pre><code${className}>${escapeHtml(text)}\n</code></pre>`;
 }
 
-/** Show an in-progress chip instead of a broken image while an upload runs. */
 function markUploads(body: string): string {
   return body.replace(
     UPLOAD_PLACEHOLDER,
@@ -88,11 +75,7 @@ function markUploads(body: string): string {
   );
 }
 
-/**
- * Mirrors BlogImage.astro's markup so the preview matches the published page.
- * `src={identifier}` resolves through the staging proxy; a quoted src is used
- * as-is, which covers hand-written tags pointing at remote URLs.
- */
+// Mirrors BlogImage.astro's markup so the preview matches the published page.
 function expandBlogImages(body: string, assets: InlineAsset[]): string {
   return body.replace(BLOG_IMAGE_TAG, (_match, rawAttrs: string) => {
     const attrs = parseAttributes(rawAttrs);

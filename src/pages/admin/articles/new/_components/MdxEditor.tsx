@@ -1,21 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { isSafeSlug } from "../../../../../lib/asset-key";
+import { clearDraft, loadDraft, saveDraft } from "../../../../../lib/editor/draft-store";
 import {
-  clearDraft,
-  loadDraft,
-  requestPersistentStorage,
-  saveDraft,
-} from "../../../../../lib/editor/draft-store";
-import {
-  assetIdFromKey,
   formatPubDate,
-  inlineImageSnippet,
-  referencedInlineKeys,
+  referencedAssets,
   serializeMdx,
 } from "../../../../../lib/editor/mdx-serialize";
 import { slugifyTitle } from "../../../../../lib/editor/slugify";
 import { insertAtCursor, replaceInTextarea } from "../../../../../lib/editor/textarea";
-import { emptyDraft, type ArticleDraft } from "../../../../../lib/editor/types";
+import type { ArticleDraft } from "../../../../../lib/editor/types";
 import { uploadAsset } from "../../../../../lib/editor/upload";
 import EditorPane from "./EditorPane";
 import HeroImagePicker from "./HeroImagePicker";
@@ -33,6 +26,15 @@ type Status =
   | { kind: "busy"; message: string }
   | { kind: "error"; message: string };
 
+// Titled, because image keys embed the slug: an untitled draft cannot upload.
+const BLANK_DRAFT: ArticleDraft = {
+  title: "Untitled",
+  description: "",
+  body: "",
+  inlineAssets: [],
+  updatedAt: 0,
+};
+
 const AUTOSAVE_DEBOUNCE_MS = 500;
 const MIN_PANE_RATIO = 0.25;
 const MAX_PANE_RATIO = 0.75;
@@ -49,16 +51,13 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // Restore before first paint of the real UI, so the fields never flash empty
-  // and then fill in.
   useEffect(() => {
     let cancelled = false;
 
     loadDraft().then((stored) => {
-      if (!cancelled) setDraft(stored ?? emptyDraft());
+      if (!cancelled) setDraft(stored ?? BLANK_DRAFT);
     });
 
-    requestPersistentStorage();
     return () => {
       cancelled = true;
     };
@@ -79,20 +78,13 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
   }, []);
 
   /**
-   * Proportional scroll sync between the two panes.
-   *
-   * Position is matched by fraction of scrollable height rather than by source
-   * mapping — the two sides have different heights per line once images and
-   * code blocks render, so this drifts on long documents, but it tracks well
-   * enough to keep the right region in view and costs nothing.
-   *
-   * `driver` stops the echo: scrolling one pane moves the other, which fires
-   * that pane's own scroll event, which would scroll the first one back.
+   * Matched by fraction of scrollable height, not by source position, so it
+   * drifts on long documents. `driver` breaks the echo where moving one pane
+   * fires the other's scroll event and bounces back.
    */
   useEffect(() => {
     const editor = textareaRef.current;
     const preview = previewRef.current;
-    // Only one pane is on screen below md, so there is nothing to sync.
     if (!isWide || !editor || !preview) return;
 
     let driver: EventTarget | null = null;
@@ -124,7 +116,7 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
     };
   }, [isWide]);
 
-  // Autosave covers navigation, but an in-flight upload really would be lost.
+  // Autosave covers navigation; an in-flight upload would genuinely be lost.
   useEffect(() => {
     if (pendingUploads === 0) return;
     const warn = (event: BeforeUnloadEvent) => event.preventDefault();
@@ -136,8 +128,6 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
     setDraft((current) => (current ? { ...current, ...patch } : current));
   }, []);
 
-  // Both derived on every render rather than stored: the slug always follows the
-  // title, and the date is always the day of publishing.
   const slug = useMemo(() => slugifyTitle(draft?.title ?? ""), [draft?.title]);
   const pubDate = useMemo(() => formatPubDate(new Date()), []);
 
@@ -148,11 +138,8 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
     return null;
   }, [slug, existingSlugs]);
 
-  /**
-   * GitHub's upload behaviour: drop a placeholder at the caret immediately, then
-   * swap it for the real component when the upload lands. Writing continues
-   * uninterrupted, and a failure leaves a visible marker rather than silence.
-   */
+  // Placeholder at the caret now, real component when the upload lands, so
+  // writing is never blocked and a failure leaves a visible marker.
   const onImages = useCallback(
     async (files: File[], textarea: HTMLTextAreaElement) => {
       if (!slug) {
@@ -163,9 +150,8 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
         return;
       }
 
-      // Every placeholder goes in before any upload starts, so dropping five
-      // images marks all five spots at once instead of trickling them in as
-      // each request completes.
+      // All placeholders before any upload, so a multi-file drop marks every
+      // spot at once.
       const jobs = files.map((file) => {
         const token = crypto.randomUUID().slice(0, 8);
         const placeholder = `![Uploading ${file.name}…](uploading:${token})`;
@@ -175,12 +161,8 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
 
       setPendingUploads((count) => count + jobs.length);
 
-      /**
-       * Prefer editing the textarea directly: an upload usually lands while the
-       * author is still typing, and routing the swap through state would reset
-       * `value`, throwing the caret to the end of the document. Only fall back
-       * to state when the textarea isn't focused, where the caret is moot.
-       */
+      // Direct DOM edit while focused: going through state would reset `value`
+      // and throw the caret to the end, mid-typing.
       const swap = (placeholder: string, replacement: string) => {
         if (document.activeElement === textarea) {
           if (replaceInTextarea(textarea, placeholder, replacement)) return;
@@ -195,7 +177,7 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
           try {
             const { key } = await uploadAsset(file, slug, "content");
             const asset = {
-              id: assetIdFromKey(key),
+              id: `img_${key.split("/").pop()!.split("-")[0]}`,
               r2Key: key,
               alt: file.name.replace(/\.[^.]+$/, ""),
             };
@@ -203,7 +185,7 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
             setDraft((current) =>
               current ? { ...current, inlineAssets: [...current.inlineAssets, asset] } : current
             );
-            swap(placeholder, inlineImageSnippet(asset));
+            swap(placeholder, `<BlogImage src={${asset.id}} alt=${JSON.stringify(asset.alt)} />`);
           } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
             swap(placeholder, `_Upload failed: ${file.name}_`);
@@ -228,8 +210,7 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
       setStatus({ kind: "error", message: slugError });
       return;
     }
-    // Frontmatter alone would satisfy the endpoint's non-empty `content` check,
-    // so an empty article has to be caught here.
+    // Frontmatter alone satisfies the endpoint's non-empty `content` check.
     if (!draft.body.trim()) {
       setStatus({ kind: "error", message: "The article body is empty." });
       return;
@@ -254,7 +235,7 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
           // Stamped now, not when the draft was started.
           content: serializeMdx(ready, formatPubDate(new Date())),
           imageKey: ready.heroKey,
-          inlineImageKeys: referencedInlineKeys(ready),
+          inlineImageKeys: referencedAssets(ready.body, ready.inlineAssets).map((a) => a.r2Key),
         }),
       });
 
@@ -366,9 +347,7 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
         </button>
       </div>
 
-      {/* A bounded height is what lets the two panes scroll independently;
-          without it `overflow-y-auto` never engages and they grow forever.
-          The bound comes from the page wrapper via flex, not a magic number. */}
+      {/* Bounded height is what makes `overflow-y-auto` engage on the panes. */}
       <div
         ref={splitRef}
         class="card bg-base-100 border-base-300 md:rounded-t-box flex flex-col overflow-hidden rounded-t-none border shadow-sm md:min-h-0 md:flex-1 md:flex-row md:border-0"

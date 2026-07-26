@@ -1,6 +1,6 @@
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { sanitizeAssetFilename, type AssetKind } from "./asset-key";
+import type { AssetKind } from "./asset-key";
 
 interface PresignedURLConfig {
   accountId: string;
@@ -12,20 +12,27 @@ interface PresignedURLConfig {
 export interface PresignRequest {
   slug: string;
   filename: string;
-  /** Must match the `Content-Type` header the browser sends on the PUT. */
   contentType: string;
   kind: AssetKind;
 }
 
 const EXPIRY_SECONDS = 300;
 
-/**
- * Hero keys stay flat for continuity with articles already published from the
- * admin panel; content keys are grouped per slug so an article's inline assets
- * sit together in the repo. Both satisfy `src/content/blog/${key}`.
- */
+function clean(value: string, maxLength: number, fallback: string): string {
+  const cleaned = value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, maxLength);
+  return cleaned || fallback;
+}
+
+// Both shapes satisfy `src/content/blog/${key}`, which is where commitMdx puts them.
 function buildKey({ kind, slug, filename }: PresignRequest): string {
-  const { stem, ext } = sanitizeAssetFilename(filename);
+  const base = filename.split(/[\\/]/).pop() ?? "";
+  const dot = base.lastIndexOf(".");
+  const stem = clean(dot > 0 ? base.slice(0, dot) : base, 60, "image");
+  const ext = clean(dot > 0 ? base.slice(dot + 1) : "", 8, "bin");
   const random = crypto.randomUUID().split("-")[0];
 
   return kind === "hero"
@@ -40,7 +47,7 @@ export async function generatePresignedPutURL(
   const key = buildKey(request);
 
   const client = new S3Client({
-    region: "auto", // Cloudflare always 'auto'
+    region: "auto",
     endpoint: `https://${config.accountId}.r2.cloudflarestorage.com`,
     credentials: {
       accessKeyId: config.accessKey,
@@ -49,9 +56,7 @@ export async function generatePresignedPutURL(
   });
 
   // ContentType is part of the signature, so the browser's PUT must send this
-  // exact header or R2 answers SignatureDoesNotMatch. Signing it is worth that
-  // constraint: R2 then stores the real type, which the staging proxy echoes
-  // back to the editor preview.
+  // exact header or R2 answers SignatureDoesNotMatch.
   const url = await getSignedUrl(
     client,
     new PutObjectCommand({
@@ -62,7 +67,7 @@ export async function generatePresignedPutURL(
     { expiresIn: EXPIRY_SECONDS }
   );
 
-  client.destroy(); // Ensure that no hanging interal HTTP agent keeping the worker alive
+  client.destroy(); // otherwise its HTTP agent keeps the worker alive
 
   return { url, key };
 }

@@ -1,11 +1,15 @@
 import type { APIRoute } from "astro";
 import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import { generatePresignedPutURL } from "../../../../lib/r2-presigned";
-import { isAllowedImageType, isSafeSlug, type AssetKind } from "../../../../lib/asset-key";
+import { isSafeSlug, type AssetKind } from "../../../../lib/asset-key";
 
 export const prerender = false;
 
-const KINDS: readonly AssetKind[] = ["hero", "content"];
+const KINDS = ["hero", "content"];
+
+// SVG is excluded deliberately: astro:assets treats it differently from raster
+// formats and it can carry script.
+const TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif", "image/avif"];
 
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
@@ -17,13 +21,9 @@ export const GET: APIRoute = async ({ request }) => {
   if (!slug || !filename || !contentType)
     return jsonErr("slug, filename and contentType are required", 400);
 
-  // The slug becomes part of the key, and the key becomes a repository path.
   if (!isSafeSlug(slug)) return jsonErr("slug must be lowercase alphanumeric with hyphens", 400);
-
-  if (!KINDS.includes(kind as AssetKind)) return jsonErr(`kind must be one of ${KINDS}`, 400);
-
-  if (!isAllowedImageType(contentType))
-    return jsonErr(`unsupported content type: ${contentType}`, 415);
+  if (!KINDS.includes(kind)) return jsonErr(`kind must be one of ${KINDS}`, 400);
+  if (!TYPES.includes(contentType)) return jsonErr(`unsupported content type: ${contentType}`, 415);
 
   const [result, error] = await tryCatch(
     generatePresignedPutURL(
@@ -42,16 +42,10 @@ export const GET: APIRoute = async ({ request }) => {
     return jsonErr("Failed to generate upload URL", 500);
   }
 
-  return new Response(
-    JSON.stringify({
-      ok: true,
-      url: result.url,
-      key: result.key,
-      // Echoed back so the client PUTs the exact header that was signed.
-      contentType,
-    }),
-    { status: 200, headers: { "Content-Type": "application/json" } }
-  );
+  return new Response(JSON.stringify({ ok: true, url: result.url, key: result.key, contentType }), {
+    status: 200,
+    headers: { "Content-Type": "application/json" },
+  });
 };
 
 function jsonErr(message: string, status: number) {

@@ -2,7 +2,7 @@ import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import type { APIRoute } from "astro";
 import { minLength, string, nonEmpty, pipe, object, optional, safeParse, array } from "valibot";
 import { Resource } from "sst/resource";
-import { commitMdx, type CommitAsset } from "../../../../lib/github-commit";
+import { commitMdx } from "../../../../lib/github-commit";
 import { isSafeAssetKey, isSafeSlug } from "../../../../lib/asset-key";
 
 export const prerender = false;
@@ -14,12 +14,9 @@ const PostRequestBodySchema = object({
   inlineImageKeys: optional(array(string())),
 });
 
-/**
- * Each asset costs one R2 read plus one GitHub blob POST, on top of the ~5
- * subrequests the ref/tree/commit dance needs. Twenty keeps a save well inside
- * the Workers subrequest budget, and the byte cap keeps the base64 pass inside
- * the CPU budget.
- */
+// Each asset costs an R2 read plus a GitHub blob POST on top of the ~5
+// subrequests the ref/tree/commit dance needs; the byte cap keeps the base64
+// pass inside the CPU budget.
 const MAX_ASSETS = 20;
 const MAX_TOTAL_BYTES = 25 * 1024 * 1024;
 
@@ -34,17 +31,6 @@ export const POST: APIRoute = async ({ request }) => {
   const { slug, content, imageKey, inlineImageKeys = [] } = result.output;
 
   if (!isSafeSlug(slug)) return jsonErr("slug must be lowercase alphanumeric with hyphens", 400);
-
-  if (imageKey && !imageKey.startsWith("hero-images/"))
-    return jsonErr("imageKey must be a hero-images/ key", 400);
-
-  // Inline keys carry the slug they were uploaded under, which may differ from
-  // the current slug if the article was renamed mid-draft. That is fine: the
-  // MDX import path is derived from the key, not from the slug.
-  for (const key of inlineImageKeys) {
-    if (!key.startsWith("content-images/"))
-      return jsonErr(`inlineImageKeys must be content-images/ keys: ${key}`, 400);
-  }
 
   const keys = [...new Set([...(imageKey ? [imageKey] : []), ...inlineImageKeys])];
 
@@ -70,20 +56,17 @@ export const POST: APIRoute = async ({ request }) => {
   );
 };
 
-async function collectAssets(keys: string[]): Promise<CommitAsset[]> {
+async function collectAssets(keys: string[]) {
   if (keys.length === 0) return [];
 
   const bucket = Resource.ImageStagingBucket;
   const objects = await Promise.all(keys.map((key) => bucket.get(key)));
 
-  // A staged upload the R2 lifecycle rule has already expired shows up here.
-  // Name the keys so the editor can flag exactly which images need re-uploading.
   const missing = keys.filter((_, i) => !objects[i]);
   if (missing.length > 0)
     throw new Error(`Images no longer in staging, please re-upload: ${missing.join(", ")}`);
 
-  // R2 hands back a stream, so `size` is known before any bytes are buffered —
-  // the total can be rejected without ever holding it in memory.
+  // R2 returns a stream, so size is known before any bytes are buffered.
   const totalBytes = objects.reduce((sum, object) => sum + (object?.size ?? 0), 0);
   if (totalBytes > MAX_TOTAL_BYTES)
     throw new Error(
@@ -91,10 +74,7 @@ async function collectAssets(keys: string[]): Promise<CommitAsset[]> {
     );
 
   return Promise.all(
-    objects.map(async (object, i) => ({
-      r2Key: keys[i],
-      buffer: await object!.arrayBuffer(),
-    }))
+    objects.map(async (object, i) => ({ r2Key: keys[i], buffer: await object!.arrayBuffer() }))
   );
 }
 

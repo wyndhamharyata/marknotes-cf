@@ -14,14 +14,6 @@ type Menu = {
 
 const { menus, currentPath } = Astro.props;
 
-/**
- * Hairline rule separating utility actions from navigation.
- *
- * This replaces the absolutely-positioned edge buttons the dock used to have,
- * which needed 6rem of side padding to reserve room for a 2rem button and so
- * left a wide gap on either side of the nav items. A divider groups them just
- * as clearly without reserving empty space.
- */
 const DIVIDER = "bg-base-content/15 mx-1 hidden h-6 w-px p-0 md:block";
 ---
 
@@ -36,12 +28,8 @@ const DIVIDER = "bg-base-content/15 mx-1 hidden h-6 w-px p-0 md:block";
   <div class="relative flex justify-center pt-3 pb-7">
     {
       /*
-      Translucent glass: the page sits behind a grid pattern, so blurring it
-      actually reads as depth rather than as a flat tint. `supports-` keeps a
-      near-opaque fallback for anything without backdrop-filter, where 65%
-      would just look washed out. shadow, not drop-shadow — the latter is a
-      filter, and stacking it with backdrop-filter on one element is asking
-      for compositing trouble.
+      shadow, not drop-shadow: the latter is a filter, and stacking it with
+      backdrop-filter on one element breaks compositing.
     */
     }
     <ul

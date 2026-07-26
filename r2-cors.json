@@ -1,0 +1,17 @@
+{
+  "rules": [
+    {
+      "allowed": {
+        "origins": [
+          "https://mwyndham.dev",
+          "https://blog.mwyndham.dev",
+          "https://devread.mwyndham.dev",
+          "http://localhost:4321"
+        ],
+        "methods": ["PUT"],
+        "headers": ["content-type"]
+      },
+      "maxAgeSeconds": 3600
+    }
+  ]
+}
