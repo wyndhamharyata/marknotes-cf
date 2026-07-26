@@ -23,7 +23,9 @@ const {
   image,
   dockProp,
   maxWidthClass = "max-w-4xl",
-  mainPaddingClass = "px-0 pb-40 md:px-4 md:py-8 md:pb-40",
+  // The dock is ~68px tall now, so 10rem of clearance is no longer needed;
+  // every admin page gets that height back.
+  mainPaddingClass = "px-0 pb-32 md:px-4 md:py-8 md:pb-32",
 } = Astro.props;
 ---
 

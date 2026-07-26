@@ -18,14 +18,16 @@ const { menus, currentPath } = Astro.props;
 <div class="fixed right-0 bottom-0 left-0 z-40">
   <!-- Gradient fade overlay - semi-transparent even at bottom -->
   <div
-    class="from-base-200/80 dark:from-base-300/80 pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-linear-to-t to-transparent"
+    class="from-base-200/80 dark:from-base-300/80 pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-linear-to-t to-transparent md:h-24"
   >
   </div>
   <!-- Dock container -->
   <div class="relative flex justify-center pb-4">
-    <ul class="menu menu-horizontal bg-base-100 rounded-2xl px-2 py-2 drop-shadow-2xl md:px-30">
+    <ul
+      class="menu menu-horizontal bg-base-100 relative rounded-2xl px-2 py-2 drop-shadow-2xl md:px-24 md:py-1.5"
+    >
       <li class="md:absolute md:top-0 md:bottom-0 md:left-6">
-        <a href="/" hx-boost="false" class="btn btn-ghost btn-circle my-auto">
+        <a href="/" hx-boost="false" class="btn btn-ghost btn-circle md:btn-sm my-auto">
           <Icon name="heroicons:arrow-uturn-left" class="h-5 w-5 fill-current" />
         </a>
       </li>
@@ -35,9 +37,9 @@ const { menus, currentPath } = Astro.props;
             <a
               href={menu.path}
               hx-boost="false"
-              class={`${currentPath === menu.path ? "menu-active" : ""} mx-1 flex w-16 flex-col px-6 md:h-16 md:w-24`}
+              class={`${currentPath === menu.path ? "menu-active" : ""} mx-1 flex w-16 flex-col px-6 md:h-10 md:w-auto md:flex-row md:items-center md:gap-2 md:px-4`}
             >
-              <Icon name={menu.iconName} class="h-5 w-5 md:mt-2" />
+              <Icon name={menu.iconName} class="h-5 w-5" />
               <p class="hidden md:block">{menu.label}</p>
             </a>
           </li>
@@ -45,7 +47,7 @@ const { menus, currentPath } = Astro.props;
       }
 
       <li class="md:absolute md:top-0 md:right-6 md:bottom-0">
-        <button class="btn btn-ghost btn-circle my-auto">
+        <button class="btn btn-ghost btn-circle md:btn-sm my-auto">
           <label class="swap swap-rotate" for="dark-toggle">
             <span class="hidden">Theme Switcher</span>
             <input type="checkbox" id="dark-toggle" class="theme-controller" />

@@ -16,14 +16,15 @@ const existingSlugs = (await getCollection("blog")).map((article) => article.id)
   description={SITE_DESCRIPTION}
   dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin/articles" }}
   maxWidthClass="max-w-[110rem]"
-  mainPaddingClass="px-0 pb-28 md:px-4 md:py-8 md:pb-28"
+  mainPaddingClass="px-0 pb-28 md:px-4 md:py-8 md:pb-24"
 >
   {
     /* Height is exact rather than guessed: `main` fills the viewport, so its
-      content box is 100dvh less its own padding (2rem top, 7rem bottom). The
-      editor then distributes that with flex instead of more magic numbers. */
+      content box is 100dvh less its own padding (2rem top, 6rem bottom). The
+      editor then distributes that with flex instead of more magic numbers.
+      6rem also matches the dock's gradient, so content stops where it begins. */
   }
-  <div class="mx-auto mt-4 flex w-full flex-col md:mt-0 md:h-[calc(100dvh-9rem)]">
+  <div class="mx-auto mt-4 flex w-full flex-col md:mt-0 md:h-[calc(100dvh-8rem)]">
     <div class="breadcrumbs my-2 hidden w-fit px-4 py-2 text-sm md:block">
       <ul class="flex flex-wrap overflow-x-clip text-ellipsis">
         <li><a href="/admin/articles">Articles</a></li>
