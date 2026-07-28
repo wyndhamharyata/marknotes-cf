@@ -36,15 +36,6 @@ type Status =
   | { kind: "busy"; message: string }
   | { kind: "error"; message: string };
 
-// Titled, because image keys embed the slug: an untitled draft cannot upload.
-const BLANK_DRAFT: ArticleDraft = {
-  title: "Untitled",
-  description: "",
-  body: "",
-  inlineAssets: [],
-  updatedAt: 0,
-};
-
 const AUTOSAVE_DEBOUNCE_MS = 500;
 const MIN_PANE_RATIO = 0.25;
 const MAX_PANE_RATIO = 0.75;
@@ -65,8 +56,7 @@ export default function MdxEditor({ proseClass, existingSlugs = [], article }: P
   const editing = article !== undefined;
   const draftId = article?.slug ?? "new";
 
-  // Identifies the revision this draft forked from, so an abandoned draft cannot
-  // silently revert a change made to the article since.
+  // Identifies the forked-from revision, so an abandoned draft cannot revert later edits.
   const base = useMemo(() => (article ? JSON.stringify(article.initial) : undefined), [article]);
 
   useEffect(() => {
@@ -75,7 +65,17 @@ export default function MdxEditor({ proseClass, existingSlugs = [], article }: P
     loadDraft(draftId).then((stored) => {
       if (cancelled) return;
       const usable = stored && stored.base === base ? stored.draft : null;
-      setDraft(usable ?? article?.initial ?? BLANK_DRAFT);
+      // Seeded "Untitled" because image keys embed the slug: untitled cannot upload.
+      setDraft(
+        usable ??
+          article?.initial ?? {
+            title: "Untitled",
+            description: "",
+            body: "",
+            inlineAssets: [],
+            updatedAt: 0,
+          }
+      );
       setRestored(usable !== null && editing);
     });
 
@@ -98,11 +98,7 @@ export default function MdxEditor({ proseClass, existingSlugs = [], article }: P
     return () => query.removeEventListener("change", sync);
   }, []);
 
-  /**
-   * Matched by fraction of scrollable height, not by source position, so it
-   * drifts on long documents. `driver` breaks the echo where moving one pane
-   * fires the other's scroll event and bounces back.
-   */
+  // `driver` breaks the echo where moving one pane fires the other's scroll and bounces back.
   useEffect(() => {
     const editor = textareaRef.current;
     const preview = previewRef.current;
@@ -168,14 +164,12 @@ export default function MdxEditor({ proseClass, existingSlugs = [], article }: P
     const hero = article.initial.heroPath;
     return [
       ...article.initial.inlineAssets.filter((asset) => asset.committed).map((a) => a.r2Key),
-      // Legacy heroes live at `../../assets/…`, outside what this editor writes,
-      // so they never become deletable.
+      // Legacy heroes sit outside what this editor writes, so they never become deletable.
       ...(hero?.startsWith("./") ? [hero.slice(2)] : []),
     ];
   }, [article]);
 
-  // Placeholder at the caret now, real component when the upload lands, so
-  // writing is never blocked and a failure leaves a visible marker.
+  // Placeholder first so writing is never blocked and a failure leaves a visible marker.
   const onImages = useCallback(
     async (files: File[], textarea: HTMLTextAreaElement) => {
       if (!slug) {
@@ -186,8 +180,7 @@ export default function MdxEditor({ proseClass, existingSlugs = [], article }: P
         return;
       }
 
-      // All placeholders before any upload, so a multi-file drop marks every
-      // spot at once.
+      // All placeholders before any upload, so a multi-file drop marks every spot at once.
       const jobs = files.map((file) => {
         const token = crypto.randomUUID().slice(0, 8);
         const placeholder = `![Uploading ${file.name}…](uploading:${token})`;
@@ -197,8 +190,7 @@ export default function MdxEditor({ proseClass, existingSlugs = [], article }: P
 
       setPendingUploads((count) => count + jobs.length);
 
-      // Direct DOM edit while focused: going through state would reset `value`
-      // and throw the caret to the end, mid-typing.
+      // Direct DOM edit while focused: state would reset `value` and move the caret.
       const swap = (placeholder: string, replacement: string) => {
         if (document.activeElement === textarea) {
           if (replaceInTextarea(textarea, placeholder, replacement)) return;

@@ -6,11 +6,7 @@ export function stagedAssetUrl(r2Key: string): string {
   return `/api/admin/assets/object?key=${encodeURIComponent(r2Key)}`;
 }
 
-/**
- * An asset an earlier publish already committed. Staging is not consulted: it
- * is emptied independently of the repo, so the repo is the only copy that
- * outlives a publish.
- */
+// Staging is emptied independently of the repo, so the repo copy outlives a publish.
 export function repoAssetUrl(key: string): string {
   return `/api/admin/assets/repo?key=${encodeURIComponent(key)}`;
 }
@@ -20,8 +16,7 @@ export async function uploadAsset(
   slug: string,
   kind: AssetKind
 ): Promise<{ key: string }> {
-  // Compression first: it rewrites the filename and MIME type, and the presigned
-  // URL signs Content-Type, so presigning earlier would sign the wrong header.
+  // Compression rewrites the MIME type, and the presigned URL signs Content-Type.
   const compressed = await compressImage(file, kind);
 
   const query = new URLSearchParams({

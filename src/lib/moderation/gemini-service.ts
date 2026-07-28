@@ -36,10 +36,6 @@ function getGeminiClient(): GoogleGenAI {
   return aiClient;
 }
 
-/**
- * Moderate a batch of comments using Gemini AI
- * Mirrors the Go implementation's batch processing approach with structured JSON output
- */
 export async function moderateComments(
   comments: ModerationInput[],
   maxRetries: number = 3

@@ -14,9 +14,7 @@ export const prerender = false;
 const { slug } = Astro.params;
 if (!slug || !isSafeSlug(slug)) return new Response("Not found", { status: 404 });
 
-// `main`, not the content collection: the collection is baked at build time, so
-// between a publish and the end of its deploy it still serves the old article,
-// and writing that back would revert the publish.
+// `main`, not the collection, which is stale until a deploy lands — writing it back reverts.
 const [resp, fetchErr] = await tryCatch(
   ghApi(`/contents/src/content/blog/${slug}.mdx?ref=main`, {
     headers: { Accept: "application/vnd.github.raw" },

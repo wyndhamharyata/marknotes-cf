@@ -11,8 +11,7 @@ import type { CreateCommentInput, ModerationResult } from "../lib/comments/types
 export type { GetCommentsForAdminInput } from "../lib/comments/queries";
 export type { SiteWideTotals, SiteWidePageviewSeries, AnalyticsSnapshotInput } from "../lib/analytics/queries";
 
-// RPC requires prototype methods, not arrow class fields. File is in
-// .prettierignore so the one-line shims survive formatting.
+// RPC needs prototype methods, not arrow fields; .prettierignore keeps the shims one-line.
 export class MainDO extends DurableObject {
   private db: DrizzleSqliteDODatabase<typeof schema>;
 

@@ -44,8 +44,7 @@ export async function commitMdx(input: {
 
   const shas = await Promise.all(
     payloads.map(async (bytes) => {
-      // Chunked: a concatenation per byte is real CPU cost on a Worker once a
-      // commit carries several megabytes of images.
+      // Chunked: a concatenation per byte is real Worker CPU cost at several megabytes.
       let binary = "";
       for (let i = 0; i < bytes.length; i += 0x8000) {
         binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));

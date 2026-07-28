@@ -24,8 +24,7 @@ export const GET: APIRoute = async ({ request }) => {
 
   return new Response(
     JSON.stringify({
-      // No run yet means GitHub has the push but has not created one; the
-      // banner cannot tell that apart from `queued` anyway.
+      // No run yet means the push landed before GitHub created one; same as `queued` here.
       status: run?.status ?? "pending",
       conclusion: run?.conclusion ?? null,
       htmlUrl: run?.html_url ?? null,

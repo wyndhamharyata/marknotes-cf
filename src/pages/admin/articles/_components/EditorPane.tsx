@@ -20,10 +20,7 @@ interface Props {
   textareaRef: RefObject<HTMLTextAreaElement>;
 }
 
-/**
- * H1 is the article title on the rendered page and H6 is unused across the
- * existing posts, so the dropdown offers the range that actually gets written.
- */
+// H1 is the page title and H6 is unused across existing posts.
 const HEADING_OPTIONS = [
   { level: 0, label: "Normal text" },
   { level: 2, label: "Heading 2" },
@@ -170,8 +167,7 @@ export default function EditorPane({ body, onBody, onImages, textareaRef }: Prop
           }}
           onKeyDown={(event) => {
             const textarea = textareaRef.current;
-            // Enter continues the list, Tab nests it, Backspace at the start of
-            // an item lifts it back out.
+            // Enter continues, Tab nests, Backspace at an item start outdents.
             if (textarea && handleListKey(textarea, event)) {
               event.preventDefault();
               syncHeading();

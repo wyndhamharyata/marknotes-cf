@@ -1,7 +1,4 @@
-// Dev-only MainDO substitute. Miniflare can't host the DO class via
-// platformProxy, so locally we drive the same query functions against a
-// better-sqlite3 file. Dynamically imported under `import.meta.env.DEV` so
-// prod bundles never see better-sqlite3.
+// Miniflare cannot host the DO via platformProxy, so dev runs the same queries on better-sqlite3.
 import fs from "node:fs";
 import path from "node:path";
 import Database from "better-sqlite3";

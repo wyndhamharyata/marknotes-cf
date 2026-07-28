@@ -9,8 +9,6 @@ interface Props {
   onSelect: (file: File | undefined) => void;
 }
 
-const ACCEPT = "image/png,image/jpeg,image/webp,image/gif,image/avif";
-
 // Inline SVG because astro-icon resolves at build time and cannot run in an island.
 export default function HeroImagePicker({ file, uploadedKey, committedUrl, onSelect }: Props) {
   const [dragging, setDragging] = useState(false);
@@ -88,7 +86,7 @@ export default function HeroImagePicker({ file, uploadedKey, committedUrl, onSel
         </p>
         <input
           type="file"
-          accept={ACCEPT}
+          accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
           class="hidden"
           onChange={(e) => accept(e.currentTarget.files)}
         />

@@ -1,20 +1,13 @@
 import { isSafeAssetKey } from "../asset-key";
 import type { ArticleDraft, InlineAsset } from "./types";
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
 /** Matches existing frontmatter, zero-padded day included: "Sep 01 2023". */
 export function formatPubDate(date: Date): string {
-  return `${MONTHS[date.getMonth()]} ${String(date.getDate()).padStart(2, "0")} ${date.getFullYear()}`;
+  const month = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ")[date.getMonth()];
+  return `${month} ${String(date.getDate()).padStart(2, "0")} ${date.getFullYear()}`;
 }
 
-/**
- * Assets still referenced by the body, deduplicated by identifier.
- *
- * Filtering by reference is what stops a deleted `<BlogImage>` line from
- * committing its image to the repo anyway. Deduplicating turns an identifier
- * collision from a duplicate `import` — a build error — into a repeated image.
- */
+// Filtering by reference stops a deleted `<BlogImage>` committing its image anyway.
 export function referencedAssets(body: string, assets: InlineAsset[]): InlineAsset[] {
   const seen = new Set<string>();
   return assets.filter((asset) => {
@@ -98,8 +91,7 @@ export function parseMdx(source: string) {
   const inlineAssets: InlineAsset[] = [];
   const extraImports: string[] = [];
 
-  // Only the run of imports before the first content line, so a Go `import (`
-  // inside a later fence stays in the body where it belongs.
+  // Only the run before the first content line, so a Go `import (` stays in the body.
   let cursor = 0;
   for (; cursor < lines.length; cursor++) {
     const line = lines[cursor].trim();
@@ -137,8 +129,7 @@ export function parseMdx(source: string) {
   };
 }
 
-// A YAML double-quoted scalar accepts JSON's escaping, so this is the exact
-// inverse of the JSON.parse that reads the value back in parseMdx.
+// YAML double-quoted accepts JSON escaping, so this inverts parseMdx's JSON.parse exactly.
 function yamlString(value: string): string {
   const oneLine = value.replaceAll("\r", "\n").split("\n").filter(Boolean).join(" ");
   return JSON.stringify(oneLine.trim());

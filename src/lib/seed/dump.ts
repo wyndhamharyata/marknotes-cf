@@ -25,8 +25,7 @@ function formatInsert(
   table: Table,
   row: Record<string, unknown>,
 ): string {
-  // getTableColumns gives the real SQL column names; drizzle's row keys are
-  // camelCase TS properties, so we map both sides off the same source.
+  // drizzle's row keys are camelCase, so both sides map off getTableColumns.
   const entries = Object.entries(getTableColumns(table)).map(([jsKey, col]) => ({
     jsKey,
     sqlName: (col as { name: string }).name,

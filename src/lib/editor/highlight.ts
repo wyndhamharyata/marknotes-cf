@@ -1,11 +1,6 @@
 import type { HighlighterCore } from "shiki/core";
 
-// github-dark is Astro's default, so preview colours match the published page.
-const THEME = "github-dark";
-
-// Only the languages the blog actually uses. Built from shiki/core rather than
-// the full bundle, whose index would have Vite emit a chunk per grammar; each
-// entry here is fetched on first use.
+// shiki/core, not the full bundle whose index makes Vite emit a chunk per grammar.
 const LANGUAGE_LOADERS: Record<string, () => Promise<unknown>> = {
   css: () => import("shiki/langs/css.mjs"),
   go: () => import("shiki/langs/go.mjs"),
@@ -70,7 +65,8 @@ export async function highlightCode(
       loadedLanguages.add(resolved);
     }
 
-    return highlighter.codeToHtml(code, { lang: resolved, theme: THEME });
+    // github-dark is Astro's default, so the preview matches the published page.
+    return highlighter.codeToHtml(code, { lang: resolved, theme: "github-dark" });
   } catch {
     return null;
   }

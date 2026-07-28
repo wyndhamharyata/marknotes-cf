@@ -15,9 +15,7 @@ const RequestBodySchema = object({
   removedKeys: optional(array(string())),
 });
 
-// Each asset costs an R2 read plus a GitHub blob POST on top of the ~5
-// subrequests the ref/tree/commit dance needs; the byte cap keeps the base64
-// pass inside the CPU budget.
+// Each asset costs an R2 read plus a blob POST; the byte cap bounds the base64 pass.
 const MAX_ASSETS = 20;
 const MAX_TOTAL_BYTES = 25 * 1024 * 1024;
 
@@ -47,9 +45,7 @@ const save: APIRoute = async ({ request }) => {
 
   const heroPrefix = `hero-images/${slug}-`;
   for (const key of removals) {
-    // Confining a delete to this slug's own namespace is what stops a forged key
-    // from reaching another article's images. The hero test rejects a further
-    // hyphen before the random suffix, or `foo` could delete `foo-bar`'s hero.
+    // Confines deletes to this slug: the hyphen test is why `foo` cannot delete `foo-bar`'s hero.
     const owned =
       key.startsWith(`content-images/${slug}/`) ||
       (key.startsWith(heroPrefix) && !key.slice(heroPrefix.length).includes("-"));

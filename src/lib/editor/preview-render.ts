@@ -3,20 +3,13 @@ import { highlightCode } from "./highlight";
 import type { InlineAsset } from "./types";
 import { repoAssetUrl, stagedAssetUrl } from "./upload";
 
-// Loaded lazily so the textarea is interactive before the parser arrives.
-// Output is injected unsanitised: admin-only editor, admin's own draft.
+// Lazy so the textarea is interactive first; output is unsanitised, being the admin's own draft.
 let markedModule: Promise<typeof import("marked")> | null = null;
 
 function loadMarked() {
   markedModule ??= import("marked");
   return markedModule;
 }
-
-const BLOG_IMAGE_TAG = /<BlogImage\s+([^>]*?)\/>/g;
-
-const UPLOAD_PLACEHOLDER = /!\[Uploading ([^\]]*)\]\(uploading:[^)]*\)/g;
-
-const ATTRIBUTE = /([A-Za-z]+)\s*=\s*(?:"([^"]*)"|\{([A-Za-z_$][\w$]*)\})/g;
 
 export async function renderPreview(body: string, assets: InlineAsset[]): Promise<string> {
   const { Marked } = await loadMarked();
@@ -43,8 +36,7 @@ const fenceKey = (lang: string | undefined, text: string) => `${lang ?? ""}|${te
 async function highlightAll(instance: Marked, markdown: string) {
   const fences = new Map<string, { lang?: string; text: string }>();
 
-  // marked's own walker: list items keep children under `items`, which a naive
-  // `token.tokens` recursion misses.
+  // marked's own walker: list items keep children under `items`, which `token.tokens` misses.
   instance.walkTokens(instance.lexer(markdown), (token: Token) => {
     if (token.type === "code") {
       fences.set(fenceKey(token.lang, token.text), { lang: token.lang, text: token.text });
@@ -69,7 +61,7 @@ function plainCode(text: string, lang?: string): string {
 
 function markUploads(body: string): string {
   return body.replace(
-    UPLOAD_PLACEHOLDER,
+    /!\[Uploading ([^\]]*)\]\(uploading:[^)]*\)/g,
     (_match, name: string) =>
       `<span class="badge badge-neutral gap-2"><span class="loading loading-spinner loading-xs"></span>Uploading ${escapeHtml(name)}</span>`
   );
@@ -77,7 +69,7 @@ function markUploads(body: string): string {
 
 // Mirrors BlogImage.astro's markup so the preview matches the published page.
 function expandBlogImages(body: string, assets: InlineAsset[]): string {
-  return body.replace(BLOG_IMAGE_TAG, (_match, rawAttrs: string) => {
+  return body.replace(/<BlogImage\s+([^>]*?)\/>/g, (_match, rawAttrs: string) => {
     const attrs = parseAttributes(rawAttrs);
     const src = resolveSrc(attrs.src, assets);
     const alt = escapeHtml(attrs.alt ?? "");
@@ -96,7 +88,7 @@ function expandBlogImages(body: string, assets: InlineAsset[]): string {
 
 function parseAttributes(raw: string): Record<string, string> {
   const attrs: Record<string, string> = {};
-  for (const match of raw.matchAll(ATTRIBUTE)) {
+  for (const match of raw.matchAll(/([A-Za-z]+)\s*=\s*(?:"([^"]*)"|\{([A-Za-z_$][\w$]*)\})/g)) {
     const [, name, quoted, identifier] = match;
     // Braces are retained so resolveSrc can tell `src={img_x}` from `src="url"`.
     attrs[name] = quoted !== undefined ? quoted : `{${identifier}}`;

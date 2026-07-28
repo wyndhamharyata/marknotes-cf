@@ -1,11 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 
-/**
- * Follows the deploy the last publish kicked off.
- *
- * A commit only reaches the site once the workflow finishes, so without this the
- * editor's redirect looks like nothing happened for two minutes.
- */
+// A commit reaches the site only once the workflow finishes, which takes minutes.
 export default function DeployBanner() {
   const [sha, setSha] = useState("");
   const [slug, setSlug] = useState("");
@@ -59,8 +54,7 @@ export default function DeployBanner() {
       } catch {
         // Offline or a transient 502; the next tick retries.
       }
-      // A dependency install plus an SST deploy takes minutes; polling faster
-      // would only spend rate limit.
+      // An install plus an SST deploy takes minutes; faster polling only spends rate limit.
       if (!cancelled) timer = setTimeout(poll, 10_000);
     };
 

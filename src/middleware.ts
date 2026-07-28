@@ -7,8 +7,7 @@ import {
   type StubLike,
 } from "./lib/db/do-client";
 
-// @vite-ignore + import.meta.env.DEV guard keep dev-fallback (and
-// better-sqlite3) out of Workers prod bundles via DCE.
+// @vite-ignore + the DEV guard keep better-sqlite3 out of prod bundles via DCE.
 let cachedDevStubPromise: Promise<StubLike> | null = null;
 
 const runtimeMiddleware = defineMiddleware(async (context, next) => {

@@ -55,8 +55,7 @@ export async function generatePresignedPutURL(
     },
   });
 
-  // ContentType is part of the signature, so the browser's PUT must send this
-  // exact header or R2 answers SignatureDoesNotMatch.
+  // ContentType is signed, so the browser's PUT must send this exact header.
   const url = await getSignedUrl(
     client,
     new PutObjectCommand({

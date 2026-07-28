@@ -7,10 +7,6 @@ export const prerender = false;
 
 const KINDS = ["hero", "content"];
 
-// SVG is excluded deliberately: astro:assets treats it differently from raster
-// formats and it can carry script.
-const TYPES = ["image/png", "image/jpeg", "image/webp", "image/gif", "image/avif"];
-
 export const GET: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
   const slug = url.searchParams.get("slug");
@@ -23,7 +19,9 @@ export const GET: APIRoute = async ({ request }) => {
 
   if (!isSafeSlug(slug)) return jsonErr("slug must be lowercase alphanumeric with hyphens", 400);
   if (!KINDS.includes(kind)) return jsonErr(`kind must be one of ${KINDS}`, 400);
-  if (!TYPES.includes(contentType)) return jsonErr(`unsupported content type: ${contentType}`, 415);
+  // SVG is excluded deliberately: astro:assets treats it differently and it can carry script.
+  if (!["image/png", "image/jpeg", "image/webp", "image/gif", "image/avif"].includes(contentType))
+    return jsonErr(`unsupported content type: ${contentType}`, 415);
 
   const [result, error] = await tryCatch(
     generatePresignedPutURL(

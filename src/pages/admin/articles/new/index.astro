@@ -6,8 +6,7 @@ import MdxEditor from "../_components/MdxEditor";
 
 export const prerender = false;
 
-// Rendered on the server so the editor can warn about a slug collision without
-// a round trip; the same collection the article pages are built from.
+// Server-rendered so the editor can warn about a slug collision without a round trip.
 const existingSlugs = (await getCollection("blog")).map((article) => article.id);
 ---
 

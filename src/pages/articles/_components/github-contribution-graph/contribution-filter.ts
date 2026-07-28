@@ -1,20 +1,3 @@
-const MONTH_NAMES = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
-const DAY_NAMES = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
 export function filterTableByDateRange(
   html: string,
   fromDate: Date,
@@ -44,7 +27,10 @@ export function filterTableByDateRange(
 
   let filtered = html;
 
-  MONTH_NAMES.forEach((month, idx) => {
+  const months =
+    "January February March April May June July August September October November December";
+
+  months.split(" ").forEach((month, idx) => {
     if (idx < fromMonth || idx > toMonth) {
       const monthRegex = new RegExp(
         `<td[^>]*class="[^"]*ContributionCalendar-label[^"]*"[^>]*>[\\s\\S]*?<span[^>]*>${month}</span>[\\s\\S]*?</td>`,
@@ -67,7 +53,7 @@ export function filterTableByDateRange(
   filtered = filtered.replace(
     /<td[^>]*class="[^"]*ContributionCalendar-label[^"]*"[^>]*>[\s\S]*?<\/td>/g,
     (match) => {
-      if (DAY_NAMES.some((day) => match.includes(day))) {
+      if ("Sun Mon Tue Wed Thu Fri Sat".split(" ").some((day) => match.includes(day))) {
         return "";
       }
       return match;

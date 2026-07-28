@@ -6,8 +6,7 @@ interface CompressedImage {
   contentType: string;
 }
 
-// Inline images become permanent git history, so shrinking them before upload
-// matters more than it would for ordinary uploads.
+// Inline images become permanent git history, so shrink before upload.
 const MAX_WIDTH: Record<AssetKind, number> = { hero: 1920, content: 1600 };
 const OUTPUT_TYPE = "image/webp";
 const QUALITY = 0.85;

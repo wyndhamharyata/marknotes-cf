@@ -1,8 +1,7 @@
 import { createStore, del, get, set } from "idb-keyval";
 import type { ArticleDraft } from "./types";
 
-// IndexedDB rather than localStorage because the hero image is held as a File
-// until publish, and structured clone can store one.
+// IndexedDB, not localStorage: only structured clone can hold the hero File.
 const store = createStore("marknotes-editor", "drafts");
 
 /** `id` is the article slug, or `new` for one that has never been published. */

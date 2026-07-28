@@ -4,11 +4,7 @@ import { isSafeAssetKey } from "../../../../lib/asset-key";
 
 export const prerender = false;
 
-/**
- * Reads a staged upload back out of R2. Presigning only grants PUT and the
- * bucket has no public domain, so this is the editor's only way to display an
- * image it just uploaded.
- */
+// Presigning grants only PUT and the bucket has no public domain, so reads come through here.
 export const GET: APIRoute = async ({ request }) => {
   const key = new URL(request.url).searchParams.get("key");
   if (!key || !isSafeAssetKey(key)) return new Response("Invalid key", { status: 400 });

@@ -2,8 +2,7 @@ import type { APIRoute } from "astro";
 import { Resource } from "sst";
 import { getDoStub } from "../../lib/db/do-client";
 
-// SQL dump for dev-fallback seeding. Layered guards: stage (404 on prod) +
-// MigrationToken (403 if mismatched). Prod doesn't bind the secret either.
+// Layered guards: stage 404s on prod, MigrationToken 403s, and prod binds no secret.
 export const GET: APIRoute = async ({ url, locals }) => {
   const stage = (locals as unknown as { runtime?: { env?: { STAGE?: string } } })
     .runtime?.env?.STAGE;

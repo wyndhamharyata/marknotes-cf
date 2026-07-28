@@ -1,8 +1,4 @@
-/**
- * Every mutation here goes through execCommand("insertText") rather than
- * assigning `textarea.value`, because it is the only way to change the content
- * while keeping the browser's native undo stack intact.
- */
+// execCommand("insertText") rather than `value =`, the only way to keep native undo.
 export function insertAtCursor(textarea: HTMLTextAreaElement, text: string): void {
   textarea.focus();
 
@@ -54,8 +50,7 @@ function transformLines(
   textarea.setSelectionRange(start, end);
   insertAtCursor(textarea, rewritten);
 
-  // Restoring the selection is what lets consecutive toolbar clicks work; a
-  // collapsed caret would leave the second click seeing only the last line.
+  // Restoring the selection is what lets consecutive toolbar clicks work.
   if (hadSelection) {
     textarea.setSelectionRange(start, start + rewritten.length);
   } else {
@@ -92,12 +87,7 @@ const LIST_PREFIX = /^([ \t]*(?:[-*+]|\d+\.)[ \t]+)/;
 const ANY_MARKER = /^[ \t]*(?:[-*+]|\d+\.)[ \t]+/;
 const INDENT = "  ";
 
-/**
- * Restarts the count at each nesting level. Markdown renderers take the `<ol>`
- * `start` attribute from the first item, so an indented item left numbered "3."
- * renders its sublist beginning at the third marker. Bullets keep their marker
- * but still advance their level's counter.
- */
+// Restarts per nesting level, since renderers take `<ol start>` from the first item.
 function renumberOrderedItems(lines: string[]): string[] {
   const counters: { indent: number; n: number }[] = [];
   let baseWidth: number | null = null;
@@ -116,8 +106,7 @@ function renumberOrderedItems(lines: string[]): string[] {
 
     let level = counters[counters.length - 1];
     if (!level || level.indent < width) {
-      // The outermost level keeps whatever number the author started on, since
-      // `1.` versus `3.` is a real choice that markdown renders as <ol start>.
+      // The outermost level keeps the author's number; `3.` is a real choice.
       const seed = width === baseWidth && ordered ? Number(ordered[1]) - 1 : 0;
       level = { indent: width, n: seed };
       counters.push(level);
@@ -180,12 +169,7 @@ function contentOffset(textarea: HTMLTextAreaElement, line: { start: number; tex
   return Math.max(0, textarea.selectionStart - line.start - prefix);
 }
 
-/**
- * Edits the caret's list block, renumbers it and writes it back in one change,
- * so a single Tab takes a single undo to reverse. `edit` returns where the caret
- * belongs as a line index plus an offset into that line's text — offsets skip
- * the marker because renumbering changes its width when 9 becomes 10.
- */
+// One change per edit, so a single Tab takes a single undo to reverse.
 function rewriteListBlock(
   textarea: HTMLTextAreaElement,
   edit: (lines: string[], index: number) => { line: number; offset: number }
@@ -226,11 +210,7 @@ function shiftIndent(textarea: HTMLTextAreaElement, direction: 1 | -1): boolean 
   });
 }
 
-/**
- * Returns true when it handled the key, so the caller can preventDefault.
- * Anything not clearly a list operation returns false — Backspace especially,
- * since hijacking it away from plain deletion would be worse than not indenting.
- */
+// False unless clearly a list op: hijacking Backspace from plain deletion would be worse.
 export function handleListKey(textarea: HTMLTextAreaElement, event: KeyboardEvent): boolean {
   if (event.metaKey || event.ctrlKey || event.altKey) return false;
 
@@ -277,12 +257,7 @@ export function handleListKey(textarea: HTMLTextAreaElement, event: KeyboardEven
   return false;
 }
 
-/**
- * Swaps a substring without disturbing the author. Routing this through state
- * instead would reassign `textarea.value`, throwing the caret to the end and
- * clearing undo — exactly wrong when an upload lands mid-typing. Returns false
- * if the needle is gone, so the caller can fall back to a state update.
- */
+// Going through state would reassign `value`, throwing the caret to the end mid-typing.
 export function replaceInTextarea(
   textarea: HTMLTextAreaElement,
   search: string,
