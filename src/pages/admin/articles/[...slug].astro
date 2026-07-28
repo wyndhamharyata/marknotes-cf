@@ -34,6 +34,10 @@ const { title, description, pubDate, updatedDate, heroImage } = post.data;
       </ul>
     </div>
 
+    <div class="flex justify-end px-4 md:px-0">
+      <a href={`/admin/articles/${post.id}/edit`} class="btn btn-primary btn-sm">Edit article</a>
+    </div>
+
     <div role="tablist" class="tabs tabs-lg tabs-lift">
       <input
         type="radio"

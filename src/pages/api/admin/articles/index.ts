@@ -3,7 +3,7 @@ import type { APIRoute } from "astro";
 import { minLength, string, nonEmpty, pipe, object, optional, safeParse, array } from "valibot";
 import { Resource } from "sst/resource";
 import { commitMdx } from "../../../../lib/github";
-import { isSafeAssetKey, isSafeSlug, ownsAssetKey } from "../../../../lib/asset-key";
+import { isSafeAssetKey, isSafeSlug } from "../../../../lib/asset-key";
 
 export const prerender = false;
 
@@ -12,7 +12,6 @@ const RequestBodySchema = object({
   content: pipe(string(), nonEmpty(), minLength(1, "content is required")),
   imageKey: optional(string()),
   inlineImageKeys: optional(array(string())),
-  /** Repo-local images the edit orphaned. */
   removedKeys: optional(array(string())),
 });
 
@@ -22,16 +21,7 @@ const RequestBodySchema = object({
 const MAX_ASSETS = 20;
 const MAX_TOTAL_BYTES = 25 * 1024 * 1024;
 
-// Deletions only add tree entries, so the cap just bounds the request body.
-const MAX_REMOVALS = 50;
-
-export const POST: APIRoute = ({ request }) =>
-  save(request, (slug) => `content: new content push from admin panel - ${slug}`);
-
-export const PUT: APIRoute = ({ request }) =>
-  save(request, (slug) => `content: edit from admin panel - ${slug}`);
-
-async function save(request: Request, message: (slug: string) => string): Promise<Response> {
+const save: APIRoute = async ({ request }) => {
   const [rawReq, parseErr] = await tryCatch(request.json());
   if (parseErr) return jsonErr("Invalid JSON", 400);
 
@@ -53,15 +43,19 @@ async function save(request: Request, message: (slug: string) => string): Promis
     return jsonErr(`Too many images: ${keys.length} (max ${MAX_ASSETS})`, 400);
 
   const removals = [...new Set(removedKeys)];
-  if (removals.length > MAX_REMOVALS)
-    return jsonErr(`Too many deletions: ${removals.length} (max ${MAX_REMOVALS})`, 400);
+  if (removals.length > 50) return jsonErr(`Too many deletions: ${removals.length} (max 50)`, 400);
 
+  const heroPrefix = `hero-images/${slug}-`;
   for (const key of removals) {
-    // Ownership is the real guard: it confines a delete to this slug's own
-    // namespace, so a forged key cannot reach another article's images.
-    if (!ownsAssetKey(key, slug))
+    // Confining a delete to this slug's own namespace is what stops a forged key
+    // from reaching another article's images. The hero test rejects a further
+    // hyphen before the random suffix, or `foo` could delete `foo-bar`'s hero.
+    const owned =
+      key.startsWith(`content-images/${slug}/`) ||
+      (key.startsWith(heroPrefix) && !key.slice(heroPrefix.length).includes("-"));
+
+    if (!isSafeAssetKey(key) || !owned)
       return jsonErr(`Cannot delete an asset outside this article: ${key}`, 400);
-    // And the article being written must no longer import it.
     if (content.includes(key)) return jsonErr(`Asset is still referenced: ${key}`, 400);
   }
 
@@ -72,7 +66,10 @@ async function save(request: Request, message: (slug: string) => string): Promis
     commitMdx({
       slug,
       mdxContent: content,
-      message: message(slug),
+      message:
+        request.method === "PUT"
+          ? `content: edit from admin panel - ${slug}`
+          : `content: new content push from admin panel - ${slug}`,
       assets,
       removedKeys: removals,
     })
@@ -86,7 +83,10 @@ async function save(request: Request, message: (slug: string) => string): Promis
   return new Response(JSON.stringify({ ok: true, sha: commitRes.sha }), {
     headers: { "Content-Type": "application/json" },
   });
-}
+};
+
+export const POST = save;
+export const PUT = save;
 
 async function collectAssets(keys: string[]) {
   if (keys.length === 0) return [];

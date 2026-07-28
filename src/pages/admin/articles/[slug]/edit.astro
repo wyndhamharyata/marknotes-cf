@@ -1,0 +1,78 @@
+---
+import { tryCatch } from "@maxmorozoff/try-catch-tuple";
+import { getEntry } from "astro:content";
+import BaseAdminLayout from "../../../../layouts/BaseAdminLayout.astro";
+import { SITE_DESCRIPTION, ADMIN_DOCK, ARTICLE_PROSE_CLASS } from "../../../../consts";
+import { isSafeAssetKey, isSafeSlug } from "../../../../lib/asset-key";
+import { parseMdx } from "../../../../lib/editor/mdx-serialize";
+import { repoAssetUrl } from "../../../../lib/editor/upload";
+import { ghApi } from "../../../../lib/github";
+import MdxEditor from "../_components/MdxEditor";
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+if (!slug || !isSafeSlug(slug)) return new Response("Not found", { status: 404 });
+
+// `main`, not the content collection: the collection is baked at build time, so
+// between a publish and the end of its deploy it still serves the old article,
+// and writing that back would revert the publish.
+const [resp, fetchErr] = await tryCatch(
+  ghApi(`/contents/src/content/blog/${slug}.mdx?ref=main`, {
+    headers: { Accept: "application/vnd.github.raw" },
+  })
+);
+if (fetchErr) return new Response("Not found", { status: 404 });
+
+const [parsed, parseErr] = await tryCatch(resp.text().then(parseMdx));
+
+const hero = parsed?.draft.heroPath;
+const heroKey = hero?.startsWith("./") ? hero.slice(2) : "";
+const heroPreviewUrl = isSafeAssetKey(heroKey)
+  ? repoAssetUrl(heroKey)
+  : // A legacy hero sits outside the asset namespace, so the collection's
+    // processed URL is the only handle on it.
+    (await getEntry("blog", slug))?.data.heroImage?.src;
+---
+
+<BaseAdminLayout
+  title={`Edit ${parsed?.draft.title ?? slug}`}
+  description={SITE_DESCRIPTION}
+  dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin/articles" }}
+  maxWidthClass="max-w-[110rem]"
+  mainPaddingClass="px-0 pb-28 md:px-4 md:py-8 md:pb-24"
+>
+  <div class="mx-auto mt-4 flex w-full flex-col md:mt-0 md:h-[calc(100dvh-8rem)]">
+    <div class="breadcrumbs my-2 hidden w-fit px-4 py-2 text-sm md:block">
+      <ul class="flex flex-wrap overflow-x-clip text-ellipsis">
+        <li><a href="/admin/articles">Articles</a></li>
+        <li><a href={`/admin/articles/${slug}`}>{parsed?.draft.title ?? slug}</a></li>
+        <li>Edit</li>
+      </ul>
+    </div>
+
+    {
+      parseErr ? (
+        <div class="alert alert-error mx-4">
+          <span>
+            {slug}.mdx cannot be opened in the editor:{" "}
+            {parseErr instanceof Error ? parseErr.message : "unreadable"}
+          </span>
+        </div>
+      ) : (
+        <MdxEditor
+          client:load
+          proseClass={ARTICLE_PROSE_CLASS}
+          article={{
+            slug,
+            pubDate: parsed.pubDate,
+            initial: parsed.draft,
+            extraFrontmatter: parsed.extraFrontmatter,
+            extraImports: parsed.extraImports,
+            heroPreviewUrl,
+          }}
+        />
+      )
+    }
+  </div>
+</BaseAdminLayout>
