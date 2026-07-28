@@ -1,3 +1,4 @@
+import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import { defineMiddleware, sequence } from "astro:middleware";
 import { client, subjects, setTokensFromCookies, isAdmin } from "./lib/auth";
 import {
@@ -47,36 +48,32 @@ const authMiddleware = defineMiddleware(async (context, next) => {
   const accessToken = context.cookies.get("access_token")?.value;
   const refreshToken = context.cookies.get("refresh_token")?.value;
 
-  try {
-    const verified = await client.verify(subjects, accessToken ?? "", {
-      refresh: refreshToken ?? "",
-    });
+  const [verified, verifyErr] = await tryCatch(
+    client.verify(subjects, accessToken ?? "", { refresh: refreshToken ?? "" }),
+  );
+  if (verifyErr) console.error("Auth verification failed:", verifyErr);
 
-    if (!verified.err) {
-      if (verified.tokens) {
-        setTokensFromCookies(
-          context.cookies,
-          verified.tokens.access,
-          verified.tokens.refresh,
+  if (verified && !verified.err) {
+    if (verified.tokens) {
+      setTokensFromCookies(
+        context.cookies,
+        verified.tokens.access,
+        verified.tokens.refresh,
+      );
+    }
+    context.locals.user = verified.subject;
+
+    if (!isAdmin(verified.subject)) {
+      if (isAdminApi) {
+        return new Response(
+          JSON.stringify({ error: "Forbidden", message: "Admin access required" }),
+          { status: 403, headers: { "Content-Type": "application/json" } },
         );
       }
-      context.locals.user = verified.subject;
-
-      // Check if user is admin
-      if (!isAdmin(verified.subject)) {
-        if (isAdminApi) {
-          return new Response(
-            JSON.stringify({ error: "Forbidden", message: "Admin access required" }),
-            { status: 403, headers: { "Content-Type": "application/json" } },
-          );
-        }
-        return context.redirect("/", 302);
-      }
-
-      return next();
+      return context.redirect("/", 302);
     }
-  } catch (e) {
-    console.error("Auth verification failed:", e);
+
+    return next();
   }
 
   // Not authenticated

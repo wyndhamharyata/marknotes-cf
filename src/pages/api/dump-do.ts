@@ -1,3 +1,4 @@
+import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import type { APIRoute } from "astro";
 import { Resource } from "sst";
 import { getDoStub } from "../../lib/db/do-client";
@@ -10,13 +11,11 @@ export const GET: APIRoute = async ({ url, locals }) => {
     return new Response("Not Found", { status: 404 });
   }
 
-  let expectedToken = "";
-  try {
-    expectedToken = (Resource as unknown as { MigrationToken: { value: string } })
-      .MigrationToken.value;
-  } catch {
-    return new Response("Forbidden", { status: 403 });
-  }
+  const [expectedToken] = tryCatch(
+    () =>
+      (Resource as unknown as { MigrationToken: { value: string } })
+        .MigrationToken.value,
+  );
   const providedToken = url.searchParams.get("token");
   if (!expectedToken || providedToken !== expectedToken) {
     return new Response("Forbidden", { status: 403 });

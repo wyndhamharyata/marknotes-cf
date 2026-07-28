@@ -1,3 +1,4 @@
+import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import { useState } from "preact/hooks";
 import CommentForm from "./CommentForm";
 import CommentItem from "./CommentItem";
@@ -53,7 +54,8 @@ export default function CommentTree({ comments: initialComments, articleSlug }: 
   const submitComment = async (message: string, parentId: number | null): Promise<boolean> => {
     setIsSubmitting(true);
     setFormError(null);
-    try {
+
+    const [posted, error] = await tryCatch(async () => {
       const res = await fetch("/api/comments/create", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -64,32 +66,34 @@ export default function CommentTree({ comments: initialComments, articleSlug }: 
         }),
       });
 
-      if (res.ok) {
-        const data = (await res.json()) as CreateCommentResponse;
-        const newNode: CommentNode = {
-          ...data.comment,
-          children: [],
-        };
-
-        if (parentId === null) {
-          setComments((prev) => [newNode, ...prev]);
-        } else {
-          setComments((prev) => addToParent(prev, parentId, newNode));
-        }
-        setActiveReplyId(null);
-        return true;
-      } else {
+      if (!res.ok) {
         const errorData = (await res.json()) as ErrorResponse;
         setFormError({ parentId, message: errorData.error || "Failed to post comment" });
         return false;
       }
-    } catch (err) {
-      console.error("Failed to submit comment:", err);
+
+      const data = (await res.json()) as CreateCommentResponse;
+      const newNode: CommentNode = {
+        ...data.comment,
+        children: [],
+      };
+
+      if (parentId === null) {
+        setComments((prev) => [newNode, ...prev]);
+      } else {
+        setComments((prev) => addToParent(prev, parentId, newNode));
+      }
+      setActiveReplyId(null);
+      return true;
+    });
+
+    setIsSubmitting(false);
+    if (error) {
+      console.error("Failed to submit comment:", error);
       setFormError({ parentId, message: "Failed to post comment. Please try again." });
       return false;
-    } finally {
-      setIsSubmitting(false);
     }
+    return posted;
   };
 
   const clearFormError = () => setFormError(null);

@@ -1,3 +1,4 @@
+import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import { and, asc, desc, eq, gte, sql } from "drizzle-orm";
 import type { DrizzleSqliteDODatabase } from "drizzle-orm/durable-sqlite";
 import * as schema from "../../do/schema";
@@ -40,7 +41,7 @@ export interface AnalyticsSnapshotInput {
 
 export async function getLatestAnalyticsBySlug(
   db: DB,
-  slug: string,
+  slug: string
 ): Promise<ArticleAnalyticsRow | null> {
   const rows = await db
     .select()
@@ -54,7 +55,7 @@ export async function getLatestAnalyticsBySlug(
 
 export async function getLatestAnalyticsBySlugs(
   db: DB,
-  slugs: string[],
+  slugs: string[]
 ): Promise<Map<string, ArticleAnalyticsRow>> {
   const map = new Map<string, ArticleAnalyticsRow>();
   if (slugs.length === 0) return map;
@@ -90,10 +91,9 @@ export async function getLatestAnalyticsBySlugs(
 export async function getAnalyticsHistoryBySlug(
   db: DB,
   slug: string,
-  opts: { sinceUnixSec?: number; limit?: number } = {},
+  opts: { sinceUnixSec?: number; limit?: number } = {}
 ): Promise<ArticleAnalyticsRow[]> {
-  const sinceUnixSec =
-    opts.sinceUnixSec ?? Math.floor((Date.now() - 30 * 86_400_000) / 1000);
+  const sinceUnixSec = opts.sinceUnixSec ?? Math.floor((Date.now() - 30 * 86_400_000) / 1000);
   const limit = opts.limit ?? 240;
 
   const rows = await db
@@ -102,8 +102,8 @@ export async function getAnalyticsHistoryBySlug(
     .where(
       and(
         eq(schema.articleAnalyticsSnapshots.articleSlug, slug),
-        gte(schema.articleAnalyticsSnapshots.capturedAt, sinceUnixSec),
-      ),
+        gte(schema.articleAnalyticsSnapshots.capturedAt, sinceUnixSec)
+      )
     )
     .orderBy(asc(schema.articleAnalyticsSnapshots.capturedAt))
     .limit(limit);
@@ -150,7 +150,7 @@ export async function getSiteWideTotals(db: DB): Promise<SiteWideTotals> {
 
 export async function getSiteWidePageviewHistory(
   db: DB,
-  days: number,
+  days: number
 ): Promise<SiteWidePageviewSeries> {
   const sinceUnixSec = Math.floor((Date.now() - days * 86_400_000) / 1000);
 
@@ -177,7 +177,7 @@ export async function getSiteWidePageviewHistory(
 
 export async function insertAnalyticsSnapshot(
   db: DB,
-  input: AnalyticsSnapshotInput,
+  input: AnalyticsSnapshotInput
 ): Promise<void> {
   await db
     .insert(schema.articleAnalyticsSnapshots)
@@ -198,7 +198,7 @@ export async function insertAnalyticsSnapshot(
 // ---------- File-local helpers ----------
 
 function rowToAnalytics(
-  row: typeof schema.articleAnalyticsSnapshots.$inferSelect,
+  row: typeof schema.articleAnalyticsSnapshots.$inferSelect
 ): ArticleAnalyticsRow {
   return {
     articleSlug: row.articleSlug,
@@ -240,23 +240,22 @@ function rowToAnalyticsRaw(row: AnalyticsSnapshotRow): ArticleAnalyticsRow {
   };
 }
 
-function parseWebVitals(
-  json: string | null | undefined,
-): Record<AnalyticsWindow, WebVitalGroup> {
+function parseWebVitals(json: string | null | undefined): Record<AnalyticsWindow, WebVitalGroup> {
   const fallback: Record<AnalyticsWindow, WebVitalGroup> = {
     "24h": EMPTY_WEB_VITAL_GROUP,
     "7d": EMPTY_WEB_VITAL_GROUP,
     "30d": EMPTY_WEB_VITAL_GROUP,
   };
   if (!json) return fallback;
-  try {
-    const parsed = JSON.parse(json) as Partial<Record<AnalyticsWindow, WebVitalGroup>>;
-    return {
-      "24h": parsed["24h"] ?? EMPTY_WEB_VITAL_GROUP,
-      "7d": parsed["7d"] ?? EMPTY_WEB_VITAL_GROUP,
-      "30d": parsed["30d"] ?? EMPTY_WEB_VITAL_GROUP,
-    };
-  } catch {
-    return fallback;
-  }
+
+  type Parsed = Partial<Record<AnalyticsWindow, WebVitalGroup>>;
+  const [parsed] = tryCatch(() => JSON.parse(json) as Parsed);
+
+  return !parsed
+    ? fallback
+    : {
+        "24h": parsed["24h"] ?? EMPTY_WEB_VITAL_GROUP,
+        "7d": parsed["7d"] ?? EMPTY_WEB_VITAL_GROUP,
+        "30d": parsed["30d"] ?? EMPTY_WEB_VITAL_GROUP,
+      };
 }

@@ -1,3 +1,4 @@
+import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
 import { isSafeSlug } from "../../../../lib/asset-key";
 import { clearDraft, loadDraft, saveDraft } from "../../../../lib/editor/draft-store";
@@ -19,7 +20,6 @@ interface Props {
   proseClass: string;
   /** Server-rendered from the content collection, for collision warnings. */
   existingSlugs?: string[];
-  /** The published article being edited; absent when writing a new one. */
   article?: {
     slug: string;
     pubDate: string;
@@ -68,13 +68,13 @@ export default function MdxEditor({ proseClass, existingSlugs = [], article }: P
       // Seeded "Untitled" because image keys embed the slug: untitled cannot upload.
       setDraft(
         usable ??
-          article?.initial ?? {
-            title: "Untitled",
-            description: "",
-            body: "",
-            inlineAssets: [],
-            updatedAt: 0,
-          }
+        article?.initial ?? {
+          title: "Untitled",
+          description: "",
+          body: "",
+          inlineAssets: [],
+          updatedAt: 0,
+        }
       );
       setRestored(usable !== null && editing);
     });
@@ -202,22 +202,27 @@ export default function MdxEditor({ proseClass, existingSlugs = [], article }: P
 
       await Promise.all(
         jobs.map(async ({ file, placeholder }) => {
-          try {
+          const [, error] = await tryCatch(async () => {
             const { key } = await uploadAsset(file, slug, "content");
             const asset = { id: `img_${key.split("/").pop()!.split("-")[0]}`, r2Key: key };
             const alt = file.name.split(".").slice(0, -1).join(".") || file.name;
 
             setDraft((current) =>
-              current ? { ...current, inlineAssets: [...current.inlineAssets, asset] } : current
+              current
+                ? {
+                  ...current,
+                  inlineAssets: [...current.inlineAssets, asset],
+                }
+                : current
             );
+
             swap(placeholder, `<BlogImage src={${asset.id}} alt=${JSON.stringify(alt)} />`);
-          } catch (error) {
-            const message = error instanceof Error ? error.message : String(error);
+          });
+          if (error) {
             swap(placeholder, `_Upload failed: ${file.name}_`);
-            setStatus({ kind: "error", message: `${file.name}: ${message}` });
-          } finally {
-            setPendingUploads((count) => count - 1);
+            setStatus({ kind: "error", message: `${file.name}: ${error.message}` });
           }
+          setPendingUploads((count) => count - 1);
         })
       );
     },
@@ -241,7 +246,7 @@ export default function MdxEditor({ proseClass, existingSlugs = [], article }: P
       return;
     }
 
-    try {
+    const [, error] = await tryCatch(async () => {
       let ready = draft;
 
       if (draft.heroFile && !draft.heroKey) {
@@ -293,12 +298,8 @@ export default function MdxEditor({ proseClass, existingSlugs = [], article }: P
 
       await clearDraft(draftId);
       window.location.href = editing ? `/admin/articles/${slug}` : "/admin/articles";
-    } catch (error) {
-      setStatus({
-        kind: "error",
-        message: error instanceof Error ? error.message : "Save failed",
-      });
-    }
+    });
+    if (error) setStatus({ kind: "error", message: error.message });
   }, [draft, slug, slugError, editing, pubDate, today, article, committedKeys, draftId]);
 
   const discardLocal = useCallback(async () => {

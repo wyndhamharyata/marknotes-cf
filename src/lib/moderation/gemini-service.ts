@@ -1,3 +1,4 @@
+import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import { GoogleGenAI, Type } from "@google/genai";
 import { Resource } from "sst";
 import type { ModerationInput, ModerationResult, ModerationBatchResult } from "../comments/types";
@@ -54,7 +55,7 @@ export async function moderateComments(
   let lastError: Error | null = null;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
+    const [results, error] = await tryCatch(async () => {
       // Use structured output schema like the Go version
       const response = await client.models.generateContent({
         model: "gemini-3-flash-preview",
@@ -83,10 +84,10 @@ export async function moderateComments(
       }
 
       // Parse the JSON response (should be clean JSON due to structured output)
-      const results: ModerationResult[] = JSON.parse(text);
+      const parsed: ModerationResult[] = JSON.parse(text);
 
       // Validate and sanitize results
-      for (const result of results) {
+      for (const result of parsed) {
         if (
           typeof result.id !== "number" ||
           typeof result.message !== "string" ||
@@ -102,15 +103,16 @@ export async function moderateComments(
         }
       }
 
-      return { results };
-    } catch (error) {
-      lastError = error as Error;
-      console.error(`Gemini API attempt ${attempt} failed:`, error);
+      return parsed;
+    });
 
-      if (attempt < maxRetries) {
-        // Exponential backoff: 1s, 2s, 4s
-        await new Promise((resolve) => setTimeout(resolve, 1000 * Math.pow(2, attempt - 1)));
-      }
+    if (results) return { results };
+
+    lastError = error;
+    console.error(`Gemini API attempt ${attempt} failed:`, error);
+    if (attempt < maxRetries) {
+      // Exponential backoff: 1s, 2s, 4s
+      await new Promise((resolve) => setTimeout(resolve, 1000 * Math.pow(2, attempt - 1)));
     }
   }
 

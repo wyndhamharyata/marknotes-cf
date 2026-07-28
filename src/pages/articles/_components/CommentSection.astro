@@ -1,4 +1,5 @@
 ---
+import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import { getDoStub } from "../../../lib/db/do-client";
 import { buildCommentTree } from "../../../lib/comments/tree";
 import { getOrCreateAlias } from "../../../lib/comments/diceware";
@@ -10,24 +11,20 @@ interface Props {
 
 const { articleSlug } = Astro.props;
 
-let alias = "anonymous";
-let serializedTree: any[] = [];
-let error: string | null = null;
-
-try {
-  // Get or create the user's alias (sets cookie if new)
-  alias = getOrCreateAlias(Astro.cookies);
-
-  // Fetch comments from database
+const [data, loadErr] = await tryCatch(async () => {
+  // getOrCreateAlias sets the cookie when the visitor has none yet.
+  const alias = getOrCreateAlias(Astro.cookies);
   const comments = await getDoStub().getCommentsBySlug(articleSlug);
-  const commentTree = buildCommentTree(comments);
 
   // Serialize dates to ISO strings for Preact
-  serializedTree = JSON.parse(JSON.stringify(commentTree));
-} catch (e) {
-  error = e instanceof Error ? e.message : String(e);
-  console.error("CommentSection error:", error);
-}
+  const serializedTree = JSON.parse(JSON.stringify(buildCommentTree(comments)));
+  return { alias, serializedTree };
+});
+if (loadErr) console.error("CommentSection error:", loadErr.message);
+
+const alias = data?.alias ?? "anonymous";
+const serializedTree = data?.serializedTree ?? [];
+const error = loadErr ? loadErr.message : null;
 ---
 
 <section id="comments" class="card bg-base-100 w-full shadow-xl" data-comment-alias={alias}>

@@ -1,3 +1,4 @@
+import { tryCatch, tryCatchSync } from "@maxmorozoff/try-catch-tuple";
 import type { AssetKind } from "../asset-key";
 
 interface CompressedImage {
@@ -15,13 +16,14 @@ export async function compressImage(file: File, kind: AssetKind): Promise<Compre
   // Canvas would flatten an animated GIF to a single frame.
   if (file.type === "image/gif") return passthrough(file);
 
-  let bitmap: ImageBitmap;
-  try {
-    // "from-image" honours the EXIF rotation phone photos rely on.
-    bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
-  } catch {
-    return passthrough(file);
-  }
+  // "from-image" honours the EXIF rotation phone photos rely on.
+  const [bitmap, bitmapErr] = await tryCatch(
+    createImageBitmap(file, {
+      imageOrientation: "from-image",
+    })
+  );
+
+  if (bitmapErr) return passthrough(file);
 
   try {
     const scale = Math.min(1, MAX_WIDTH[kind] / bitmap.width);

@@ -1,4 +1,5 @@
 ---
+import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import { filterTableByDateRange } from "./contribution-filter";
 import "./GithubContributionGraph.css";
 
@@ -22,25 +23,18 @@ const dateRanges: Record<number, { from: Date; to: Date }> = {
 
 const { from, to } = dateRanges[Math.sign(months)];
 
-let tableHtml = "";
-let error = "";
-
-try {
+const [tableHtml, fetchErr] = await tryCatch(async () => {
   const response = await fetch(`https://github.com/users/${username}/contributions`);
   const html = await response.text();
 
   const tableMatch = html.match(
     /<table[^>]*class="[^"]*ContributionCalendar-grid[^"]*"[^>]*>[\s\S]*?<\/table>/
   );
+  if (!tableMatch) throw new Error("Could not parse contribution data");
 
-  if (tableMatch) {
-    tableHtml = filterTableByDateRange(tableMatch[0], from, to);
-  } else {
-    error = "Could not parse contribution data";
-  }
-} catch (e) {
-  error = "Failed to fetch contribution data";
-}
+  return filterTableByDateRange(tableMatch[0], from, to);
+});
+const error = fetchErr?.message ?? "";
 ---
 
 <div class="contribution-graph not-prose mx-auto -my-6 w-full max-w-[720px]">

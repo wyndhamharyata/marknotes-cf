@@ -1,3 +1,4 @@
+import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import type { HighlighterCore } from "shiki/core";
 
 // shiki/core, not the full bundle whose index makes Vite emit a chunk per grammar.
@@ -56,7 +57,7 @@ export async function highlightCode(
   const resolved = ALIASES[key] ?? key;
   if (!(resolved in LANGUAGE_LOADERS)) return null;
 
-  try {
+  const [html] = await tryCatch(async () => {
     const highlighter = await getHighlighter();
 
     if (!loadedLanguages.has(resolved)) {
@@ -67,7 +68,6 @@ export async function highlightCode(
 
     // github-dark is Astro's default, so the preview matches the published page.
     return highlighter.codeToHtml(code, { lang: resolved, theme: "github-dark" });
-  } catch {
-    return null;
-  }
+  });
+  return html;
 }

@@ -1,4 +1,5 @@
 // Miniflare cannot host the DO via platformProxy, so dev runs the same queries on better-sqlite3.
+import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import fs from "node:fs";
 import path from "node:path";
 import Database from "better-sqlite3";
@@ -30,34 +31,38 @@ async function initLocalDb() {
 
   if (!MIGRATION_TOKEN) {
     console.log(
-      `[dev-fallback] Created empty ${DB_PATH}. Set MIGRATION_TOKEN in .env to auto-seed from staging on next dev start.`,
+      `[dev-fallback] Created empty ${DB_PATH}. Set MIGRATION_TOKEN in .env to auto-seed from staging on next dev start.`
     );
     return { sqlite, dbForQueries };
   }
 
-  try {
+  const [, seedErr] = await tryCatch(async () => {
     const url = `${STAGING_URL}/api/dump-do?token=${encodeURIComponent(MIGRATION_TOKEN)}`;
     console.log(`[dev-fallback] Fresh DB — fetching seed from ${STAGING_URL}...`);
+
     const res = await fetch(url);
     if (!res.ok) {
       throw new Error(`Dump endpoint returned ${res.status}: ${await res.text()}`);
     }
+
     const sql = await res.text();
     sqlite.exec(sql);
-    const replyCount = (
-      sqlite.prepare("SELECT COUNT(*) AS c FROM replies").get() as { c: number }
-    ).c;
-    const snapshotCount = (
-      sqlite
-        .prepare("SELECT COUNT(*) AS c FROM article_analytics_snapshots")
-        .get() as { c: number }
-    ).c;
-    console.log(
-      `[dev-fallback] Seeded ${DB_PATH}: ${replyCount} replies, ${snapshotCount} snapshots.`,
-    );
-  } catch (e) {
+
+    type Num = { c: number };
+
+    const replyCount = (sqlite.prepare("SELECT COUNT(*) AS c FROM replies").get() as Num).c;
+
+    const snap = sqlite
+      .prepare(`SELECT COUNT(*) AS c FROM article_analytics_snapshots`)
+      .get() as Num;
+    const snapCount = snap.c;
+
+    console.log(`[dev-fallback] Seeded ${DB_PATH}: ${replyCount} replies, ${snapCount} snapshots.`);
+  });
+
+  if (seedErr) {
     console.warn(
-      `[dev-fallback] Auto-seed from staging failed; starting with empty DB. ${e instanceof Error ? e.message : String(e)}`,
+      `[dev-fallback] Auto-seed from staging failed; starting with empty DB. ${seedErr.message}`
     );
   }
 
@@ -73,7 +78,7 @@ export const devStub = {
     commentsQ.createComment(db, input),
   createCommentWithModeration: (
     input: Parameters<typeof commentsQ.createCommentWithModeration>[1],
-    moderationStatus: number,
+    moderationStatus: number
   ) => commentsQ.createCommentWithModeration(db, input, moderationStatus),
   getCommentsForAdmin: (opts: commentsQ.GetCommentsForAdminInput) =>
     commentsQ.getCommentsForAdmin(db, opts),
@@ -81,20 +86,14 @@ export const devStub = {
   markCommentSafe: (id: number) => commentsQ.markCommentSafe(db, id),
   hideComment: (id: number) => commentsQ.hideComment(db, id),
   getUnmoderatedComments: (limit: number) => commentsQ.getUnmoderatedComments(db, limit),
-  updateModerationStatus: (
-    results: Parameters<typeof commentsQ.updateModerationStatus>[1],
-  ) => commentsQ.updateModerationStatus(db, results),
-  getLatestAnalyticsBySlug: (slug: string) =>
-    analyticsQ.getLatestAnalyticsBySlug(db, slug),
-  getLatestAnalyticsBySlugs: (slugs: string[]) =>
-    analyticsQ.getLatestAnalyticsBySlugs(db, slugs),
-  getAnalyticsHistoryBySlug: (
-    slug: string,
-    opts: { sinceUnixSec?: number; limit?: number } = {},
-  ) => analyticsQ.getAnalyticsHistoryBySlug(db, slug, opts),
+  updateModerationStatus: (results: Parameters<typeof commentsQ.updateModerationStatus>[1]) =>
+    commentsQ.updateModerationStatus(db, results),
+  getLatestAnalyticsBySlug: (slug: string) => analyticsQ.getLatestAnalyticsBySlug(db, slug),
+  getLatestAnalyticsBySlugs: (slugs: string[]) => analyticsQ.getLatestAnalyticsBySlugs(db, slugs),
+  getAnalyticsHistoryBySlug: (slug: string, opts: { sinceUnixSec?: number; limit?: number } = {}) =>
+    analyticsQ.getAnalyticsHistoryBySlug(db, slug, opts),
   getSiteWideTotals: () => analyticsQ.getSiteWideTotals(db),
-  getSiteWidePageviewHistory: (days: number) =>
-    analyticsQ.getSiteWidePageviewHistory(db, days),
+  getSiteWidePageviewHistory: (days: number) => analyticsQ.getSiteWidePageviewHistory(db, days),
   insertAnalyticsSnapshot: (input: analyticsQ.AnalyticsSnapshotInput) =>
     analyticsQ.insertAnalyticsSnapshot(db, input),
   dumpSql: () => dumpSqlImpl(db),

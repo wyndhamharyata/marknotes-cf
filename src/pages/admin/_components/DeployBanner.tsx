@@ -1,3 +1,4 @@
+import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import { useEffect, useState } from "preact/hooks";
 
 // A commit reaches the site only once the workflow finishes, which takes minutes.
@@ -24,6 +25,16 @@ export default function DeployBanner() {
     setSlug(record.slug);
   }, []);
 
+  const fetchStatus = async () => {
+    const resp = await fetch(`/api/admin/deploy-status?sha=${sha}`);
+    if (!resp.ok) return null;
+    return (await resp.json()) as {
+      status: string;
+      conclusion: string | null;
+      htmlUrl: string | null;
+    };
+  };
+
   useEffect(() => {
     if (!sha) return;
 
@@ -31,33 +42,23 @@ export default function DeployBanner() {
     let timer: ReturnType<typeof setTimeout>;
 
     const poll = async () => {
-      try {
-        const resp = await fetch(`/api/admin/deploy-status?sha=${sha}`);
-        const body = (await resp.json()) as {
-          status: string;
-          conclusion: string | null;
-          htmlUrl: string | null;
-        };
+      const [body] = await tryCatch(fetchStatus());
 
-        if (cancelled) return;
-        if (resp.ok) {
-          setStatus(body.status);
-          setConclusion(body.conclusion);
-          setRunUrl(body.htmlUrl);
+      if (cancelled) return;
+      if (body) {
+        setStatus(body.status);
+        setConclusion(body.conclusion);
+        setRunUrl(body.htmlUrl);
 
-          if (body.status === "completed") {
-            if (body.conclusion === "success") {
-              localStorage.removeItem("marknotes-deploy");
-              timer = setTimeout(() => setDismissed(true), 6_000);
-            }
-            return;
+        if (body.status === "completed") {
+          if (body.conclusion === "success") {
+            localStorage.removeItem("marknotes-deploy");
+            timer = setTimeout(() => setDismissed(true), 6_000);
           }
+          return;
         }
-      } catch {
-        // Offline or a transient 502; the next tick retries.
       }
-      // An install plus an SST deploy takes minutes; faster polling only spends rate limit.
-      if (!cancelled) timer = setTimeout(poll, 10_000);
+      timer = setTimeout(poll, 10_000);
     };
 
     void poll();
