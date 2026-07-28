@@ -2,9 +2,7 @@ import { getTableColumns, type Table } from "drizzle-orm";
 import type { DrizzleSqliteDODatabase } from "drizzle-orm/durable-sqlite";
 import * as schema from "../../do/schema";
 
-type DB = DrizzleSqliteDODatabase<typeof schema>;
-
-export async function dumpSqlImpl(db: DB): Promise<string> {
+export async function dumpSqlImpl(db: DrizzleSqliteDODatabase<typeof schema>): Promise<string> {
   const [replies, snapshots] = await Promise.all([
     db.select().from(schema.replies),
     db.select().from(schema.articleAnalyticsSnapshots),
@@ -42,5 +40,5 @@ function formatValue(v: unknown): string {
   if (v === null || v === undefined) return "NULL";
   if (typeof v === "number") return String(v);
   if (typeof v === "boolean") return v ? "1" : "0";
-  return `'${String(v).replace(/'/g, "''")}'`;
+  return `'${String(v).replaceAll("'", "''")}'`;
 }

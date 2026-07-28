@@ -137,11 +137,9 @@ export function parseMdx(source: string) {
   };
 }
 
+// A YAML double-quoted scalar accepts JSON's escaping, so this is the exact
+// inverse of the JSON.parse that reads the value back in parseMdx.
 function yamlString(value: string): string {
-  const escaped = value
-    .replace(/\\/g, "\\\\")
-    .replace(/"/g, '\\"')
-    .replace(/[\r\n]+/g, " ")
-    .trim();
-  return `"${escaped}"`;
+  const oneLine = value.replaceAll("\r", "\n").split("\n").filter(Boolean).join(" ");
+  return JSON.stringify(oneLine.trim());
 }

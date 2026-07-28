@@ -6,8 +6,6 @@ import {
   type WebVitalGroup,
 } from "./types";
 
-const GRAPHQL_ENDPOINT = "https://api.cloudflare.com/client/v4/graphql";
-
 export interface FetchAnalyticsArgs {
   accountTag: string;
   siteTag: string;
@@ -31,7 +29,7 @@ export async function fetchArticleAnalytics(
 
   const query = buildQuery(args.accountTag, args.siteTag, path, now, windows);
 
-  const res = await fetch(GRAPHQL_ENDPOINT, {
+  const res = await fetch("https://api.cloudflare.com/client/v4/graphql", {
     method: "POST",
     headers: {
       authorization: `Bearer ${args.token}`,
