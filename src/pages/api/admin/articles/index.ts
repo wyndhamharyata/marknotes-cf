@@ -7,7 +7,7 @@ import { isSafeAssetKey, isSafeSlug } from "../../../../lib/asset-key";
 
 export const prerender = false;
 
-const RequestBodySchema = object({
+const SaveReqSchema = object({
   slug: pipe(string(), nonEmpty(), minLength(1, "slug is required")),
   content: pipe(string(), nonEmpty(), minLength(1, "content is required")),
   imageKey: optional(string()),
@@ -23,7 +23,7 @@ const save: APIRoute = async ({ request }) => {
   const [rawReq, parseErr] = await tryCatch(request.json());
   if (parseErr) return jsonErr("Invalid JSON", 400);
 
-  const result = safeParse(RequestBodySchema, rawReq);
+  const result = safeParse(SaveReqSchema, rawReq);
   if (!result.success)
     return jsonErr(`Validation failed: ${result.issues.map((i) => i.message).join(", ")}`, 400);
 
