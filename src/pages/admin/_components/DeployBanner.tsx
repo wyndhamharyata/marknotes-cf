@@ -46,8 +46,10 @@ export default function DeployBanner() {
           setRunUrl(body.htmlUrl);
 
           if (body.status === "completed") {
-            // Kept on failure, so a broken deploy still follows you around.
-            if (body.conclusion === "success") localStorage.removeItem("marknotes-deploy");
+            if (body.conclusion === "success") {
+              localStorage.removeItem("marknotes-deploy");
+              timer = setTimeout(() => setDismissed(true), 6_000);
+            }
             return;
           }
         }
@@ -71,14 +73,16 @@ export default function DeployBanner() {
   const done = status === "completed";
   const failed = done && conclusion !== "success";
 
+  const tone = failed
+    ? "border-error-content/25 bg-error/95 text-error-content"
+    : done
+      ? "border-success-content/25 bg-success/95 text-success-content"
+      : "border-info-content/25 bg-info/95 text-info-content";
+
   return (
-    <div class="pointer-events-none fixed inset-x-0 bottom-28 z-50 flex justify-center px-4 md:bottom-24">
+    <div class="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4">
       <div
-        class={`pointer-events-auto flex items-center gap-3 rounded-2xl border px-4 py-2 text-sm shadow-2xl backdrop-blur-xl backdrop-saturate-150 ${
-          failed
-            ? "border-error/40 bg-error/90 text-error-content"
-            : "border-base-content/10 bg-base-100/90 supports-[backdrop-filter]:bg-base-100/75"
-        }`}
+        class={`pointer-events-auto flex items-center gap-3 rounded-2xl border px-4 py-2 text-sm font-medium shadow-2xl backdrop-blur-xl backdrop-saturate-150 ${tone}`}
       >
         {!done && <span class="loading loading-spinner loading-xs" />}
         <span class="min-w-0">
@@ -94,7 +98,7 @@ export default function DeployBanner() {
         )}
         <button
           type="button"
-          class="btn btn-ghost btn-xs shrink-0"
+          class="btn btn-ghost btn-xs shrink-0 [--btn-fg:currentColor]"
           onClick={() => {
             localStorage.removeItem("marknotes-deploy");
             setDismissed(true);
