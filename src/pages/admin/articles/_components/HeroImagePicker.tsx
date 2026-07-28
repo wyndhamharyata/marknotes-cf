@@ -1,16 +1,18 @@
 import { useEffect, useState } from "preact/hooks";
-import { stagedAssetUrl } from "../../../../../lib/editor/upload";
+import { stagedAssetUrl } from "../../../../lib/editor/upload";
 
 interface Props {
   file?: File;
   uploadedKey?: string;
+  /** Hero an earlier publish committed, resolved by the page. */
+  committedUrl?: string;
   onSelect: (file: File | undefined) => void;
 }
 
 const ACCEPT = "image/png,image/jpeg,image/webp,image/gif,image/avif";
 
 // Inline SVG because astro-icon resolves at build time and cannot run in an island.
-export default function HeroImagePicker({ file, uploadedKey, onSelect }: Props) {
+export default function HeroImagePicker({ file, uploadedKey, committedUrl, onSelect }: Props) {
   const [dragging, setDragging] = useState(false);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
 
@@ -25,8 +27,9 @@ export default function HeroImagePicker({ file, uploadedKey, onSelect }: Props) 
     return () => URL.revokeObjectURL(url);
   }, [file]);
 
-  // A restored draft has the key but not the File.
-  const previewUrl = objectUrl ?? (uploadedKey ? stagedAssetUrl(uploadedKey) : null);
+  // A restored draft has the key but not the File; an unchanged hero has neither.
+  const previewUrl =
+    objectUrl ?? (uploadedKey ? stagedAssetUrl(uploadedKey) : (committedUrl ?? null));
 
   const accept = (list: FileList | null) => {
     const image = Array.from(list ?? []).find((candidate) => candidate.type.startsWith("image/"));

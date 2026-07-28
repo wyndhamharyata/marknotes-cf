@@ -10,7 +10,7 @@ import {
   toBulletList,
   toOrderedList,
   wrapSelection,
-} from "../../../../../lib/editor/textarea";
+} from "../../../../lib/editor/textarea";
 
 interface Props {
   body: string;

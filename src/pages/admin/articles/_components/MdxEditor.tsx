@@ -1,24 +1,34 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "preact/hooks";
-import { isSafeSlug } from "../../../../../lib/asset-key";
-import { clearDraft, loadDraft, saveDraft } from "../../../../../lib/editor/draft-store";
-import {
-  formatPubDate,
-  referencedAssets,
-  serializeMdx,
-} from "../../../../../lib/editor/mdx-serialize";
-import { slugifyTitle } from "../../../../../lib/editor/slugify";
-import { insertAtCursor, replaceInTextarea } from "../../../../../lib/editor/textarea";
-import type { ArticleDraft } from "../../../../../lib/editor/types";
-import { uploadAsset } from "../../../../../lib/editor/upload";
+import { isSafeAssetKey, isSafeSlug } from "../../../../lib/asset-key";
+import { trackDeploy } from "../../../../lib/deploy-tracker";
+import { clearDraft, loadDraft, saveDraft } from "../../../../lib/editor/draft-store";
+import { formatPubDate, referencedAssets, serializeMdx } from "../../../../lib/editor/mdx-serialize";
+import { slugifyTitle } from "../../../../lib/editor/slugify";
+import { insertAtCursor, replaceInTextarea } from "../../../../lib/editor/textarea";
+import type { ArticleDraft } from "../../../../lib/editor/types";
+import { uploadAsset } from "../../../../lib/editor/upload";
 import EditorPane from "./EditorPane";
 import HeroImagePicker from "./HeroImagePicker";
 import MetaFields from "./MetaFields";
 import PreviewPane from "./PreviewPane";
 
+/** The published article being edited, parsed from the copy on `main`. */
+export interface EditTarget {
+  slug: string;
+  pubDate: string;
+  initial: ArticleDraft;
+  extraFrontmatter: string[];
+  extraImports: string[];
+  /** Resolved server-side, because a committed hero may predate asset keys. */
+  heroPreviewUrl?: string;
+}
+
 interface Props {
-  /** Server-rendered from the content collection, for collision warnings. */
-  existingSlugs: string[];
   proseClass: string;
+  /** Server-rendered from the content collection, for collision warnings. */
+  existingSlugs?: string[];
+  /** Absent when writing a new article. */
+  article?: EditTarget;
 }
 
 type Status =
@@ -39,8 +49,9 @@ const AUTOSAVE_DEBOUNCE_MS = 500;
 const MIN_PANE_RATIO = 0.25;
 const MAX_PANE_RATIO = 0.75;
 
-export default function MdxEditor({ existingSlugs, proseClass }: Props) {
+export default function MdxEditor({ proseClass, existingSlugs = [], article }: Props) {
   const [draft, setDraft] = useState<ArticleDraft | null>(null);
+  const [restored, setRestored] = useState(false);
   const [view, setView] = useState<"write" | "preview">("write");
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [pendingUploads, setPendingUploads] = useState(0);
@@ -51,23 +62,36 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
 
+  const editing = article !== undefined;
+  const draftId = article?.slug ?? "new";
+
+  // Identifies the committed revision this draft forked from, so an abandoned
+  // draft cannot silently revert a change made to the article elsewhere.
+  const base = useMemo(
+    () => (article ? JSON.stringify(article.initial) : undefined),
+    [article]
+  );
+
   useEffect(() => {
     let cancelled = false;
 
-    loadDraft().then((stored) => {
-      if (!cancelled) setDraft(stored ?? BLANK_DRAFT);
+    loadDraft(draftId).then((stored) => {
+      if (cancelled) return;
+      const usable = stored && stored.base === base ? stored.draft : null;
+      setDraft(usable ?? article?.initial ?? BLANK_DRAFT);
+      setRestored(usable !== null && editing);
     });
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [draftId, base]);
 
   useEffect(() => {
     if (!draft) return;
-    const timer = setTimeout(() => void saveDraft(draft), AUTOSAVE_DEBOUNCE_MS);
+    const timer = setTimeout(() => void saveDraft(draftId, draft, base), AUTOSAVE_DEBOUNCE_MS);
     return () => clearTimeout(timer);
-  }, [draft]);
+  }, [draft, draftId, base]);
 
   useEffect(() => {
     const query = window.matchMedia("(min-width: 768px)");
@@ -128,15 +152,30 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
     setDraft((current) => (current ? { ...current, ...patch } : current));
   }, []);
 
-  const slug = useMemo(() => slugifyTitle(draft?.title ?? ""), [draft?.title]);
-  const pubDate = useMemo(() => formatPubDate(new Date()), []);
+  const derivedSlug = useMemo(() => slugifyTitle(draft?.title ?? ""), [draft?.title]);
+  const slug = article?.slug ?? derivedSlug;
+
+  const today = useMemo(() => formatPubDate(new Date()), []);
+  const pubDate = article?.pubDate ?? today;
 
   const slugError = useMemo(() => {
+    if (editing) return null; // renaming would orphan every inbound link
     if (!slug) return "Give the article a title — the slug comes from it.";
     if (!isSafeSlug(slug)) return "Title must contain letters or numbers.";
     if (existingSlugs.includes(slug)) return "An article with this slug already exists.";
     return null;
-  }, [slug, existingSlugs]);
+  }, [editing, slug, existingSlugs]);
+
+  // Repo-backed images this article arrived with. Anything still here at save
+  // time that the article no longer references is an orphan to delete.
+  const committedKeys = useMemo(() => {
+    if (!article) return [];
+    const heroKey = assetKeyFromPath(article.initial.heroPath);
+    return [
+      ...article.initial.inlineAssets.filter((asset) => asset.committed).map((a) => a.r2Key),
+      ...(heroKey ? [heroKey] : []),
+    ];
+  }, [article]);
 
   // Placeholder at the caret now, real component when the upload lands, so
   // writing is never blocked and a failure leaves a visible marker.
@@ -176,16 +215,13 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
         jobs.map(async ({ file, placeholder }) => {
           try {
             const { key } = await uploadAsset(file, slug, "content");
-            const asset = {
-              id: `img_${key.split("/").pop()!.split("-")[0]}`,
-              r2Key: key,
-              alt: file.name.replace(/\.[^.]+$/, ""),
-            };
+            const asset = { id: `img_${key.split("/").pop()!.split("-")[0]}`, r2Key: key };
+            const alt = file.name.replace(/\.[^.]+$/, "");
 
             setDraft((current) =>
               current ? { ...current, inlineAssets: [...current.inlineAssets, asset] } : current
             );
-            swap(placeholder, `<BlogImage src={${asset.id}} alt=${JSON.stringify(asset.alt)} />`);
+            swap(placeholder, `<BlogImage src={${asset.id}} alt=${JSON.stringify(alt)} />`);
           } catch (error) {
             const message = error instanceof Error ? error.message : String(error);
             swap(placeholder, `_Upload failed: ${file.name}_`);
@@ -226,31 +262,56 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
         setDraft(ready);
       }
 
+      const kept = referencedAssets(ready.body, ready.inlineAssets);
+      const keptKeys = new Set(
+        [...kept.map((asset) => asset.r2Key), ready.heroKey, assetKeyFromPath(ready.heroPath)].filter(
+          (key): key is string => key !== undefined && key !== null
+        )
+      );
+
       setStatus({ kind: "busy", message: "Committing to GitHub…" });
       const response = await fetch("/api/admin/articles", {
-        method: "POST",
+        method: editing ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           slug,
-          // Stamped now, not when the draft was started.
-          content: serializeMdx(ready, formatPubDate(new Date())),
+          content: serializeMdx(ready, {
+            // Stamped now for a new article; preserved for an edit, which
+            // records the revision in `updatedDate` instead.
+            pubDate,
+            updatedDate: editing ? today : undefined,
+            extraFrontmatter: article?.extraFrontmatter,
+            extraImports: article?.extraImports,
+          }),
           imageKey: ready.heroKey,
-          inlineImageKeys: referencedAssets(ready.body, ready.inlineAssets).map((a) => a.r2Key),
+          // Committed assets are already in the repo and long gone from staging.
+          inlineImageKeys: kept.filter((asset) => !asset.committed).map((asset) => asset.r2Key),
+          removedKeys: committedKeys.filter((key) => !keptKeys.has(key)),
         }),
       });
 
-      const payload = (await response.json().catch(() => null)) as { error?: string } | null;
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string; sha?: string }
+        | null;
       if (!response.ok) throw new Error(payload?.error ?? `Save failed (${response.status})`);
 
-      await clearDraft();
-      window.location.href = "/admin/articles";
+      if (payload?.sha) trackDeploy(payload.sha, slug);
+      await clearDraft(draftId);
+      window.location.href = editing ? `/admin/articles/${slug}` : "/admin/articles";
     } catch (error) {
       setStatus({
         kind: "error",
         message: error instanceof Error ? error.message : "Save failed",
       });
     }
-  }, [draft, slug, slugError]);
+  }, [draft, slug, slugError, editing, pubDate, today, article, committedKeys, draftId]);
+
+  const discardLocal = useCallback(async () => {
+    if (!article) return;
+    await clearDraft(article.slug);
+    setDraft(article.initial);
+    setRestored(false);
+  }, [article]);
 
   const startResize = useCallback((event: PointerEvent) => {
     const container = splitRef.current;
@@ -284,10 +345,14 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
   const busy = status.kind === "busy";
   const paneStyle = (share: number) => (isWide ? { width: `${share * 100}%` } : undefined);
 
+  const metaLine = editing
+    ? `${slug}.mdx · ${pubDate} · updated ${today} · slug fixed`
+    : `${slug || "untitled"}.mdx · ${pubDate}`;
+
   return (
     <div class="flex flex-col gap-3 px-4 md:min-h-0 md:flex-1">
       <div class="flex flex-wrap items-center justify-between gap-2 px-4 md:px-0">
-        <h1 class="text-2xl font-bold">New article</h1>
+        <h1 class="text-2xl font-bold">{editing ? "Edit article" : "New article"}</h1>
         <div class="flex items-center gap-2">
           {pendingUploads > 0 && (
             <span class="badge badge-neutral badge-lg gap-2">
@@ -295,7 +360,7 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
               {pendingUploads} uploading
             </span>
           )}
-          <a href="/admin/articles" class="btn btn-ghost">
+          <a href={editing ? `/admin/articles/${slug}` : "/admin/articles"} class="btn btn-ghost">
             Cancel
           </a>
           <button
@@ -305,11 +370,19 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
             onClick={publish}
           >
             {busy && <span class="loading loading-spinner loading-sm" />}
-            Publish
+            {editing ? "Update" : "Publish"}
           </button>
         </div>
       </div>
 
+      {restored && (
+        <div class="alert alert-warning">
+          <span>Restored unsaved changes from a previous session.</span>
+          <button type="button" class="btn btn-ghost btn-sm" onClick={discardLocal}>
+            Discard
+          </button>
+        </div>
+      )}
       {status.kind === "error" && (
         <div class="alert alert-error">
           <span>{status.message}</span>
@@ -359,8 +432,7 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
           <MetaFields
             title={draft.title}
             description={draft.description}
-            slug={slug}
-            pubDate={pubDate}
+            meta={metaLine}
             slugError={slugError}
             onTitle={(title) => update({ title })}
             onDescription={(description) => update({ description })}
@@ -395,7 +467,10 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
               <HeroImagePicker
                 file={draft.heroFile}
                 uploadedKey={draft.heroKey}
-                onSelect={(heroFile) => update({ heroFile, heroKey: undefined })}
+                committedUrl={draft.heroPath ? article?.heroPreviewUrl : undefined}
+                onSelect={(heroFile) =>
+                  update({ heroFile, heroKey: undefined, heroPath: undefined })
+                }
               />
             }
           />
@@ -403,4 +478,16 @@ export default function MdxEditor({ existingSlugs, proseClass }: Props) {
       </div>
     </div>
   );
+}
+
+/**
+ * The deletable key behind a `heroImage` frontmatter path, if it has one.
+ *
+ * Legacy heroes live at `../../assets/…`, outside the namespace this editor
+ * writes, so they resolve to null and are never proposed for deletion.
+ */
+function assetKeyFromPath(path: string | undefined): string | null {
+  if (!path?.startsWith("./")) return null;
+  const key = path.slice(2);
+  return isSafeAssetKey(key) ? key : null;
 }

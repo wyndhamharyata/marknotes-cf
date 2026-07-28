@@ -1,9 +1,8 @@
 interface Props {
   title: string;
   description: string;
-  /** Derived from the title; shown so the committed filename stays visible. */
-  slug: string;
-  pubDate: string;
+  /** Filename and dates, worded by the caller since only it knows the mode. */
+  meta: string;
   slugError: string | null;
   onTitle: (value: string) => void;
   onDescription: (value: string) => void;
@@ -12,8 +11,7 @@ interface Props {
 export default function MetaFields({
   title,
   description,
-  slug,
-  pubDate,
+  meta,
   slugError,
   onTitle,
   onDescription,
@@ -41,7 +39,7 @@ export default function MetaFields({
       />
 
       <p class={`font-mono text-sm ${slugError ? "text-error" : "text-base-content/50"}`}>
-        {slugError ?? `${slug || "untitled"}.mdx · ${pubDate}`}
+        {slugError ?? meta}
       </p>
     </div>
   );

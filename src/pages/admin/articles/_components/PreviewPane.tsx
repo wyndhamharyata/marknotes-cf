@@ -1,7 +1,7 @@
 import { useEffect, useState } from "preact/hooks";
 import type { ComponentChildren, RefObject } from "preact";
-import { renderPreview } from "../../../../../lib/editor/preview-render";
-import type { InlineAsset } from "../../../../../lib/editor/types";
+import { renderPreview } from "../../../../lib/editor/preview-render";
+import type { InlineAsset } from "../../../../lib/editor/types";
 
 interface Props {
   body: string;

@@ -6,6 +6,15 @@ export function stagedAssetUrl(r2Key: string): string {
   return `/api/admin/assets/object?key=${encodeURIComponent(r2Key)}`;
 }
 
+/**
+ * An asset an earlier publish already committed. Staging is not consulted: it
+ * is emptied independently of the repo, so the repo is the only copy that
+ * outlives a publish.
+ */
+export function repoAssetUrl(key: string): string {
+  return `/api/admin/assets/repo?key=${encodeURIComponent(key)}`;
+}
+
 export async function uploadAsset(
   file: File,
   slug: string,

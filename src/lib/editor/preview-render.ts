@@ -1,7 +1,7 @@
 import type { Marked, Token } from "marked";
 import { highlightCode } from "./highlight";
 import type { InlineAsset } from "./types";
-import { stagedAssetUrl } from "./upload";
+import { repoAssetUrl, stagedAssetUrl } from "./upload";
 
 // Loaded lazily so the textarea is interactive before the parser arrives.
 // Output is injected unsanitised: admin-only editor, admin's own draft.
@@ -110,7 +110,8 @@ function resolveSrc(value: string | undefined, assets: InlineAsset[]): string | 
   if (value.startsWith("{")) {
     const id = value.slice(1, -1);
     const asset = assets.find((candidate) => candidate.id === id);
-    return asset ? stagedAssetUrl(asset.r2Key) : null;
+    if (!asset) return null;
+    return asset.committed ? repoAssetUrl(asset.r2Key) : stagedAssetUrl(asset.r2Key);
   }
 
   return value;
