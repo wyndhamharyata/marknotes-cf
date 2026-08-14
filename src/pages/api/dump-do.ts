@@ -1,20 +1,18 @@
 import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 import { Resource } from "sst";
 import { getDoStub } from "../../lib/db/do-client";
 
 // Layered guards: stage 404s on prod, MigrationToken 403s, and prod binds no secret.
-export const GET: APIRoute = async ({ url, locals }) => {
-  const stage = (locals as unknown as { runtime?: { env?: { STAGE?: string } } })
-    .runtime?.env?.STAGE;
+export const GET: APIRoute = async ({ url }) => {
+  const stage = env.STAGE;
   if (stage === "production") {
     return new Response("Not Found", { status: 404 });
   }
 
   const [expectedToken] = tryCatch(
-    () =>
-      (Resource as unknown as { MigrationToken: { value: string } })
-        .MigrationToken.value,
+    () => (Resource as unknown as { MigrationToken: { value: string } }).MigrationToken.value
   );
   const providedToken = url.searchParams.get("token");
   if (!expectedToken || providedToken !== expectedToken) {

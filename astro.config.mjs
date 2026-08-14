@@ -4,7 +4,6 @@ import sitemap from "@astrojs/sitemap";
 import cloudflare from "@astrojs/cloudflare";
 import preact from "@astrojs/preact";
 import tailwindcss from "@tailwindcss/vite";
-import icon from "astro-icon";
 import { defineConfig, envField } from "astro/config";
 
 // https://astro.build/config
@@ -15,18 +14,43 @@ export default defineConfig({
     "/resume": "/articles/m-wyndham-haryata-permana-sr-full-stack-engineer/",
   },
   adapter: cloudflare({
-    configPath: process.env.SST_WRANGLER_PATH,
-    platformProxy: {
-      enabled: true,
-    },
+    configPath: process.env.SST_WRANGLER_PATH ?? "./wrangler.local.jsonc",
     imageService: "cloudflare",
   }),
+  compressHTML: true,
   image: {
     domains: ["resource.mwyndham.dev"],
   },
-  integrations: [mdx(), sitemap(), preact(), icon()],
+  integrations: [mdx(), sitemap(), preact()],
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [
+      tailwindcss(),
+      {
+        name: "cloudflare-dev-optimizer",
+        configEnvironment(environmentName) {
+          if (["astro", "ssr", "prerender"].includes(environmentName)) {
+            return {
+              optimizeDeps: {
+                ignoreOutdatedRequests: true,
+                include: [
+                  "astro/assets/services/noop",
+                  "preact/devtools",
+                  "@astrojs/preact/server.js",
+                  "@openauthjs/openauth/client",
+                  "@openauthjs/openauth/subject",
+                  "valibot",
+                  "sst",
+                ],
+                exclude: [
+                  "astro/dist/core/render/route-cache",
+                  "astro/dist/core/render/route-errors",
+                ],
+              },
+            };
+          }
+        },
+      },
+    ],
   },
   env: {
     schema: {

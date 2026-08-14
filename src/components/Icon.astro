@@ -1,0 +1,23 @@
+---
+import { icons } from "../lib/icons";
+
+interface Props {
+  name: string;
+  class?: string;
+}
+
+const { name } = Astro.props;
+const icon = icons[name];
+if (!icon) {
+  throw new Error(`Unknown icon: ${name}`);
+}
+---
+
+<svg
+  width="1em"
+  height="1em"
+  viewBox={`0 0 ${icon.width} ${icon.height}`}
+  class={Astro.props.class}
+  set:html={icon.body}
+  aria-hidden="true"
+/>

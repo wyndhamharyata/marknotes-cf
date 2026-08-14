@@ -1,14 +1,15 @@
 /// <reference path="../.astro/types.d.ts" />
 /// <reference types="@cloudflare/workers-types" />
 
-interface Env {
-  MAIN_DO: DurableObjectNamespace<import("./do/main-do").MainDO>;
+declare namespace Cloudflare {
+  interface Env {
+    MAIN_DO?: DurableObjectNamespace<import("./do/main-do").MainDO>;
+    STAGE?: string;
+  }
 }
 
-type Runtime = import("@astrojs/cloudflare").Runtime<Env>;
-
 declare namespace App {
-  interface Locals extends Runtime {
+  interface Locals {
     user?: {
       type: "user";
       properties: {

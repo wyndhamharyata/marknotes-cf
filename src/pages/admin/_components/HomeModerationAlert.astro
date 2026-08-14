@@ -1,5 +1,5 @@
 ---
-import { Icon } from "astro-icon/components";
+import Icon from "../../../components/Icon.astro";
 import { getDoStub } from "../../../lib/db/do-client";
 
 const counts = await getDoStub().getCommentCounts();
