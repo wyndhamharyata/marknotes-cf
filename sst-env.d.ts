@@ -6,62 +6,6 @@
 
 declare module "sst" {
   export interface Resource {
-    "AnalyticsCronHandler": import("@cloudflare/workers-types").Service
-    "BaseUrl": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "CfAccountId": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "CfAnalyticsEmail": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "CfAnalyticsToken": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "CfSiteTag": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "GeminiApiKey": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "GithubToken": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "ImageStagingBucket": import("@cloudflare/workers-types").R2Bucket
-    "MainDOHost": import("@cloudflare/workers-types").Service
-    "Max": {
-      "type": "sst.cloudflare.Astro"
-      "url": string
-    }
-    "MigrationToken": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "ModerationCronHandler": import("@cloudflare/workers-types").Service
-    "OpenAuthUrl": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "R2AccessKeyId": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "R2CloudflareAPIToken": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
-    "R2SecretAccessKey": {
-      "type": "sst.sst.Secret"
-      "value": string
-    }
   }
 }
 
