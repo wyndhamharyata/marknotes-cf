@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "preact/hooks";
 import type { KopimapShop } from "../lib/kopimap";
+// Static: a dynamically imported stylesheet 404s in the Cloudflare build.
+import "maplibre-gl/dist/maplibre-gl.css";
 
 interface Props {
   shop: KopimapShop;
@@ -21,10 +23,7 @@ export default function ShopBlock({ shop, rating = 0 }: Props) {
       if (!entry.isIntersecting) return;
       observer.disconnect();
 
-      const [{ Map, Marker }] = await Promise.all([
-        import("maplibre-gl"),
-        import("maplibre-gl/dist/maplibre-gl.css"),
-      ]);
+      const { Map, Marker } = await import("maplibre-gl");
       const dark = document.documentElement.classList.contains("dark");
       const created = new Map({
         container,
