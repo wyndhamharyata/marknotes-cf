@@ -6,6 +6,7 @@
 
 declare module "sst" {
   export interface Resource {
+    "AnalyticsCronHandler": import("@cloudflare/workers-types").Service
     "BaseUrl": {
       "type": "sst.sst.Secret"
       "value": string
@@ -34,10 +35,17 @@ declare module "sst" {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "ImageStagingBucket": import("@cloudflare/workers-types").R2Bucket
+    "MainDOHost": import("@cloudflare/workers-types").Service
+    "Max": {
+      "type": "sst.cloudflare.Astro"
+      "url": string
+    }
     "MigrationToken": {
       "type": "sst.sst.Secret"
       "value": string
     }
+    "ModerationCronHandler": import("@cloudflare/workers-types").Service
     "OpenAuthUrl": {
       "type": "sst.sst.Secret"
       "value": string
