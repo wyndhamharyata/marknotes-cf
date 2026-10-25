@@ -1,4 +1,6 @@
 /// <reference path="./.sst/platform/config.d.ts" />
+const PROD_BUCKET = "marknotes-cf-production-imagestagingbucketbucket-wotheafa";
+
 export default $config({
   app(input) {
     return {
@@ -6,7 +8,7 @@ export default $config({
       removal: input?.stage === "production" ? "retain" : "remove",
       protect: ["production"].includes(input?.stage),
       home: "cloudflare",
-      providers: { cloudflare: "6.13.0" },
+      providers: { cloudflare: "6.15.0" },
     };
   },
   async run() {
@@ -26,6 +28,68 @@ export default $config({
     const r2AccessKeyId = new sst.Secret("R2AccessKeyId");
     const r2SecretAccessKey = new sst.Secret("R2SecretAccessKey");
     const r2CloudflareAPIToken = new sst.Secret("R2CloudflareAPIToken");
+
+    // `sst dev` deploys nothing: it runs astro dev with prod secrets and a local DO (`npm run db:pull` copies prod data).
+    if ($dev) {
+      const secrets = {
+        GeminiApiKey: geminiApiKey,
+        OpenAuthUrl: openAuthUrl,
+        BaseUrl: baseUrl,
+        MigrationToken: migrationToken,
+        GithubToken: githubToken,
+        R2AccessKeyId: r2AccessKeyId,
+        R2SecretAccessKey: r2SecretAccessKey,
+        R2CloudflareAPIToken: r2CloudflareAPIToken,
+        CfAccountId: cfAccountId,
+      };
+      const fs = await import("fs");
+      const wranglerPath = `${process.cwd()}/.dev/wrangler.jsonc`;
+      const environment = $resolve(
+        Object.fromEntries(Object.entries(secrets).map(([k, s]) => [k, s.value]))
+      ).apply((v: Record<string, string>) => {
+        const vars: Record<string, string> = {
+          STAGE: "production",
+          GEMINI_API_KEY: v.GeminiApiKey,
+          OPEN_AUTH_URL: v.OpenAuthUrl,
+          BASE_URL: v.BaseUrl,
+          R2_BUCKET_NAME: PROD_BUCKET,
+          GITHUB_TOKEN: v.GithubToken,
+          R2_ACCESS_KEY_ID: v.R2AccessKeyId,
+          R2_SECRET_ACCESS_KEY: v.R2SecretAccessKey,
+          R2_CLOUDFLARE_API_TOKEN: v.R2CloudflareAPIToken,
+          CF_ACCOUNT_ID: v.CfAccountId,
+          SST_RESOURCE_App: JSON.stringify({ name: $app.name, stage: $app.stage }),
+        };
+        for (const [k, value] of Object.entries(v)) {
+          vars[`SST_RESOURCE_${k}`] = JSON.stringify({ type: "sst.sst.Secret", value });
+        }
+        fs.mkdirSync(".dev", { recursive: true });
+        fs.writeFileSync(
+          wranglerPath,
+          JSON.stringify(
+            {
+              name: "marknotes-cf",
+              compatibility_date: "2026-08-11",
+              compatibility_flags: ["nodejs_compat", "disable_nodejs_process_v2"],
+              main: `${process.cwd()}/src/dev-worker.ts`,
+              vars,
+              // All local: remote bindings add a slow remote session + a round trip per call.
+              durable_objects: { bindings: [{ name: "MAIN_DO", class_name: "MainDO" }] },
+              migrations: [{ tag: "v1", new_sqlite_classes: ["MainDO"] }],
+              r2_buckets: [{ binding: "ImageStagingBucket", bucket_name: PROD_BUCKET }],
+            },
+            null,
+            2
+          )
+        );
+        return vars;
+      });
+      new sst.x.DevCommand("LocalDev", {
+        dev: { command: "npm run dev" },
+        environment: environment.apply((vars) => ({ ...vars, SST_WRANGLER_PATH: wranglerPath })),
+      });
+      return;
+    }
 
     const imageStagingBucket = new sst.cloudflare.Bucket("ImageStagingBucket");
     // Gate the newSqliteClasses migration on INIT_DO=1 — CF rejects re-sends.
@@ -116,13 +180,6 @@ export default $config({
             },
           };
         },
-      },
-    });
-
-    new sst.x.DevCommand("LocalDev", {
-      dev: {
-        autostart: false,
-        command: "npm run dev",
       },
     });
 

@@ -10,7 +10,8 @@
     "format:check": "prettier --check .",
     "db:generate": "drizzle-kit generate",
     "r2:cors": "wrangler r2 bucket cors set marknotes-cf-production-imagestagingbucketbucket-wotheafa --file r2-cors.json",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "db:pull": "node --env-file-if-exists=.env scripts/db-pull.mjs"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

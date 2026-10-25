@@ -50,4 +50,6 @@ export class MainDO extends DurableObject {
 
   // Dump (dev seed via /api/dump-do)
   dumpSql() { return dumpSqlImpl(this.db); }
+  // Local dev seeding only (scripts/db-pull.mjs → src/dev-worker.ts); bound params keep message text out of the SQL.
+  seed(tables: { table: string; columns: string[]; rows: SqlStorageValue[][] }[]) { this.ctx.storage.transactionSync(() => { for (const { table, columns, rows } of tables) { this.ctx.storage.sql.exec(`DELETE FROM ${table}`); for (const row of rows) this.ctx.storage.sql.exec(`INSERT INTO ${table} (${columns.join(", ")}) VALUES (${columns.map(() => "?").join(", ")})`, ...row); } }); }
 }
