@@ -1,0 +1,5 @@
+{
+  "name": "marknotes-cf",
+  "compatibility_date": "2026-08-11",
+  "compatibility_flags": ["nodejs_compat", "disable_nodejs_process_v2"],
+}

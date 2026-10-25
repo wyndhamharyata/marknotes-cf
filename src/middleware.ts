@@ -1,5 +1,6 @@
 import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import { defineMiddleware, sequence } from "astro:middleware";
+import { env } from "cloudflare:workers";
 import { client, subjects, setTokensFromCookies, isAdmin } from "./lib/auth";
 import {
   getDoStubFromEnv,
@@ -8,27 +9,13 @@ import {
   type StubLike,
 } from "./lib/db/do-client";
 
-// @vite-ignore + the DEV guard keep better-sqlite3 out of prod bundles via DCE.
-let cachedDevStubPromise: Promise<StubLike> | null = null;
-
 const runtimeMiddleware = defineMiddleware(async (context, next) => {
-  const env = (
-    context.locals as unknown as { runtime?: { env?: EnvWithMainDo } }
-  ).runtime?.env;
-
   let stub: StubLike | null = null;
-  if (env?.MAIN_DO !== undefined) {
-    stub = getDoStubFromEnv(env);
-  } else if (import.meta.env.DEV) {
-    if (!cachedDevStubPromise) {
-      cachedDevStubPromise = import(
-        /* @vite-ignore */ "./lib/db/dev-fallback"
-      ).then((mod) => mod.devStub as unknown as StubLike);
-    }
-    stub = await cachedDevStubPromise;
+  if (env.MAIN_DO !== undefined) {
+    stub = getDoStubFromEnv(env as EnvWithMainDo);
   }
 
-  return runtimeAls.run({ env: env ?? {}, stub }, () => next());
+  return runtimeAls.run({ env: (env as EnvWithMainDo) ?? {}, stub }, () => next());
 });
 
 const authMiddleware = defineMiddleware(async (context, next) => {
@@ -49,17 +36,13 @@ const authMiddleware = defineMiddleware(async (context, next) => {
   const refreshToken = context.cookies.get("refresh_token")?.value;
 
   const [verified, verifyErr] = await tryCatch(
-    client.verify(subjects, accessToken ?? "", { refresh: refreshToken ?? "" }),
+    client.verify(subjects, accessToken ?? "", { refresh: refreshToken ?? "" })
   );
   if (verifyErr) console.error("Auth verification failed:", verifyErr);
 
   if (verified && !verified.err) {
     if (verified.tokens) {
-      setTokensFromCookies(
-        context.cookies,
-        verified.tokens.access,
-        verified.tokens.refresh,
-      );
+      setTokensFromCookies(context.cookies, verified.tokens.access, verified.tokens.refresh);
     }
     context.locals.user = verified.subject;
 
@@ -67,7 +50,7 @@ const authMiddleware = defineMiddleware(async (context, next) => {
       if (isAdminApi) {
         return new Response(
           JSON.stringify({ error: "Forbidden", message: "Admin access required" }),
-          { status: 403, headers: { "Content-Type": "application/json" } },
+          { status: 403, headers: { "Content-Type": "application/json" } }
         );
       }
       return context.redirect("/", 302);
@@ -80,14 +63,11 @@ const authMiddleware = defineMiddleware(async (context, next) => {
   if (isAdminApi) {
     return new Response(
       JSON.stringify({ error: "Unauthorized", message: "Authentication required" }),
-      { status: 401, headers: { "Content-Type": "application/json" } },
+      { status: 401, headers: { "Content-Type": "application/json" } }
     );
   }
 
-  const { url } = await client.authorize(
-    context.url.origin + "/callback",
-    "code",
-  );
+  const { url } = await client.authorize(context.url.origin + "/callback", "code");
 
   if (context.request.headers.get("HX-Request") === "true") {
     return new Response(null, {
