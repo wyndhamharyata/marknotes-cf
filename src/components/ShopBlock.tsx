@@ -31,6 +31,7 @@ export default function ShopBlock({ shop, rating = 0 }: Props) {
         center: [shop.lng, shop.lat],
         zoom: 15,
         interactive: false,
+        attributionControl: { compact: true },
       });
       new Marker({ color: getComputedStyle(container).color })
         .setLngLat([shop.lng, shop.lat])
