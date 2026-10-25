@@ -19,5 +19,7 @@ export interface ArticleDraft {
   /** Chosen but not yet uploaded; IndexedDB can store a File, localStorage cannot. */
   heroFile?: File;
   inlineAssets: InlineAsset[];
+  /** Coffee reviews only; Kopimap shows it on the shop. */
+  rating?: number;
   updatedAt: number;
 }

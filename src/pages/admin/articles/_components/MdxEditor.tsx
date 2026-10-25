@@ -11,6 +11,7 @@ import { slugifyTitle } from "../../../../lib/editor/slugify";
 import { insertAtCursor, replaceInTextarea } from "../../../../lib/editor/textarea";
 import type { ArticleDraft } from "../../../../lib/editor/types";
 import { uploadAsset } from "../../../../lib/editor/upload";
+import type { KopimapShop } from "../../../../lib/kopimap";
 import EditorPane from "./EditorPane";
 import HeroImagePicker from "./HeroImagePicker";
 import MetaFields from "./MetaFields";
@@ -22,6 +23,8 @@ interface Props {
   existingSlugs?: string[];
   /** New article only: frontmatter prefilled from the URL, such as petakopi's `coffeeId`. */
   extraFrontmatter?: string[];
+  /** The Kopimap shop this article reviews, fetched by the page from its `coffeeId`. */
+  shop?: KopimapShop;
   article?: {
     slug: string;
     pubDate: string;
@@ -42,7 +45,13 @@ const AUTOSAVE_DEBOUNCE_MS = 500;
 const MIN_PANE_RATIO = 0.25;
 const MAX_PANE_RATIO = 0.75;
 
-export default function MdxEditor({ proseClass, existingSlugs = [], extraFrontmatter = [], article }: Props) {
+export default function MdxEditor({
+  proseClass,
+  existingSlugs = [],
+  extraFrontmatter = [],
+  shop,
+  article,
+}: Props) {
   const [draft, setDraft] = useState<ArticleDraft | null>(null);
   const [restored, setRestored] = useState(false);
   const [view, setView] = useState<"write" | "preview">("write");
@@ -56,7 +65,8 @@ export default function MdxEditor({ proseClass, existingSlugs = [], extraFrontma
   const previewRef = useRef<HTMLDivElement>(null);
 
   const editing = article !== undefined;
-  const draftId = article?.slug ?? "new";
+  // One draft per shop, so starting a second review never restores the first one.
+  const draftId = article?.slug ?? (shop ? `new:${shop.id}` : "new");
 
   // Identifies the forked-from revision, so an abandoned draft cannot revert later edits.
   const base = useMemo(() => (article ? JSON.stringify(article.initial) : undefined), [article]);
@@ -71,7 +81,7 @@ export default function MdxEditor({ proseClass, existingSlugs = [], extraFrontma
       setDraft(
         usable ??
         article?.initial ?? {
-          title: "Untitled",
+          title: shop?.name ?? "Untitled",
           description: "",
           body: "",
           inlineAssets: [],
@@ -242,6 +252,10 @@ export default function MdxEditor({ proseClass, existingSlugs = [], extraFrontma
       setStatus({ kind: "error", message: slugError });
       return;
     }
+    if (shop && !draft.rating) {
+      setStatus({ kind: "error", message: "Set a rating before you publish a review." });
+      return;
+    }
     // Frontmatter alone satisfies the endpoint's non-empty `content` check.
     if (!draft.body.trim()) {
       setStatus({ kind: "error", message: "The article body is empty." });
@@ -295,14 +309,14 @@ export default function MdxEditor({ proseClass, existingSlugs = [], extraFrontma
       if (payload?.sha)
         localStorage.setItem(
           "marknotes-deploy",
-          JSON.stringify({ sha: payload.sha, slug, startedAt: Date.now() })
+          JSON.stringify({ sha: payload.sha, slug, startedAt: Date.now(), coffee: shop !== undefined })
         );
 
       await clearDraft(draftId);
       window.location.href = editing ? `/admin/articles/${slug}` : "/admin/articles";
     });
     if (error) setStatus({ kind: "error", message: error.message });
-  }, [draft, slug, slugError, editing, pubDate, today, article, extraFrontmatter, committedKeys, draftId]);
+  }, [draft, slug, slugError, shop, editing, pubDate, today, article, extraFrontmatter, committedKeys, draftId]);
 
   const discardLocal = useCallback(async () => {
     if (!article) return;
@@ -434,6 +448,9 @@ export default function MdxEditor({ proseClass, existingSlugs = [], extraFrontma
             slugError={slugError}
             onTitle={(title) => update({ title })}
             onDescription={(description) => update({ description })}
+            shop={shop}
+            rating={draft.rating}
+            onRating={(rating) => update({ rating })}
           />
           <EditorPane
             body={draft.body}
@@ -461,11 +478,14 @@ export default function MdxEditor({ proseClass, existingSlugs = [], extraFrontma
             title={draft.title}
             pubDate={pubDate}
             scrollRef={previewRef}
+            shop={shop}
+            rating={draft.rating}
             hero={
               <HeroImagePicker
                 file={draft.heroFile}
                 uploadedKey={draft.heroKey}
                 committedUrl={draft.heroPath ? article?.heroPreviewUrl : undefined}
+                photos={shop?.photos}
                 onSelect={(heroFile) =>
                   update({ heroFile, heroKey: undefined, heroPath: undefined })
                 }

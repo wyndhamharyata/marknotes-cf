@@ -35,6 +35,25 @@ export async function getCommentsBySlug(db: DB, articleSlug: string): Promise<Re
   return rows.map(rowToReply);
 }
 
+// One query for every coffee review, so Kopimap's list costs one DO call, not one per slug.
+export async function getPublicCommentsBySlugs(db: DB, slugs: string[]): Promise<Reply[]> {
+  if (slugs.length === 0) return [];
+  const rows = await db
+    .select()
+    .from(schema.replies)
+    .where(
+      and(
+        inArray(schema.replies.articleSlug, slugs),
+        isNull(schema.replies.deletedAt),
+        eq(schema.replies.moderationStatus, ModerationStatus.OK),
+        eq(schema.replies.hidePublicity, 0),
+      ),
+    )
+    .orderBy(desc(schema.replies.createdAt));
+
+  return rows.map(rowToReply);
+}
+
 export async function createComment(db: DB, input: CreateCommentInput): Promise<number> {
   const result = await db
     .insert(schema.replies)

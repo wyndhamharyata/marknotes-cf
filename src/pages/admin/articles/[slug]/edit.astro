@@ -8,6 +8,7 @@ import { parseMdx } from "../../../../lib/editor/mdx-serialize";
 import { repoAssetUrl } from "../../../../lib/editor/upload";
 import { ghApi } from "../../../../lib/github";
 import MdxEditor from "../_components/MdxEditor";
+import { fetchShop } from "../../../../lib/kopimap";
 
 export const prerender = false;
 
@@ -23,6 +24,12 @@ const [resp, fetchErr] = await tryCatch(
 if (fetchErr) return new Response(fetchErr.message, { status: 502 });
 
 const [parsed, parseErr] = await tryCatch(resp.text().then(parseMdx));
+
+const coffeeLine = parsed?.extraFrontmatter.find((line) => line.startsWith("coffeeId:"));
+const shop = coffeeLine
+  ? ((await fetchShop(JSON.parse(coffeeLine.slice("coffeeId:".length).trim()) as string)) ??
+    undefined)
+  : undefined;
 
 const hero = parsed?.draft.heroPath;
 const heroKey = hero?.startsWith("./") ? hero.slice(2) : "";
@@ -61,6 +68,7 @@ const heroPreviewUrl = isSafeAssetKey(heroKey)
         <MdxEditor
           client:load
           proseClass={ARTICLE_PROSE_CLASS}
+          shop={shop}
           article={{
             slug,
             pubDate: parsed.pubDate,

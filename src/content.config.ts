@@ -16,6 +16,8 @@ const blog = defineCollection({
       heroImage: image().optional(),
       // petakopi `coffees.id`; marks this article as that coffee shop's review.
       coffeeId: z.string().optional(),
+      // The review owns the rating; Kopimap reads it from /api/coffee-reviews.json.
+      rating: z.number().min(0.5).max(5).multipleOf(0.5).optional(),
     }),
 });
 

@@ -9,6 +9,8 @@ export default function DeployBanner() {
   const [conclusion, setConclusion] = useState<string | null>(null);
   const [runUrl, setRunUrl] = useState<string | null>(null);
   const [dismissed, setDismissed] = useState(false);
+  const [coffee, setCoffee] = useState(false);
+  const [kopimap, setKopimap] = useState<"pending" | "updated" | "later">("pending");
 
   // localStorage is not readable while the layout renders on the server.
   useEffect(() => {
@@ -23,6 +25,7 @@ export default function DeployBanner() {
     }
     setSha(record.sha);
     setSlug(record.slug);
+    setCoffee(record.coffee === true);
   }, []);
 
   const fetchStatus = async () => {
@@ -53,6 +56,13 @@ export default function DeployBanner() {
         if (body.status === "completed") {
           if (body.conclusion === "success") {
             localStorage.removeItem("marknotes-deploy");
+            // Kopimap rereads the review index on its own within 10 minutes; this makes it now.
+            if (coffee) {
+              const [resp] = await tryCatch(fetch("/api/admin/coffee/refresh", { method: "POST" }));
+              const refreshed =
+                resp?.ok && ((await resp.json()) as { refreshed: boolean }).refreshed;
+              setKopimap(refreshed ? "updated" : "later");
+            }
             timer = setTimeout(() => setDismissed(true), 6_000);
           }
           return;
@@ -67,7 +77,7 @@ export default function DeployBanner() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [sha]);
+  }, [sha, coffee]);
 
   if (!sha || dismissed) return null;
 
@@ -89,6 +99,12 @@ export default function DeployBanner() {
         <span class="min-w-0">
           {!done && `Deploying ${slug}…`}
           {done && !failed && `${slug} is live`}
+          {done && !failed && coffee && kopimap === "updated" && " · Kopimap updated"}
+          {done &&
+            !failed &&
+            coffee &&
+            kopimap === "later" &&
+            " · Kopimap updates within 10 minutes"}
           {failed && `Deploy failed for ${slug}`}
         </span>
 

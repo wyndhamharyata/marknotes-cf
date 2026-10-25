@@ -1,0 +1,15 @@
+---
+import ShopBlock from "../../../components/ShopBlock";
+import { fetchShop } from "../../../lib/kopimap";
+
+interface Props {
+  coffeeId: string;
+  rating?: number;
+}
+
+const { coffeeId, rating } = Astro.props;
+// Kopimap down means no block; the article itself never waits on it.
+const shop = await fetchShop(coffeeId);
+---
+
+{shop && <ShopBlock client:visible shop={shop} rating={rating} />}

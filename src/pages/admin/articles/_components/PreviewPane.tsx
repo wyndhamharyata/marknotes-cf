@@ -2,6 +2,8 @@ import { useEffect, useState } from "preact/hooks";
 import type { ComponentChildren, RefObject } from "preact";
 import { renderPreview } from "../../../../lib/editor/preview-render";
 import type { InlineAsset } from "../../../../lib/editor/types";
+import type { KopimapShop } from "../../../../lib/kopimap";
+import ShopBlock from "../../../../components/ShopBlock";
 
 interface Props {
   body: string;
@@ -13,6 +15,8 @@ interface Props {
   hero: ComponentChildren;
   /** Owned by MdxEditor so it can drive scroll sync against the textarea. */
   scrollRef: RefObject<HTMLDivElement>;
+  shop?: KopimapShop;
+  rating?: number;
 }
 
 /** Long enough to skip a burst of keystrokes, short enough to feel live. */
@@ -27,6 +31,8 @@ export default function PreviewPane({
   pubDate,
   hero,
   scrollRef,
+  shop,
+  rating,
 }: Props) {
   const [html, setHtml] = useState("");
 
@@ -59,6 +65,8 @@ export default function PreviewPane({
           <h1 class="justify-center text-3xl font-extrabold md:text-4xl">{title}</h1>
           <div class="divider" />
         </div>
+
+        {shop && <ShopBlock shop={shop} rating={rating} />}
 
         {body.trim() ? (
           <div class={proseClass} dangerouslySetInnerHTML={{ __html: html }} />

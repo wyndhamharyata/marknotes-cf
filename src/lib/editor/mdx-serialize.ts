@@ -36,6 +36,7 @@ export function serializeMdx(
     `pubDate: ${yamlString(meta.pubDate)}`,
     meta.updatedDate ? `updatedDate: ${yamlString(meta.updatedDate)}` : null,
     hero ? `heroImage: ${yamlString(hero)}` : null,
+    draft.rating ? `rating: ${draft.rating}` : null,
     ...meta.extraFrontmatter,
   ].filter((line): line is string => line !== null);
 
@@ -77,7 +78,7 @@ export function parseMdx(source: string) {
       throw new Error(`Cannot parse frontmatter: ${line.slice(0, 60)}`);
 
     const value = line.slice(colon + 1).trim();
-    if (["title", "description", "pubDate", "updatedDate", "heroImage"].includes(key)) {
+    if (["title", "description", "pubDate", "updatedDate", "heroImage", "rating"].includes(key)) {
       fields.set(key, value.startsWith('"') ? (JSON.parse(value) as string) : value);
     } else {
       extraFrontmatter.push(line);
@@ -120,6 +121,7 @@ export function parseMdx(source: string) {
       description: fields.get("description") ?? "",
       body: lines.slice(cursor).join("\n").trim(),
       heroPath: fields.get("heroImage"),
+      rating: fields.has("rating") ? Number(fields.get("rating")) : undefined,
       inlineAssets,
       updatedAt: 0,
     } satisfies ArticleDraft,

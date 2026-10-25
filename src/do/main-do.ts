@@ -25,6 +25,7 @@ export class MainDO extends DurableObject {
 
   // Comments (public)
   getCommentsBySlug(slug: string) { return commentsQ.getCommentsBySlug(this.db, slug); }
+  getPublicCommentsBySlugs(slugs: string[]) { return commentsQ.getPublicCommentsBySlugs(this.db, slugs); }
   createComment(input: CreateCommentInput) { return commentsQ.createComment(this.db, input); }
   createCommentWithModeration(input: CreateCommentInput, moderationStatus: number) { return commentsQ.createCommentWithModeration(this.db, input, moderationStatus); }
 

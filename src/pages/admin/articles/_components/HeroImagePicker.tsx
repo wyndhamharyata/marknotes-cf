@@ -1,5 +1,6 @@
 import { useEffect, useState } from "preact/hooks";
 import { stagedAssetUrl } from "../../../../lib/editor/upload";
+import type { KopimapShop } from "../../../../lib/kopimap";
 
 interface Props {
   file?: File;
@@ -7,11 +8,20 @@ interface Props {
   /** Hero an earlier publish committed, resolved by the page. */
   committedUrl?: string;
   onSelect: (file: File | undefined) => void;
+  /** Coffee reviews only: the shop's Kopimap photos, offered as heroes. */
+  photos?: KopimapShop["photos"];
 }
 
 // Inline SVG because astro-icon resolves at build time and cannot run in an island.
-export default function HeroImagePicker({ file, uploadedKey, committedUrl, onSelect }: Props) {
+export default function HeroImagePicker({
+  file,
+  uploadedKey,
+  committedUrl,
+  onSelect,
+  photos = [],
+}: Props) {
   const [dragging, setDragging] = useState(false);
+  const [importing, setImporting] = useState<string | null>(null);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
 
   // Object URLs leak until revoked.
@@ -91,6 +101,45 @@ export default function HeroImagePicker({ file, uploadedKey, committedUrl, onSel
           onChange={(e) => accept(e.currentTarget.files)}
         />
       </label>
+
+      {photos.length > 0 && (
+        <div class="mt-3 flex flex-col gap-2">
+          <p class="text-base-content/70 text-sm">
+            Or use a photo from <span class="text-base-content font-semibold">Kopimap</span>
+          </p>
+          <div class="flex flex-wrap gap-2">
+            {photos.map((photo) => (
+              <button
+                key={photo.id}
+                type="button"
+                class="rounded-box relative h-20 w-28 overflow-hidden"
+                disabled={importing !== null}
+                onClick={async () => {
+                  setImporting(photo.id);
+                  // A File, so publish uploads it exactly like a dropped image.
+                  const resp = await fetch(
+                    `/api/admin/coffee/photo?url=${encodeURIComponent(photo.url)}`
+                  );
+                  if (resp.ok) {
+                    const blob = await resp.blob();
+                    onSelect(
+                      new File([blob], photo.url.split("/").pop() ?? "kopimap", { type: blob.type })
+                    );
+                  }
+                  setImporting(null);
+                }}
+              >
+                <img src={photo.url} alt={photo.alt} class="h-full w-full object-cover" />
+                {importing === photo.id && (
+                  <span class="bg-base-100/70 absolute inset-0 flex items-center justify-center">
+                    <span class="loading loading-spinner loading-sm" />
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

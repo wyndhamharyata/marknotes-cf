@@ -5,11 +5,12 @@ import BaseLayout from "./BaseLayout.astro";
 import FormattedDate from "../pages/articles/_components/FormattedDate.astro";
 import CommentSection from "../pages/articles/_components/CommentSection.astro";
 import ScrollButtons from "../pages/articles/_components/ScrollButtons.astro";
+import ShopIsland from "../pages/articles/_components/ShopIsland.astro";
 import { ARTICLE_PROSE_CLASS } from "../consts";
 
 type Props = CollectionEntry<"blog">["data"] & { slug: string };
 
-const { title, description, pubDate, updatedDate, heroImage, slug } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, slug, coffeeId, rating } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} image={heroImage}>
@@ -43,6 +44,13 @@ const { title, description, pubDate, updatedDate, heroImage, slug } = Astro.prop
         <h1 class="card-title justify-center text-3xl font-extrabold md:text-4xl">{title}</h1>
         <div class="divider"></div>
       </div>
+      {
+        coffeeId && (
+          <ShopIsland server:defer coffeeId={coffeeId} rating={rating}>
+            <div slot="fallback" class="skeleton rounded-box mb-8 h-44 w-full" />
+          </ShopIsland>
+        )
+      }
       <div class={ARTICLE_PROSE_CLASS}>
         <slot />
       </div>
