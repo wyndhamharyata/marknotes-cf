@@ -16,13 +16,17 @@ export const GET: APIRoute = async () => {
         data.coffeeId,
         {
           count: own.length,
-          latest: own.slice(0, 2).map(({ id, alias, message, createdAt, parentId }) => ({
-            id,
-            alias,
-            message,
-            createdAt,
-            parentId,
-          })),
+          // Newest two, oldest first, so a reply sits under its parent.
+          latest: own
+            .slice(0, 2)
+            .reverse()
+            .map(({ id, alias, message, createdAt, parentId }) => ({
+              id,
+              alias,
+              message,
+              createdAt,
+              parentId,
+            })),
         },
       ];
     })
