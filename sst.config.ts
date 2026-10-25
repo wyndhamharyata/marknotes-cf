@@ -36,13 +36,14 @@ export default $config({
         OpenAuthUrl: openAuthUrl,
         BaseUrl: baseUrl,
         MigrationToken: migrationToken,
-        GithubToken: githubToken,
         R2AccessKeyId: r2AccessKeyId,
         R2SecretAccessKey: r2SecretAccessKey,
         R2CloudflareAPIToken: r2CloudflareAPIToken,
         CfAccountId: cfAccountId,
       };
       const fs = await import("fs");
+      // Local dev borrows the gh CLI login instead of a PAT.
+      const githubCliToken = (await import("child_process")).execSync("gh auth token").toString().trim();
       const wranglerPath = `${process.cwd()}/.dev/wrangler.jsonc`;
       const environment = $resolve(
         Object.fromEntries(Object.entries(secrets).map(([k, s]) => [k, s.value]))
@@ -53,7 +54,7 @@ export default $config({
           OPEN_AUTH_URL: v.OpenAuthUrl,
           BASE_URL: v.BaseUrl,
           R2_BUCKET_NAME: PROD_BUCKET,
-          GITHUB_TOKEN: v.GithubToken,
+          GITHUB_TOKEN: githubCliToken,
           R2_ACCESS_KEY_ID: v.R2AccessKeyId,
           R2_SECRET_ACCESS_KEY: v.R2SecretAccessKey,
           R2_CLOUDFLARE_API_TOKEN: v.R2CloudflareAPIToken,

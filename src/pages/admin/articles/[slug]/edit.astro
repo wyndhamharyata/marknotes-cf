@@ -20,7 +20,7 @@ const [resp, fetchErr] = await tryCatch(
     headers: { Accept: "application/vnd.github.raw" },
   })
 );
-if (fetchErr) return new Response("Not found", { status: 404 });
+if (fetchErr) return new Response(fetchErr.message, { status: 502 });
 
 const [parsed, parseErr] = await tryCatch(resp.text().then(parseMdx));
 
