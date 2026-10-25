@@ -8,6 +8,9 @@ export const prerender = false;
 
 // Server-rendered so the editor can warn about a slug collision without a round trip.
 const existingSlugs = (await getCollection("blog")).map((article) => article.id);
+// petakopi's "Create Review Article" link; only uuid characters, so the value is safe to write into YAML.
+const coffeeId = Astro.url.searchParams.get("coffeeId") ?? "";
+const isUuid = coffeeId.length === 36 && [...coffeeId].every((c) => "0123456789abcdef-".includes(c));
 ---
 
 <BaseAdminLayout
@@ -29,6 +32,11 @@ const existingSlugs = (await getCollection("blog")).map((article) => article.id)
       </ul>
     </div>
 
-    <MdxEditor client:load existingSlugs={existingSlugs} proseClass={ARTICLE_PROSE_CLASS} />
+    <MdxEditor
+      client:load
+      existingSlugs={existingSlugs}
+      extraFrontmatter={isUuid ? [`coffeeId: "${coffeeId}"`] : []}
+      proseClass={ARTICLE_PROSE_CLASS}
+    />
   </div>
 </BaseAdminLayout>

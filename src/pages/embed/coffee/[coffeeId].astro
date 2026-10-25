@@ -1,0 +1,15 @@
+---
+import { type CollectionEntry, getCollection, render } from "astro:content";
+
+export const prerender = true;
+
+// Body-only HTML for petakopi's review card; petakopi fetches it server-side.
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => data.coffeeId !== undefined);
+  return posts.map((post) => ({ params: { coffeeId: post.data.coffeeId }, props: post }));
+}
+
+const { Content } = await render(Astro.props as CollectionEntry<"blog">);
+---
+
+<Content />

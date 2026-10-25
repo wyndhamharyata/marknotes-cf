@@ -20,6 +20,8 @@ interface Props {
   proseClass: string;
   /** Server-rendered from the content collection, for collision warnings. */
   existingSlugs?: string[];
+  /** New article only: frontmatter prefilled from the URL, such as petakopi's `coffeeId`. */
+  extraFrontmatter?: string[];
   article?: {
     slug: string;
     pubDate: string;
@@ -40,7 +42,7 @@ const AUTOSAVE_DEBOUNCE_MS = 500;
 const MIN_PANE_RATIO = 0.25;
 const MAX_PANE_RATIO = 0.75;
 
-export default function MdxEditor({ proseClass, existingSlugs = [], article }: Props) {
+export default function MdxEditor({ proseClass, existingSlugs = [], extraFrontmatter = [], article }: Props) {
   const [draft, setDraft] = useState<ArticleDraft | null>(null);
   const [restored, setRestored] = useState(false);
   const [view, setView] = useState<"write" | "preview">("write");
@@ -273,7 +275,7 @@ export default function MdxEditor({ proseClass, existingSlugs = [], article }: P
           content: serializeMdx(ready, {
             pubDate,
             updatedDate: editing ? today : undefined,
-            extraFrontmatter: article?.extraFrontmatter ?? [],
+            extraFrontmatter: article?.extraFrontmatter ?? extraFrontmatter,
             extraImports: article?.extraImports ?? [],
           }),
           imageKey: ready.heroKey,
@@ -300,7 +302,7 @@ export default function MdxEditor({ proseClass, existingSlugs = [], article }: P
       window.location.href = editing ? `/admin/articles/${slug}` : "/admin/articles";
     });
     if (error) setStatus({ kind: "error", message: error.message });
-  }, [draft, slug, slugError, editing, pubDate, today, article, committedKeys, draftId]);
+  }, [draft, slug, slugError, editing, pubDate, today, article, extraFrontmatter, committedKeys, draftId]);
 
   const discardLocal = useCallback(async () => {
     if (!article) return;

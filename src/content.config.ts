@@ -14,6 +14,8 @@ const blog = defineCollection({
       pubDate: z.coerce.date(),
       updatedDate: z.coerce.date().optional(),
       heroImage: image().optional(),
+      // petakopi `coffees.id`; marks this article as that coffee shop's review.
+      coffeeId: z.string().optional(),
     }),
 });
 
