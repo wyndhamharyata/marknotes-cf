@@ -45,10 +45,14 @@ const { title, description, pubDate, updatedDate, heroImage, slug, coffeeId, rat
         <div class="divider"></div>
       </div>
       {
+        // Own wrapper: under hx-boost the island marker comment is lost, and Astro's swap
+        // then deletes every earlier sibling, which here is the title.
         coffeeId && (
-          <ShopIsland server:defer coffeeId={coffeeId} rating={rating}>
-            <div slot="fallback" class="skeleton rounded-box mb-8 h-44 w-full" />
-          </ShopIsland>
+          <div class="contents">
+            <ShopIsland server:defer coffeeId={coffeeId} rating={rating}>
+              <div slot="fallback" class="skeleton rounded-box mb-8 h-44 w-full" />
+            </ShopIsland>
+          </div>
         )
       }
       <div class={ARTICLE_PROSE_CLASS}>

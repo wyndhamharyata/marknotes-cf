@@ -17,9 +17,10 @@ import HomeTopArticles from "./_components/HomeTopArticles.astro";
   maxWidthClass="max-w-6xl"
 >
   <div class="mx-auto flex w-full flex-col gap-6 px-4 pt-4 md:px-0 md:pt-0">
-    <HomeModerationAlert server:defer />
+    <!-- Each island in its own wrapper: see the note in BlogPost.astro. -->
+    <div class="contents"><HomeModerationAlert server:defer /></div>
 
-    <HomeKpiStrip server:defer />
+    <div class="contents"><HomeKpiStrip server:defer /></div>
 
     <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
       <section class="card bg-base-100/60 px-4 py-2 shadow-2xl md:col-span-2">
@@ -27,14 +28,16 @@ import HomeTopArticles from "./_components/HomeTopArticles.astro";
         <p class="text-base-content/60 text-sm">
           Site-wide rolling 24-hour total at each snapshot.
         </p>
-        <HomeTrendChart server:defer>
-          <div
-            slot="fallback"
-            class="text-base-content/60 flex min-h-70 items-center justify-center"
-          >
-            Loading chart…
-          </div>
-        </HomeTrendChart>
+        <div class="contents">
+          <HomeTrendChart server:defer>
+            <div
+              slot="fallback"
+              class="text-base-content/60 flex min-h-70 items-center justify-center"
+            >
+              Loading chart…
+            </div>
+          </HomeTrendChart>
+        </div>
       </section>
 
       <section class="card bg-base-100/60 px-4 py-4 md:col-span-1">
@@ -46,6 +49,6 @@ import HomeTopArticles from "./_components/HomeTopArticles.astro";
       </section>
     </div>
 
-    <HomeTopArticles server:defer />
+    <div class="contents"><HomeTopArticles server:defer /></div>
   </div>
 </BaseAdminLayout>
