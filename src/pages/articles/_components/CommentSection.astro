@@ -3,6 +3,8 @@ import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import { getDoStub } from "../../../lib/db/do-client";
 import { buildCommentTree } from "../../../lib/comments/tree";
 import { getOrCreateAlias } from "../../../lib/comments/diceware";
+import { isAdminRequest } from "../../../lib/auth";
+import { AUTHOR_ALIAS } from "../../../lib/comments/author";
 import CommentTree from "./comments/CommentTree";
 
 interface Props {
@@ -13,7 +15,9 @@ const { articleSlug } = Astro.props;
 
 const [data, loadErr] = await tryCatch(async () => {
   // getOrCreateAlias sets the cookie when the visitor has none yet.
-  const alias = getOrCreateAlias(Astro.cookies);
+  const alias = (await isAdminRequest(Astro.cookies))
+    ? AUTHOR_ALIAS
+    : getOrCreateAlias(Astro.cookies);
   const comments = await getDoStub().getCommentsBySlug(articleSlug);
 
   // Serialize dates to ISO strings for Preact

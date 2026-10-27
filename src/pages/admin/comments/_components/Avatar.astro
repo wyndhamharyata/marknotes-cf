@@ -1,5 +1,6 @@
 ---
 import { minidenticon } from "minidenticons";
+import { AUTHOR_ALIAS, AUTHOR_AVATAR } from "../../../../lib/comments/author";
 
 interface Props {
   seed: string;
@@ -7,16 +8,14 @@ interface Props {
 }
 
 const { seed, size = 40 } = Astro.props;
-const svg = minidenticon(seed, 95, 45);
+const src =
+  seed === AUTHOR_ALIAS
+    ? AUTHOR_AVATAR
+    : `data:image/svg+xml;utf8,${encodeURIComponent(minidenticon(seed, 95, 45))}`;
 ---
 
 <div class="avatar" style={`width: ${size}px; height: ${size}px;`}>
   <div class="mask mask-squircle bg-base-300 ring-base-content/40 ring-1">
-    <img
-      src={`data:image/svg+xml;utf8,${encodeURIComponent(svg)}`}
-      alt={seed}
-      width={size}
-      height={size}
-    />
+    <img src={src} alt={seed} width={size} height={size} />
   </div>
 </div>

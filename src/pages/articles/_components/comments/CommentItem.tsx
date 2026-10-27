@@ -1,6 +1,7 @@
 import Avatar from "./Avatar";
 import CommentForm from "./CommentForm";
 import type { CommentNode } from "./types";
+import { AUTHOR_ALIAS } from "../../../../lib/comments/author";
 
 interface CommentItemProps {
   comment: CommentNode;
@@ -73,6 +74,9 @@ export default function CommentItem({
         <div class="min-w-0 flex-1">
           <div class="mb-1 flex flex-wrap items-center gap-2">
             <span class="text-sm font-semibold">{comment.alias}</span>
+            {comment.alias === AUTHOR_ALIAS && (
+              <span class="badge badge-primary badge-soft badge-xs">Author</span>
+            )}
             <span class="text-base-content/50 text-xs">{formatDate(comment.createdAt)}</span>
             {hasChildren && (
               <button

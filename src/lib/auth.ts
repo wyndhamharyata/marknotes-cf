@@ -51,6 +51,18 @@ export function setTokensFromCookies(
   });
 }
 
+// Public pages skip the auth middleware, so comments check the login cookies themselves.
+export async function isAdminRequest(cookies: AstroCookies): Promise<boolean> {
+  const access = cookies.get("access_token")?.value;
+  if (!access) return false;
+  const verified = await client
+    .verify(subjects, access, { refresh: cookies.get("refresh_token")?.value ?? "" })
+    .catch(() => null);
+  if (!verified || verified.err) return false;
+  if (verified.tokens) setTokensFromCookies(cookies, verified.tokens.access, verified.tokens.refresh);
+  return isAdmin(verified.subject);
+}
+
 export function isAdmin(user: App.Locals["user"]): boolean {
   if (!user) return false;
   const { oauthID, email } = user.properties;

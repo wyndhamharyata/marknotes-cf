@@ -3,6 +3,8 @@ import { getDoStub } from "../../../lib/db/do-client";
 import { getOrCreateAlias } from "../../../lib/comments/diceware";
 import { ModerationStatus } from "../../../lib/comments/types";
 import { hasProfanity } from "../../../lib/moderation/profanity-filter";
+import { isAdminRequest } from "../../../lib/auth";
+import { AUTHOR_ALIAS } from "../../../lib/comments/author";
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   const formData = await request.formData();
@@ -15,15 +17,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     return assertionErr;
   }
 
-  const alias = getOrCreateAlias(cookies);
+  const isAuthor = await isAdminRequest(cookies);
+  const alias = isAuthor ? AUTHOR_ALIAS : getOrCreateAlias(cookies);
 
   const parentId =
     parentIdStr && parentIdStr !== "0" && parentIdStr !== "" ? parseInt(parentIdStr, 10) : null;
 
   const trimmedMessage = replyBody.trim();
 
-  // Profanity is now rejected in assertValidRequest, so all comments reaching here are clean
-  const moderationStatus = ModerationStatus.UNVERIFIED;
+  // Profanity is now rejected in assertValidRequest, so all comments reaching here are clean.
+  // My own comments skip the AI moderation queue.
+  const moderationStatus = isAuthor ? ModerationStatus.OK : ModerationStatus.UNVERIFIED;
 
   const newId = await getDoStub().createCommentWithModeration(
     {
