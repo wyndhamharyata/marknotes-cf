@@ -1054,6 +1054,18 @@ html.dark .halftone:not(:hover, .colour) img {
   border-top-width: 1.5px;
 }
 
+/* A YouTube iframe carries width="560"; on a phone or in the editor's preview that would
+   push the sheet wide. Fill the column and keep the player's 16:9 shape. */
+.article-prose iframe {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  margin-inline: auto;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 0;
+}
+
 /* A code block: a thermal printout in one ink, torn at both ends; colour under the pointer. */
 .printout {
   margin: 4px -14px 24px;
