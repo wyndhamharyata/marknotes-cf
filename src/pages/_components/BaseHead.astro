@@ -79,7 +79,7 @@ const { title, description, image = FallbackImage } = Astro.props;
 
     const newLink = document.createElement("link");
     newLink.rel = "icon";
-    newLink.type = "image/svg+xml"; // Dynamic favicon is still SVG (minidenticon)
+    newLink.type = "image/svg+xml"; // Dynamic favicon is still SVG (adorable)
     newLink.href = `/api/favicon.svg?v=${sessionId}`;
     document.head.appendChild(newLink);
   }

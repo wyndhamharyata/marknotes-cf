@@ -1292,8 +1292,10 @@ html.dark .on-counter {
   outline-offset: -1.5px;
 }
 .ident img {
-  width: 40px;
-  height: 40px;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   filter: url(#rough-sm);
 }
 .ident.ph img {
@@ -2029,8 +2031,8 @@ html.dark .page-head h1 {
   height: 28px;
 }
 .thread-row .ident img {
-  width: 28px;
-  height: 28px;
+  width: 100%;
+  height: 100%;
 }
 .pager {
   display: flex;
