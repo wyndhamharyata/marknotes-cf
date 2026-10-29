@@ -370,9 +370,8 @@ body{background:var(--terrazzo),var(--grain),var(--counter)}
 /* ================= Koran: Marknotes ================= */
 .n-frame p,.n-frame li{max-width:none}
 .n-frame li+li{margin-top:0}
-/* the placemat: Kopimap's printed map of Solo under everything */
-.k-counter{background:var(--grain),linear-gradient(rgba(236,236,236,.18),rgba(236,236,236,.18)),url(bg-map-light.jpg) 50% 0/cover,#D2D2D2}
-.k-counter.terrazzo{background:var(--terrazzo),var(--grain),#D6D6D6}
+/* the counter: terrazzo, chips in the palette colours */
+.k-counter{background:var(--terrazzo),var(--grain),#D6D6D6}
 .k-counter.plain{background:var(--grain),#D2D2D2}
 .k-counter.steel{background:var(--brush),var(--grain),linear-gradient(180deg,#C8C8C8,#BDBDBD)}
 .k-till{z-index:30}
@@ -583,7 +582,7 @@ body{background:var(--terrazzo),var(--grain),var(--counter)}
 
 /* night: a lamp over the counter */
 .k-lamp{position:absolute;inset:0;z-index:45;pointer-events:none;background:radial-gradient(ellipse 62% 78% at 50% 30%,transparent 46%,rgba(0,0,0,.5))}
-.k-night.k-counter{background:var(--grain),url(bg-map-dark.jpg) 50% 0/cover,#1C1C1C}
+.k-night.k-counter{background:linear-gradient(rgba(28,28,28,.45),rgba(28,28,28,.45)),var(--terrazzo),var(--grain),#1C1C1C}
 
 
 /* admin */
@@ -666,16 +665,16 @@ body{background:var(--terrazzo),var(--grain),var(--counter)}
 
 <div class="notice">
   <p><strong>Proposal only. No application code changed.</strong> Nothing under <code>src/</code>, config, the Durable Object, Cloudflare or production was touched, and nothing was deployed.</p>
-  <p>This report is <code>docs/redesign/koran/index.html</code>. Its assets sit beside it: thumbnails and heroes scaled down from <code>src/assets/</code> and <code>src/content/blog/hero-images/</code>, the GitHub avatar from <code>AUTHOR_AVATAR</code>, a photo from the Banjarnegara article, Couvee’s photos from Kopimap, and four crops of Kopimap’s printed map (<code>kopimap_print_light.json</code> and <code>_dark.json</code>): Solo by day and night for the placemat, and Couvee Solo for the ticket. Titles, dates, ratings, the Couvee shop and its two comments are real, read on 29 October 2026 from the repo, <code>https://mwyndham.dev</code> and <code>https://kopimap.mwyndham.dev/api/coffees</code> (21 articles, 3 reviews). Every number, chart and moderated comment in section 10 is illustrative.</p>
+  <p>This report is <code>docs/redesign/koran/index.html</code>. Its assets sit beside it: thumbnails and heroes scaled down from <code>src/assets/</code> and <code>src/content/blog/hero-images/</code>, the GitHub avatar from <code>AUTHOR_AVATAR</code>, a photo from the Banjarnegara article, Couvee’s photos from Kopimap, and two crops of Kopimap’s printed map (<code>kopimap_print_light.json</code> and <code>_dark.json</code>) at Couvee Solo for the ticket. Titles, dates, ratings, the Couvee shop and its two comments are real, read on 29 October 2026 from the repo, <code>https://mwyndham.dev</code> and <code>https://kopimap.mwyndham.dev/api/coffees</code> (21 articles, 3 reviews). Every number, chart and moderated comment in section 10 is illustrative.</p>
   <p>The design language is Nota as it shipped on Kopimap: the same tokens, materials, type, shape rules and motion. Only the objects are new.</p>
 </div>
 
-<p class="lede">Marknotes becomes the newspaper on the same counter. At a warung kopi the <em>koran</em> lies on the counter for whoever sits down, and Kopimap’s review clipping is cut from it. It lies on Kopimap’s printed map of Solo. The front page is a broadsheet, the archive is a run of back pages, each article is a sheet of newsprint, a coffee review has its shop’s ticket stapled to it, and a comment is written on the pink carbon nota and filed as a thermal slip. Prints and code are in one ink until you point at them.</p>
+<p class="lede">Marknotes becomes the newspaper on the same counter. At a warung kopi the <em>koran</em> lies on the counter for whoever sits down, and Kopimap’s review clipping is cut from it. It lies on a terrazzo counter. The front page is a broadsheet, the archive is a run of back pages, each article is a sheet of newsprint, a coffee review has its shop’s ticket stapled to it, and a comment is written on the pink carbon nota and filed as a thermal slip. Prints and code are in one ink until you point at them.</p>
 
 <section id="changes" style="margin:34px 0 0;border-top:4px solid var(--ink);padding-top:14px;max-width:800px">
 <h3 style="margin:0 0 8px;font-size:26px">Changes in this pass</h3>
 <ul class="notes">
-  <li><strong>Colour balances the texture.</strong> Every grey still measures neutral (equal red, green and blue), but grain on plain grey reads as old paper. Grey surfaces now carry colour from the palette: the newsprint has blue, red, mint and orange fibres, the page lies on Kopimap’s printed map with its blue water and green parks, and reviews carry a mint ticket stub.</li>
+  <li><strong>Colour balances the texture.</strong> Every grey still measures neutral (equal red, green and blue), but grain on plain grey reads as old paper. Grey surfaces now carry colour from the palette: the newsprint has blue, red, mint and orange fibres, the counter under the page is terrazzo with chips in the palette colours, and reviews carry a mint ticket stub.</li>
   <li><strong>Real newsprint.</strong> The sheet’s texture is fine grain, dark specks, light inclusions and short fibres, replacing the soft mottle.</li>
   <li><strong>Prints and code come to colour.</strong> Halftone prints show their colour photo under the pointer. Code is one ink at rest and shows its syntax colours under the pointer.</li>
   <li><strong>A new Blog page.</strong> The receipt is gone. Blog is the paper’s back pages: one band per year, the year in big numerals, and the stories set in columns with their prints.</li>
@@ -728,7 +727,7 @@ body{background:var(--terrazzo),var(--grain),var(--counter)}
 <p><em>Koran</em> is Indonesian for newspaper. It is the paper object every warung kopi already has, so Marknotes joins Kopimap on the same counter instead of borrowing a second metaphor. One source of objects keeps it coherent; anything with no object stays plain type.</p>
 <div class="tbl"><table>
   <tr><th>Object on the counter</th><th>What it is in Marknotes</th><th>Material</th></tr>
-  <tr><td>The placemat</td><td>The page itself: Kopimap’s printed map of Solo</td><td>Printed map, grey land, white roads, blue water, green parks</td></tr>
+  <tr><td>The counter</td><td>The page itself, public and admin</td><td>Terrazzo: neutral grey with chips in biro, chop, mint, pink and signal</td></tr>
   <tr><td>The till</td><td>The site’s keys: Home, Blog, Kopimap, Resume. The current section’s key is latched. Its base plate is the colophon.</td><td>Perforated graphite, aluminium keys, LEDs</td></tr>
   <tr><td>The front page</td><td>Home: the masthead, the latest article as the lead, two more under it, and the hello column</td><td>Newsprint with coloured fibres, halftone prints, column rules</td></tr>
   <tr><td>The back pages</td><td>Blog: every article, one band per year</td><td>The same newsprint</td></tr>
@@ -745,7 +744,6 @@ body{background:var(--terrazzo),var(--grain),var(--counter)}
 <h3>The uncommon patterns</h3>
 <ul class="notes">
   <li><strong>One ticket, two sites.</strong> A review’s shop block is Kopimap’s ticket itself: the same card, chop, cups, dotted facts and printed map, stapled to the top of the review. On Home and Blog the same shop rides as a stub, like a stub on Kopimap’s rail. Kopimap clips the review; Marknotes staples the ticket.</li>
-  <li><strong>The paper lies on the map.</strong> The page’s ground is Kopimap’s printed map of Solo, so the city the reviews are about is always under the paper, and the two sites share a surface.</li>
   <li><strong>Prints come to colour.</strong> Every photo is printed in halftone until the pointer is on it, and then it is the colour photo. Code is one ink until the pointer is on it, and then it has its syntax colours. The page stays calm, and colour arrives where you look.</li>
   <li><strong>Colour balances texture.</strong> Wherever a grey surface carries grain, it also carries a little colour from the palette, so the grain reads as paper, not age.</li>
   <li><strong>Pink and blue mean you are writing.</strong> The comment box and the article editor are Kopimap’s edit nota: pink carbonless paper, ruled lines, your words in biro.</li>
@@ -904,7 +902,7 @@ err := db.<span class="fn">Preload</span>(<span class="st">"Reports"</span>).<sp
 <h2 id="mobile">8. Phones</h2>
 <p>390×844. Home, Blog, the top of the Couvee review, and its comments.</p>
 <div class="phones">
-  <div><h4>Home</h4><div class="fig"><div class="fit" data-min="0"><div class="fit-in"><div class="n-frame k-counter plain phone" data-w="390" data-h="844" style="width:390px;height:844px"><nav class="n-till k-till m"><div class="n-keys"><a class="n-key grow" href="#mobile" aria-current=page><span class="led"></span>Home</a><a class="n-key grow" href="#mobile"><span class="led"></span>Blog</a><a class="n-key grow" href="#mobile"><span class="led"></span>Kopimap<svg class="o"><use href="#i-out"/></svg></a><a class="n-key grow" href="#mobile"><span class="led"></span>Resume</a></div><div class="n-slot"></div></nav>
+  <div><h4>Home</h4><div class="fig"><div class="fit" data-min="0"><div class="fit-in"><div class="n-frame k-counter phone" data-w="390" data-h="844" style="width:390px;height:844px"><nav class="n-till k-till m"><div class="n-keys"><a class="n-key grow" href="#mobile" aria-current=page><span class="led"></span>Home</a><a class="n-key grow" href="#mobile"><span class="led"></span>Blog</a><a class="n-key grow" href="#mobile"><span class="led"></span>Kopimap<svg class="o"><use href="#i-out"/></svg></a><a class="n-key grow" href="#mobile"><span class="led"></span>Resume</a></div><div class="n-slot"></div></nav>
 <div class="k-sheet m" style="top:84px;height:900px">
   <div class="k-plate">Marknotes</div><div class="k-rule2"></div>
   <div class="k-mfront">
@@ -914,7 +912,7 @@ err := db.<span class="fn">Preload</span>(<span class="st">"Reports"</span>).<sp
     <div class="k-mrow"><div class="k-ht" style="height:64px"><img src="h-loske.jpg" alt=""></div><div><div class="k-hl">Loske: Good Idea In Theory, Short on Delivery.</div><div class="k-date"><span class="n-stamp sm" style="--r:-2deg">Coffee review</span>13 Jul 2025</div><div class="k-stub m"><div class="nm">Loske Coffee Service Karangasem</div><div class="r"><span class="n-cups" role="img" aria-label="3.5 out of 5"><i class="n-cup f"></i><i class="n-cup f"></i><i class="n-cup f"></i><i class="n-cup h"></i><i class="n-cup"></i></span><b class="n-score">3.5</b></div></div></div></div>
   </div>
 </div></div></div></div></div></div>
-  <div><h4>Blog</h4><div class="fig"><div class="fit" data-min="0"><div class="fit-in"><div class="n-frame k-counter plain phone" data-w="390" data-h="844" style="width:390px;height:844px"><nav class="n-till k-till m"><div class="n-keys"><a class="n-key grow" href="#mobile"><span class="led"></span>Home</a><a class="n-key grow" href="#mobile" aria-current=page><span class="led"></span>Blog</a><a class="n-key grow" href="#mobile"><span class="led"></span>Kopimap<svg class="o"><use href="#i-out"/></svg></a><a class="n-key grow" href="#mobile"><span class="led"></span>Resume</a></div><div class="n-slot"></div></nav>
+  <div><h4>Blog</h4><div class="fig"><div class="fit" data-min="0"><div class="fit-in"><div class="n-frame k-counter phone" data-w="390" data-h="844" style="width:390px;height:844px"><nav class="n-till k-till m"><div class="n-keys"><a class="n-key grow" href="#mobile"><span class="led"></span>Home</a><a class="n-key grow" href="#mobile" aria-current=page><span class="led"></span>Blog</a><a class="n-key grow" href="#mobile"><span class="led"></span>Kopimap<svg class="o"><use href="#i-out"/></svg></a><a class="n-key grow" href="#mobile"><span class="led"></span>Resume</a></div><div class="n-slot"></div></nav>
 <div class="k-sheet m" style="top:84px;height:1400px">
   <div class="k-flag" style="padding:18px 16px 8px"><span class="t" style="font-size:80px">Blog</span><a class="n-key sm" href="#mobile">RSS</a></div><div class="k-rule2"></div>
   <div class="k-mblog">
@@ -926,7 +924,7 @@ err := db.<span class="fn">Preload</span>(<span class="st">"Reports"</span>).<sp
     <div class="k-mrow"><div class="k-ht" style="height:64px"><img src="s-sorak.jpg" alt=""></div><div><div class="k-hl">Sorak Sorai - Fancy Place, But Only For Recreational Visit</div><div class="k-date"><span class="n-stamp sm" style="--r:-2deg">Coffee review</span>3 Jul 2025</div><div class="k-stub m"><div class="nm">Sorak Sorai Coffee Solo</div><div class="r"><span class="n-cups" role="img" aria-label="3.0 out of 5"><i class="n-cup f"></i><i class="n-cup f"></i><i class="n-cup f"></i><i class="n-cup"></i><i class="n-cup"></i></span><b class="n-score">3.0</b></div></div></div></div>
   </div>
 </div></div></div></div></div></div>
-  <div><h4>A coffee review</h4><div class="fig"><div class="fit" data-min="0"><div class="fit-in"><div class="n-frame k-counter plain phone" data-w="390" data-h="844" style="width:390px;height:844px"><nav class="n-till k-till m"><div class="n-keys"><a class="n-key grow" href="#mobile"><span class="led"></span>Home</a><a class="n-key grow" href="#mobile" aria-current=page><span class="led"></span>Blog</a><a class="n-key grow" href="#mobile"><span class="led"></span>Kopimap<svg class="o"><use href="#i-out"/></svg></a><a class="n-key grow" href="#mobile"><span class="led"></span>Resume</a></div><div class="n-slot"></div></nav>
+  <div><h4>A coffee review</h4><div class="fig"><div class="fit" data-min="0"><div class="fit-in"><div class="n-frame k-counter phone" data-w="390" data-h="844" style="width:390px;height:844px"><nav class="n-till k-till m"><div class="n-keys"><a class="n-key grow" href="#mobile"><span class="led"></span>Home</a><a class="n-key grow" href="#mobile" aria-current=page><span class="led"></span>Blog</a><a class="n-key grow" href="#mobile"><span class="led"></span>Kopimap<svg class="o"><use href="#i-out"/></svg></a><a class="n-key grow" href="#mobile"><span class="led"></span>Resume</a></div><div class="n-slot"></div></nav>
 <article class="k-sheet k-art m" style="top:84px;height:1300px">
   <div class="k-ht" style="height:150px"><img src="h-couvee.jpg" alt=""></div>
   <div class="k-h1">Couvee - Nice Place to Have Work Done</div>
@@ -943,7 +941,7 @@ err := db.<span class="fn">Preload</span>(<span class="st">"Reports"</span>).<sp
   <div class="k-map"><img src="map-couvee.jpg" alt="Couvee Solo on the map"></div>
 </section>
 </article></div></div></div></div></div>
-  <div><h4>Comments</h4><div class="fig"><div class="fit" data-min="0"><div class="fit-in"><div class="n-frame k-counter plain phone" data-w="390" data-h="844" style="width:390px;height:844px">
+  <div><h4>Comments</h4><div class="fig"><div class="fit" data-min="0"><div class="fit-in"><div class="n-frame k-counter phone" data-w="390" data-h="844" style="width:390px;height:844px">
 <section class="k-mcom">
   <div class="k-fold">Comments<span class="ct">2</span></div>
   <form class="k-nota"><dl class="k-from"><dt>From</dt><i class="n-lead"></i><dd>Blaze Mast</dd></dl>
@@ -954,7 +952,7 @@ err := db.<span class="fn">Preload</span>(<span class="st">"Reports"</span>).<sp
 <ol class="notes">
   <li><strong>The till stays at the top</strong> and scrolls away with the page: four keys at 44px, no menu. With Night and Admin in the colophon, the four fit at 360px.</li>
   <li><strong>Blog</strong> keeps the year bands; stories become rows with a 96px print, and a review’s stub sits under its headline.</li>
-  <li><strong>The sheet</strong> runs nearly edge to edge, so phones skip the map image and show the plain ground colour.</li>
+  <li><strong>The sheet</strong> runs nearly edge to edge; the terrazzo shows only at the margins.</li>
   <li><strong>Prints</strong> stay halftone in lists. In an article, a tap on the hero shows its colour until the next tap.</li>
   <li><strong>No floating buttons</strong>, and nothing animates on phones.</li>
 </ol>
@@ -1020,7 +1018,7 @@ err := db.<span class="fn">Preload</span>(<span class="st">"Reports"</span>).<sp
   <div class="k-end"><button class="n-key ink" type="button">Post</button></div></form><div class="k-slip"><div class="tear-b"><div class="k-who"><span class="k-id"><svg viewBox="-1.5 -1.5 8 8" aria-hidden="true"><rect x="0" y="1" width="1" height="1"/><rect x="0" y="2" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="1" y="4" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="4" y="1" width="1" height="1"/><rect x="4" y="2" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="3" y="1" width="1" height="1"/><rect x="3" y="4" width="1" height="1"/></svg></span><b>Optic Lead</b><i class="n-lead"></i><time>20 Sep 2026</time></div><p class="k-msg">Is this blog made by hand? It looks amazing, also those donuts look amazing....</p><div class="k-acts"><button class="n-key sm">Reply</button><button class="n-key sm">1 reply<svg><use href="#i-down"/></svg></button></div></div></div><div class="k-replies"><div class="k-slip"><div class="tear-b"><div class="k-who"><span class="k-id ph"><img src="a-wyndham.jpg" alt=""></span><b>Wyndham</b><span class="n-stamp sm" style="--r:-2deg">Author</span><i class="n-lead"></i><time>23 Sep 2026</time></div><p class="k-msg">Author here. Yes! everything here is by hand. Not a framework or anything.</p><div class="k-acts"><button class="n-key sm">Reply</button></div></div></div></div></section>
 <div class="k-lamp" style="background:radial-gradient(ellipse 70% 80% at 50% 30%,transparent 50%,rgba(0,0,0,.45))"></div></div></div></div></div>
 <div class="phones">
-  <div><h4>Day</h4><div class="fig"><div class="fit" data-min="0"><div class="fit-in"><div class="n-frame k-counter plain phone" data-w="390" data-h="844" style="width:390px;height:844px"><nav class="n-till k-till m"><div class="n-keys"><a class="n-key grow" href="#mobile"><span class="led"></span>Home</a><a class="n-key grow" href="#mobile" aria-current=page><span class="led"></span>Blog</a><a class="n-key grow" href="#mobile"><span class="led"></span>Kopimap<svg class="o"><use href="#i-out"/></svg></a><a class="n-key grow" href="#mobile"><span class="led"></span>Resume</a></div><div class="n-slot"></div></nav>
+  <div><h4>Day</h4><div class="fig"><div class="fit" data-min="0"><div class="fit-in"><div class="n-frame k-counter phone" data-w="390" data-h="844" style="width:390px;height:844px"><nav class="n-till k-till m"><div class="n-keys"><a class="n-key grow" href="#mobile"><span class="led"></span>Home</a><a class="n-key grow" href="#mobile" aria-current=page><span class="led"></span>Blog</a><a class="n-key grow" href="#mobile"><span class="led"></span>Kopimap<svg class="o"><use href="#i-out"/></svg></a><a class="n-key grow" href="#mobile"><span class="led"></span>Resume</a></div><div class="n-slot"></div></nav>
 <article class="k-sheet k-art m" style="top:84px;height:1300px">
   <div class="k-ht" style="height:150px"><img src="h-couvee.jpg" alt=""></div>
   <div class="k-h1">Couvee - Nice Place to Have Work Done</div>
@@ -1056,9 +1054,9 @@ err := db.<span class="fn">Preload</span>(<span class="st">"Reports"</span>).<sp
 </article></div></div></div></div></div>
 </div>
 <ol class="notes">
-  <li><strong>A lamp over the counter.</strong> The placemat turns to Kopimap’s dark printed map, and a soft pool of light falls on the middle of the page, so the sheet glows and the edges fall away. It is one fixed overlay, drawn once.</li>
+  <li><strong>A lamp over the counter.</strong> The terrazzo goes dark with its chips dimmed, and a soft pool of light falls on the middle of the page, so the sheet glows and the edges fall away. It is one fixed overlay, drawn once.</li>
   <li><strong>The papers dim, the inks hold.</strong> Newsprint <code>#BDBDBD</code>, thermal <code>#D4D4D4</code>, ticket <code>#A9C7BB</code>, nota <code>#D9A0B5</code>. Chop darkens to <code>#900B20</code>, ink-2 to <code>#3D3D3D</code> and biro to <code>#1730A6</code> to hold contrast. Nothing changes hue, so the chop is red at noon and at midnight.</li>
-  <li><strong>Type on the counter</strong>, such as the Comments head, turns to night thermal grey, since ink would vanish on the dark map.</li>
+  <li><strong>Type on the counter</strong>, such as the Comments head, turns to night thermal grey, since ink would vanish on the dark counter.</li>
   <li><strong>The ticket’s map</strong> uses <code>kopimap_print_dark.json</code>, the same style Kopimap uses at night.</li>
   <li><strong>Prints and code</strong> behave as by day: halftone and one ink at rest, colour under the pointer.</li>
   <li><strong>The switch</strong> is the Night key in the colophon. It latches and lights; the stored <code>dark-mode</code> value and the OS default work as today.</li>
@@ -1067,10 +1065,10 @@ err := db.<span class="fn">Preload</span>(<span class="st">"Reports"</span>).<sp
 <!-- ================================================================== -->
 
 <h2 id="admin">10. Admin</h2>
-<p>Admin is the back of the counter, on terrazzo instead of the map: the same till, slips, stamps and nota, plus the register’s VFD for numbers. Every page below replaces its daisyUI version. Numbers, charts and the moderated comments are illustrative.</p>
+<p>Admin is the back of the counter: the same till, slips, stamps and nota, plus the register’s VFD for numbers. Every page below replaces its daisyUI version. Numbers, charts and the moderated comments are illustrative.</p>
 
 <h3>Home</h3>
-<div class="fig"><div class="fit" data-min=".45"><div class="fit-in"><div class="n-frame k-counter terrazzo" data-w="1440" data-h="1000" style="width:1440px;height:1000px">
+<div class="fig"><div class="fit" data-min=".45"><div class="fit-in"><div class="n-frame k-counter" data-w="1440" data-h="1000" style="width:1440px;height:1000px">
 <div class="k-alert" style="left:40px;top:22px;width:1360px"><b>2 comments need review</b><span>1 unmoderated · 1 flagged</span><a class="n-key sm" href="#admin">Review</a></div>
 <div class="n-till" style="left:40px;top:84px;width:1360px;padding-bottom:12px"><i class="bolt" style="left:4px;top:4px"></i><i class="bolt" style="right:4px;top:4px"></i><div class="k-kpi" style="grid-template-columns:repeat(4,1fr)"><div class="n-vfd"><span>Articles</span><i class="k-vlead"></i><b>21</b></div><div class="n-vfd"><span>Pageviews 7d</span><i class="k-vlead"></i><b>1,284</b></div><div class="n-vfd"><span>Visits 7d</span><i class="k-vlead"></i><b>612</b></div><div class="n-vfd"><span>Comments</span><i class="k-vlead"></i><b>44</b></div></div></div>
 <div class="k-plot" style="left:40px;top:196px;width:880px;height:330px"><span class="t">Pageviews — last 30 days</span><svg viewBox="0 0 880 330" style="position:absolute;inset:0;width:100%;height:100%" aria-hidden="true"><polyline fill="none" stroke="#141414" stroke-width="2"  points="20,300 50,308 80,283 110,294 140,278 170,304 200,266 230,273 260,248 290,284 320,259 350,223 380,244 410,237 440,213 470,250 500,218 530,200 560,229 590,183 620,206 650,194 680,167 710,211 740,178 770,156 800,172 830,148 860,132"/><rect x="853.0" y="125.0" width="14" height="14" fill="#FF5A1F" stroke="#141414" stroke-width="1.5"/></svg></div>
@@ -1098,7 +1096,7 @@ err := db.<span class="fn">Preload</span>(<span class="st">"Reports"</span>).<sp
 </ol>
 
 <h3>Articles</h3>
-<div class="fig"><div class="fit" data-min=".45"><div class="fit-in"><div class="n-frame k-counter terrazzo" data-w="1440" data-h="980" style="width:1440px;height:980px">
+<div class="fig"><div class="fit" data-min=".45"><div class="fit-in"><div class="n-frame k-counter" data-w="1440" data-h="980" style="width:1440px;height:980px">
 <div class="k-head" style="left:170px;top:30px;width:1100px"><span class="t">Articles</span><a class="n-key cobalt" href="#admin"><svg><use href="#i-plus"/></svg>New article</a></div>
 <div class="n-paperwrap" style="left:170px;top:110px;width:1100px"><div class="n-receipt tear-b" style="padding:4px 18px 22px">
   <div class="k-lhead"><span></span><span>21 articles</span><span>Views 7d</span><span>Comments</span></div><div class="k-lrow"><span class="n-thumb"><img src="t-building-keling-ios-alar.jpg" alt=""></span><span><span class="nm">Building Keling: A Fine-Grained iOS Alarm App with AlarmKit</span><span class="ln"><span class="d" style="font-weight:400">24 May 2026</span></span></span><span class="k-num">120</span><span class="k-num">0</span></div><div class="k-lrow"><span class="n-thumb"><img src="t-da-career-suicide-or-is-.jpg" alt=""></span><span><span class="nm">Data Analyst: Career Suicide, Or Is It?</span><span class="ln"><span class="d" style="font-weight:400">6 May 2026</span></span></span><span class="k-num">64</span><span class="k-num">0</span></div><div class="k-lrow"><span class="n-thumb"><img src="t-loske-coffee-service-kar.jpg" alt=""></span><span><span class="nm">Loske: Good Idea In Theory, Short on Delivery.</span><span class="ln"><span class="n-stamp sm" style="--r:1deg">Coffee review</span><span class="d" style="font-weight:400">13 Jul 2025</span></span></span><span class="k-num">58</span><span class="k-num">1</span></div><div class="k-lrow"><span class="n-thumb"><img src="t-sorak-sorai-coffee-solo-.jpg" alt=""></span><span><span class="nm">Sorak Sorai - Fancy Place, But Only For Recreational Visit</span><span class="ln"><span class="n-stamp sm" style="--r:1deg">Coffee review</span><span class="d" style="font-weight:400">3 Jul 2025</span></span></span><span class="k-num">41</span><span class="k-num">0</span></div><div class="k-lrow"><span class="n-thumb"><img src="t-couvee-nice-place-to-hav.jpg" alt=""></span><span><span class="nm">Couvee - Nice Place to Have Work Done</span><span class="ln"><span class="n-stamp sm" style="--r:1deg">Coffee review</span><span class="d" style="font-weight:400">22 Jun 2025</span></span></span><span class="k-num">212</span><span class="k-num">3</span></div><div class="k-lrow"><span class="n-thumb"><img src="t-my-adventure-on-implemen.jpg" alt=""></span><span><span class="nm">My Adventure on Implementing Comment Feature for This Blog</span><span class="ln"><span class="d" style="font-weight:400">11 Jun 2025</span></span></span><span class="k-num">77</span><span class="k-num">4</span></div><div class="k-lrow"><span class="n-thumb"><img src="t-my-top-go-patterns-and-f.jpg" alt=""></span><span><span class="nm">My Top Go Patterns and Features to Use</span><span class="ln"><span class="d" style="font-weight:400">10 May 2025</span></span></span><span class="k-num">39</span><span class="k-num">0</span></div><div class="k-lrow"><span class="n-thumb"><img src="t-gorm-maximalism-collecti.jpg" alt=""></span><span><span class="nm">GORM Maximalism: Collection of Tricks When Using Go ORM</span><span class="ln"><span class="d" style="font-weight:400">20 May 2024</span></span></span><span class="k-num">143</span><span class="k-num">2</span></div><div class="k-lrow"><span class="n-thumb"><img src="t-banjarnegara-a-city-froz.jpg" alt=""></span><span><span class="nm">Banjarnegara: A City Frozen in Time, Eaten Alive</span><span class="ln"><span class="d" style="font-weight:400">19 May 2024</span></span></span><span class="k-num">52</span><span class="k-num">1</span></div>
@@ -1111,7 +1109,7 @@ err := db.<span class="fn">Preload</span>(<span class="st">"Reports"</span>).<sp
 </ol>
 
 <h3>An article’s numbers</h3>
-<div class="fig"><div class="fit" data-min=".45"><div class="fit-in"><div class="n-frame k-counter terrazzo" data-w="1440" data-h="980" style="width:1440px;height:980px">
+<div class="fig"><div class="fit" data-min=".45"><div class="fit-in"><div class="n-frame k-counter" data-w="1440" data-h="980" style="width:1440px;height:980px">
 <div class="k-head" style="left:40px;top:24px;width:1360px"><a class="n-key" href="#admin"><svg><use href="#i-back"/></svg>Articles</a><span class="t" style="font-size:40px;margin-left:8px">Couvee - Nice Place to Have Work Done</span><a class="n-key ink" href="#admin">Edit</a></div>
 <div style="position:absolute;left:40px;top:96px;width:700px;height:780px;overflow:hidden">
   <article class="k-sheet k-art" style="left:0;top:0;width:880px;transform:scale(.795);transform-origin:0 0">
@@ -1148,7 +1146,7 @@ err := db.<span class="fn">Preload</span>(<span class="st">"Reports"</span>).<sp
 </ol>
 
 <h3>The editor</h3>
-<div class="fig"><div class="fit" data-min=".45"><div class="fit-in"><div class="n-frame k-counter terrazzo" data-w="1440" data-h="960" style="width:1440px;height:960px">
+<div class="fig"><div class="fit" data-min=".45"><div class="fit-in"><div class="n-frame k-counter" data-w="1440" data-h="960" style="width:1440px;height:960px">
 <div class="k-vfdbar" style="left:40px;top:20px;width:1360px"><div class="n-vfd"><span>Deploying couvee-nice-place-to-have-work-done</span><i class="k-vlead"></i><span class="blk"><i></i><i></i><i></i><i class="o"></i><i class="o"></i></span></div></div>
 <div class="k-head" style="left:40px;top:86px;width:660px"><a class="n-key" href="#admin"><svg><use href="#i-back"/></svg>Articles</a><span class="t" style="font-size:40px;margin-left:8px">Edit article</span><a class="n-key ink" href="#admin">Update</a></div>
 <form class="k-nota" style="position:absolute;left:40px;top:150px;width:660px;margin:0;padding:18px 20px 20px">
@@ -1204,7 +1202,7 @@ To be honest, the coffee selection is not that much.</span>
 </ol>
 
 <h3>Moderation</h3>
-<div class="fig"><div class="fit" data-min=".45"><div class="fit-in"><div class="n-frame k-counter terrazzo" data-w="1440" data-h="1120" style="width:1440px;height:1120px">
+<div class="fig"><div class="fit" data-min=".45"><div class="fit-in"><div class="n-frame k-counter" data-w="1440" data-h="1120" style="width:1440px;height:1120px">
 <div class="k-head" style="left:270px;top:30px;width:900px"><span class="t">Comments</span></div>
 <div class="n-keys" style="position:absolute;left:270px;top:104px;width:900px;margin:0;flex-wrap:wrap"><a class="n-key" href="#admin" aria-current=page><span class="led"></span>All <span style="font:700 12px/1 var(--mono)">44</span></a><a class="n-key" href="#admin"><span class="led"></span>Unmoderated <span style="font:700 12px/1 var(--mono)">1</span></a><a class="n-key" href="#admin"><span class="led"></span>OK <span style="font:700 12px/1 var(--mono)">40</span></a><a class="n-key" href="#admin"><span class="led"></span>Warning <span style="font:700 12px/1 var(--mono)">2</span></a><a class="n-key" href="#admin"><span class="led"></span>Alert <span style="font:700 12px/1 var(--mono)">1</span></a></div>
 <section style="position:absolute;left:270px;top:170px;width:900px"><div class="k-slip"><div class="tear-b"><div class="k-who"><span class="k-id"><svg viewBox="-1.5 -1.5 8 8" aria-hidden="true"><rect x="0" y="0" width="1" height="1"/><rect x="0" y="1" width="1" height="1"/><rect x="0" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="1" y="1" width="1" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="2" y="1" width="1" height="1"/><rect x="2" y="3" width="1" height="1"/><rect x="2" y="4" width="1" height="1"/><rect x="4" y="0" width="1" height="1"/><rect x="4" y="1" width="1" height="1"/><rect x="4" y="3" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="3" y="1" width="1" height="1"/><rect x="3" y="2" width="1" height="1"/></svg></span><b>Hazy Tulip</b><span class="n-stamp dim sm" style="--r:-2deg;margin-left:8px">Unmoderated</span><i class="n-lead"></i><time>28 Oct 2026</time></div><p class="k-msg">Which one is better for working, Loske or Couvee?</p><p class="k-on">on <a href="#admin">Couvee - Nice Place to Have Work Done</a></p><div class="k-acts"><button class="n-key sm ink">Approve</button><button class="n-key sm">Hide</button></div></div></div><div class="k-slip"><div class="tear-b"><div class="k-who"><span class="k-id"><svg viewBox="-1.5 -1.5 8 8" aria-hidden="true"><rect x="0" y="3" width="1" height="1"/><rect x="0" y="4" width="1" height="1"/><rect x="1" y="2" width="1" height="1"/><rect x="2" y="0" width="1" height="1"/><rect x="2" y="2" width="1" height="1"/><rect x="4" y="3" width="1" height="1"/><rect x="4" y="4" width="1" height="1"/><rect x="3" y="2" width="1" height="1"/></svg></span><b>Gravel Plum</b><span class="n-stamp sm" style="--r:-2deg;margin-left:8px">Warning</span><i class="n-lead"></i><time>27 Oct 2026</time></div><p class="k-msg">Check out cheap beans here bit.ly/…</p><div class="k-reason"><span class="n-staple" style="left:14px;top:-3px"></span><div class="tear-b">✦ Contains a shortened link to an unknown site.</div></div><p class="k-on">on <a href="#admin">Loske: Good Idea In Theory, Short on Delivery.</a></p><div class="k-acts"><button class="n-key sm ink">Approve</button><button class="n-key sm">Hide</button></div></div></div><div class="k-slip"><div class="tear-b"><div class="k-parent">Replying to <b>Optic Lead</b>: Is this blog made by hand? It looks amazing…</div><div class="k-who"><span class="k-id ph"><img src="a-wyndham.jpg" alt=""></span><b>Wyndham</b><span class="n-stamp ink sm" style="--r:-2deg;margin-left:8px">OK</span><i class="n-lead"></i><time>23 Sep 2026</time></div><p class="k-msg">Author here. Yes! everything here is by hand. Not a framework or anything.</p><p class="k-on">on <a href="#admin">Couvee - Nice Place to Have Work Done</a></p><div class="k-acts"><button class="n-key sm">Hide</button></div></div></div><div class="k-pager"><a class="n-key sq sm" href="#admin">‹</a><a class="n-key sq sm" href="#admin" aria-current="page">1</a><a class="n-key sq sm" href="#admin">2</a><a class="n-key sq sm" href="#admin">3</a><a class="n-key sq sm" href="#admin">›</a></div></section>
@@ -1218,7 +1216,7 @@ To be honest, the coffee selection is not that much.</span>
   <li>Pages are steel keys, the current one latched.</li>
 </ol>
 <div class="phones">
-  <div><h4>Moderation on a phone</h4><div class="fig"><div class="fit" data-min="0"><div class="fit-in"><div class="n-frame k-counter terrazzo phone" data-w="390" data-h="844" style="width:390px;height:844px">
+  <div><h4>Moderation on a phone</h4><div class="fig"><div class="fit" data-min="0"><div class="fit-in"><div class="n-frame k-counter phone" data-w="390" data-h="844" style="width:390px;height:844px">
 <section style="position:absolute;left:8px;right:8px;top:12px">
   <div style="font:900 44px/.85 var(--display);text-transform:uppercase;margin:4px 0 12px">Comments</div>
   <div class="n-keys" style="margin:0 -8px 14px 0;overflow:hidden;flex-wrap:nowrap"><a class="n-key sm" href="#admin"><span class="led"></span>All <span style="font:700 12px/1 var(--mono)">44</span></a><a class="n-key sm" href="#admin" aria-current=page><span class="led"></span>Unmoderated <span style="font:700 12px/1 var(--mono)">1</span></a><a class="n-key sm" href="#admin"><span class="led"></span>OK <span style="font:700 12px/1 var(--mono)">40</span></a><a class="n-key sm" href="#admin"><span class="led"></span>Warning <span style="font:700 12px/1 var(--mono)">2</span></a><a class="n-key sm" href="#admin"><span class="led"></span>Alert <span style="font:700 12px/1 var(--mono)">1</span></a></div>
@@ -1242,9 +1240,8 @@ To be honest, the coffee selection is not that much.</span>
 <h3>Texture</h3>
 <div class="tiles">
   <figure class="tile"><div style="background:var(--newsprint),var(--mottle),var(--news)"></div><figcaption>Newsprint, coloured fibres</figcaption></figure>
-  <figure class="tile"><div class="k-counter" style="background-position:42% 40%"></div><figcaption>Placemat map</figcaption></figure>
-  <figure class="tile"><div class="k-counter k-night" style="background-position:42% 40%"></div><figcaption>Placemat at night</figcaption></figure>
-  <figure class="tile"><div class="k-counter terrazzo"></div><figcaption>Terrazzo, the alternative</figcaption></figure>
+  <figure class="tile"><div class="k-counter"></div><figcaption>Terrazzo counter</figcaption></figure>
+  <figure class="tile"><div class="k-counter k-night"></div><figcaption>Terrazzo at night</figcaption></figure>
   <figure class="tile"><div class="k-print" style="margin:0;height:118px;border:0"><pre style="height:118px;padding:20px 14px"><span class="kw">type</span> <span class="ty">User</span> <span class="kw">struct</span> {
   <span class="ty">gorm.Model</span>
 }</pre></div><figcaption>Thermal printout</figcaption></figure>
@@ -1307,7 +1304,7 @@ To be honest, the coffee selection is not that much.</span>
 
 <h2 id="system">12. The system</h2>
 <h3>Palette</h3>
-<p>Kopimap’s tokens, unchanged, plus the placemat. Contrast is WCAG 2 on the flat paper colour; grain and fibres are not counted.</p>
+<p>Kopimap’s tokens, unchanged, plus the counter. Contrast is WCAG 2 on the flat paper colour; grain and fibres are not counted.</p>
 <div class="tbl"><table>
   <tr><th>Token</th><th>Hex</th><th>Means in Marknotes</th><th>Contrast</th></tr>
   <tr><td>ink</td><td class="num"><span class="sw" style="background:#141414"></span>#141414</td><td>All text, rules, frames, bold</td><td class="num">13.43 news · 17.05 thermal · 14.51 ticket · 11.44 nota</td></tr>
@@ -1320,11 +1317,10 @@ To be honest, the coffee selection is not that much.</span>
   <tr><td>thermal</td><td class="num"><span class="sw" style="background:#F6F6F6"></span>#F6F6F6</td><td>Comment slips, code printouts, inline code, admin ledgers</td><td>see ink</td></tr>
   <tr><td>ticket</td><td class="num"><span class="sw" style="background:#CDEBDF"></span>#CDEBDF</td><td>A Kopimap shop: the ticket and the stub</td><td>see ink</td></tr>
   <tr><td>nota</td><td class="num"><span class="sw" style="background:#FFB8D2"></span>#FFB8D2</td><td>Writing: a comment, an article</td><td>see ink and biro</td></tr>
-  <tr><td>placemat <em>(new)</em></td><td class="num">Kopimap print style</td><td>The page: Kopimap’s printed map, with an 18% light wash so the paper stays forward. Plain <code>#D2D2D2</code> on phones.</td><td>No text sits on it</td></tr>
-  <tr><td>terrazzo</td><td class="num">#D6D6D6 + chips</td><td>Admin’s ground: the counter behind the bar, chips in the palette colours</td><td>No text sits on it</td></tr>
+  <tr><td>counter <em>(new)</em></td><td class="num">#D6D6D6 + chips</td><td>The page, public and admin: terrazzo, chips in the palette colours. Night #1C1C1C, chips dimmed.</td><td>No text sits on it</td></tr>
   <tr><td>graphite / steel / vfd</td><td class="num">#262626 / #C6C6C6 / #8FF0D2</td><td>The till, its keys and the colophon; the VFD in admin</td><td class="num">colophon #C6C6C6 on graphite 8.86</td></tr>
 </table></div>
-<p><strong>Colour balances texture.</strong> A grey surface that carries grain also carries colour: newsprint has 14 fibres per 300px tile in biro, chop, mint and signal; the placemat has the map’s water and parks; the counter’s alternative has terrazzo chips. Large grey areas never appear without one.</p>
+<p><strong>Colour balances texture.</strong> A grey surface that carries grain also carries colour: newsprint has 14 fibres per 300px tile in biro, chop, mint and signal; the counter is terrazzo with palette chips. Large grey areas never appear without one.</p>
 <p>Night values are in section 9. On night paper: ink 9.81 on news and 12.43 on thermal, chop 4.96, ink-2 5.78 and biro 5.56 on news, biro 4.80 on the night nota.</p>
 
 <h3>Type</h3>
@@ -1401,7 +1397,7 @@ To be honest, the coffee selection is not that much.</span>
   </div>
   <div><h4>Changes</h4>
     <ul class="notes">
-      <li>The look: newsprint with fibres, thermal, mint and pink on Kopimap’s map; four inks; no radius.</li>
+      <li>The look: newsprint with fibres, thermal, mint and pink on a terrazzo counter; four inks; no radius.</li>
       <li>Header: the till; Night and Admin move to the colophon.</li>
       <li>Home: the front page. Blog: the back pages, by year.</li>
       <li>Reviews: the COFFEE REVIEW chop and the shop’s stub.</li>
@@ -1411,7 +1407,7 @@ To be honest, the coffee selection is not that much.</span>
       <li>Comments: the nota and slips, 16px text, ink identicons.</li>
       <li>Admin: tills, VFDs, ledgers, plotted charts, the nota editor, stamped moderation.</li>
       <li>ScrollButtons removed. Dates fixed. Dark becomes the night counter under a lamp.</li>
-      <li>Big Shoulders, its Stencil subset and Atkinson Mono added; two placemat images.</li>
+      <li>Big Shoulders, its Stencil subset and Atkinson Mono added.</li>
     </ul>
   </div>
 </div>
@@ -1422,7 +1418,7 @@ To be honest, the coffee selection is not that much.</span>
 <p>Each step ships on its own and leaves the site working.</p>
 <div class="tbl"><table>
   <tr><th>#</th><th>Step</th><th>Ships</th><th>Est.</th></tr>
-  <tr><td>1</td><td>Dates and tokens</td><td><code>timeZone: "Asia/Jakarta"</code> in FormattedDate. The Nota palette mapped onto daisyUI’s variables, every radius 0, the placemat, the newsprint texture, the three fonts. The whole site turns neutral and square at once.</td><td class="num">0.5–1 d</td></tr>
+  <tr><td>1</td><td>Dates and tokens</td><td><code>timeZone: "Asia/Jakarta"</code> in FormattedDate. The Nota palette mapped onto daisyUI’s variables, every radius 0, the terrazzo counter, the newsprint texture, the three fonts. The whole site turns neutral and square at once.</td><td class="num">0.5–1 d</td></tr>
   <tr><td>2</td><td>Till and colophon</td><td>Header as the till with section-latched keys, the colophon with Night and Admin, ScrollButtons deleted.</td><td class="num">0.5–1 d</td></tr>
   <tr><td>3</td><td>Sheet and prose</td><td>The sheet, halftone hero with colour on hover, headline, dateline, prose rules, the two-theme Shiki printout, photo prints, the contribution graph in ink.</td><td class="num">1.5–2 d</td></tr>
   <tr><td>4</td><td>Ticket and stub</td><td>ShopBlock as Kopimap’s ticket with the printed style; the stub and COFFEE REVIEW chop for lists.</td><td class="num">1 d</td></tr>
@@ -1443,7 +1439,6 @@ To be honest, the coffee selection is not that much.</span>
   <li><strong>Kitsch.</strong> A newspaper costume turns into a theme park fast: fake bylines, kickers, “Vol. 1 No. 21” and fold lines. None of those are here. The guard is Kopimap’s: one source of objects, every colour one job, and anything with no object stays plain type.</li>
   <li><strong>A textured page for long reading.</strong> The fibres and specks are sparse and small, and ink holds 13.43:1 on the flat colour. If a 2,400-word article reads busy, the fibres drop to half density first; the sheet can move to thermal white last.</li>
   <li><strong>Scroll cost on low-end Android.</strong> Kopimap found full-page SVG-turbulence backgrounds expensive. The newsprint tile is SVG noise plus drawn fibres; if scrolling lags, it becomes one 300px PNG tile (about 40 KB), the same fix planned for Kopimap.</li>
-  <li><strong>Placemat weight.</strong> The two map images are about 210 KB (light) and 145 KB (dark) as WebP at 1600px. They load on desktop only, after the sheet, and are cached; phones skip them.</li>
   <li><strong>Colour on hover only reaches mice.</strong> On touch, list prints stay halftone; only an article’s hero answers a tap. Body photos are colour anyway.</li>
   <li><strong>Fonts.</strong> Big Shoulders, the Stencil subset and Atkinson Mono add about 60–80 KB woff2. Pages are prerendered, so this is the only new first-load cost.</li>
   <li><strong>Copied CSS drifts.</strong> The Nota classes live in two repos. A comment at the top of each block naming the other file is the cheap guard.</li>
@@ -1453,7 +1448,6 @@ To be honest, the coffee selection is not that much.</span>
 
 <h2 id="decisions">17. Decisions I need from you</h2>
 <ol class="notes">
-  <li><strong>The page’s ground:</strong> Kopimap’s printed map (recommended, in every mockup), or terrazzo (specimen above).</li>
   <li><strong>Article paper:</strong> newsprint with fibres (recommended), or thermal white for long reading.</li>
   <li><strong>Night switch:</strong> in the colophon (recommended), or a fifth key in the till.</li>
   <li><strong>Admin link:</strong> a key in the colophon (recommended), removed entirely (you type <code>/admin</code>), or kept in the till.</li>
