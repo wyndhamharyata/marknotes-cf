@@ -81,15 +81,15 @@ export function getModerationLabel(status: ModerationStatusType): string {
   }
 }
 
-// OK in ink; Warning and Alert in the author's chop red, Alert the larger stamp; Unmoderated grey.
+// The colours moderation always had: OK green, Warning amber, Alert red, Unmoderated grey.
 export function getModerationStampClass(status: ModerationStatusType): string {
   switch (status) {
     case ModerationStatus.OK:
-      return "stamp stamp-ink";
+      return "stamp stamp-ok";
     case ModerationStatus.WARNING:
-      return "stamp";
+      return "stamp stamp-warning";
     case ModerationStatus.DANGEROUS:
-      return "stamp stamp-lg";
+      return "stamp stamp-lg stamp-alert";
     default:
       return "stamp stamp-dim";
   }

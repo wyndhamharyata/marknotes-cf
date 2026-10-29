@@ -83,11 +83,14 @@ const { title, description, pubDate, updatedDate, heroImage, coffeeId, rating } 
         </div>
       </article>
 
-      <CommentSection server:defer articleSlug={post.id}>
-        <section slot="fallback" class="comments">
-          <h2 class="fold">Comments</h2>
-        </section>
-      </CommentSection>
+      {/* Own wrapper: see the note in BlogPost.astro. */}
+      <div class="contents">
+        <CommentSection server:defer articleSlug={post.id}>
+          <section slot="fallback" class="comments">
+            <h2 class="fold">Comments</h2>
+          </section>
+        </CommentSection>
+      </div>
     </div>
 
     <div class="side-numbers">

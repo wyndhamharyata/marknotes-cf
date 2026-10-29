@@ -51,9 +51,12 @@ const { title, description, pubDate, updatedDate, heroImage, slug, coffeeId, rat
     </div>
   </article>
 
-  <CommentSection server:defer articleSlug={slug}>
-    <section slot="fallback" class="comments">
-      <h2 class="fold">Comments</h2>
-    </section>
-  </CommentSection>
+  {/* Own wrapper, for the same reason as the shop's island above. */}
+  <div class="contents">
+    <CommentSection server:defer articleSlug={slug}>
+      <section slot="fallback" class="comments">
+        <h2 class="fold">Comments</h2>
+      </section>
+    </CommentSection>
+  </div>
 </BaseLayout>

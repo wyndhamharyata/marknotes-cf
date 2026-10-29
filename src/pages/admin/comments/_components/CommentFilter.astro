@@ -13,6 +13,8 @@ type Props = {
 type Filter = {
   link: string;
   label: string;
+  /** The filter's light, in the colour this status always had. */
+  led: string;
   key: keyof CommentCounts;
   moderationStatus: ModerationStatusType | null;
 };
@@ -24,30 +26,35 @@ const filters: Filter[] = [
   {
     link: "/admin/comments",
     label: "All",
+    led: "#0069A8",
     key: "all",
     moderationStatus: null,
   },
   {
     link: "/admin/comments?status=0",
     label: "Unmoderated",
+    led: "#F6F6F6",
     key: "unverified",
     moderationStatus: ModerationStatus.UNVERIFIED,
   },
   {
     link: "/admin/comments?status=1",
     label: "OK",
+    led: "#008033",
     key: "ok",
     moderationStatus: ModerationStatus.OK,
   },
   {
     link: "/admin/comments?status=2",
     label: "Warning",
+    led: "#FCB700",
     key: "warning",
     moderationStatus: ModerationStatus.WARNING,
   },
   {
     link: "/admin/comments?status=3",
     label: "Alert",
+    led: "#C5005A",
     key: "dangerous",
     moderationStatus: ModerationStatus.DANGEROUS,
   },
@@ -60,6 +67,7 @@ const filters: Filter[] = [
       <a
         href={filter.link}
         class="key"
+        style={`--led: ${filter.led}`}
         aria-current={filterStatus === filter.moderationStatus ? "page" : undefined}
       >
         <span class="led" />
