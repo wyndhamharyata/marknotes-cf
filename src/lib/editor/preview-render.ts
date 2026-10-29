@@ -14,8 +14,7 @@ export async function renderPreview(body: string, assets: InlineAsset[]): Promis
 
   const withUploads = body.replace(
     /!\[Uploading ([^\]]*)\]\(uploading:[^)]*\)/g,
-    (_match, name: string) =>
-      `<span class="badge badge-neutral gap-2"><span class="loading loading-spinner loading-xs"></span>Uploading ${escapeHtml(name)}</span>`
+    (_match, name: string) => `<span class="tag">Uploading ${escapeHtml(name)}</span>`
   );
 
   // Mirrors BlogImage.astro's markup so the preview matches the published page.
@@ -41,14 +40,12 @@ export async function renderPreview(body: string, assets: InlineAsset[]): Promis
     }
 
     if (!src) {
-      return `<div class="alert alert-warning my-6">Image not found: ${escapeHtml(rawSrc ?? "(no src)")}</div>`;
+      return `<p class="err">Image not found: ${escapeHtml(rawSrc ?? "(no src)")}</p>`;
     }
 
-    const caption = attrs.caption
-      ? `<figcaption class="text-base-content/70 mt-2 text-center text-sm italic">${escapeHtml(attrs.caption)}</figcaption>`
-      : "";
+    const caption = attrs.caption ? `<figcaption>${escapeHtml(attrs.caption)}</figcaption>` : "";
 
-    return `<figure class="my-6"><img src="${escapeHtml(src)}" alt="${escapeHtml(attrs.alt ?? "")}" class="mx-auto max-w-full rounded-lg shadow-md" loading="lazy" />${caption}</figure>`;
+    return `<figure class="photo-fig not-prose"><div class="photo"><img src="${escapeHtml(src)}" alt="${escapeHtml(attrs.alt ?? "")}" loading="lazy" /><i class="pc"></i><i class="pc"></i><i class="pc"></i><i class="pc"></i></div>${caption}</figure>`;
   });
 
   const instance = new Marked({ gfm: true, async: false });

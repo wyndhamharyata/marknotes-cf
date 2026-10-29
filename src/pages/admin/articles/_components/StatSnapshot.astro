@@ -4,24 +4,22 @@ import { getDoStub } from "../../../../lib/db/do-client";
 const { slug } = Astro.props;
 
 const analytics = await getDoStub().getLatestAnalyticsBySlug(slug);
+const readouts = [
+  ["24 hours", analytics?.pageviews24h ?? 0],
+  ["7 days", analytics?.pageviews7d ?? 0],
+  ["30 days", analytics?.pageviews30d ?? 0],
+] as const;
 ---
 
-<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-  <div class="md:stat">
-    <div class="stat-title">Page Views (24 Hour)</div>
-    <div class="stat-value">{analytics?.pageviews24h ?? 0}</div>
-    <div class="stat-desc">Rolling total — last 24 hr</div>
-  </div>
-
-  <div class="md:stat">
-    <div class="stat-title">Page Views (7 Day)</div>
-    <div class="stat-value">{analytics?.pageviews7d ?? 0}</div>
-    <div class="stat-desc">Rolling total — last 7 days</div>
-  </div>
-
-  <div class="md:stat">
-    <div class="stat-title">Page Views (30 Day)</div>
-    <div class="stat-value">{analytics?.pageviews30d ?? 0}</div>
-    <div class="stat-desc">Rolling total — last 30 days</div>
-  </div>
+<div class="till readouts">
+  <i class="bolt l"></i><i class="bolt r"></i>
+  {
+    readouts.map(([label, value]) => (
+      <div class="vfd">
+        <span>{label}</span>
+        <i class="vfd-leader" />
+        <b>{value}</b>
+      </div>
+    ))
+  }
 </div>

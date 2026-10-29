@@ -1,11 +1,12 @@
 ---
 import {
   ModerationStatus,
-  getModerationBorderClass,
+  getModerationLabel,
+  getModerationStampClass,
   type AdminComment,
 } from "../../../../lib/comments/types";
-import Avatar from "./Avatar.astro";
-import ParentContext from "./ParentContext.astro";
+import { formatDate } from "../../../../lib/date";
+import Avatar from "../../../articles/_components/comments/Avatar";
 import ModerationReason from "./ModerationReason.astro";
 import CommentReplies from "./CommentReplies.astro";
 
@@ -16,70 +17,49 @@ type Props = {
 const { comment } = Astro.props;
 ---
 
-<div
-  class:list={[
-    "md:card bg-base-100/80 border-l-4",
-    getModerationBorderClass(comment.moderationStatus),
-  ]}
->
-  <div class="card-body space-y-3 p-4">
-    {comment.parent && <ParentContext comment={comment} />}
-
-    <!-- Comment Header -->
-    <div class="flex items-start gap-3">
-      <Avatar seed={comment.alias} size={40} />
-      <div class="min-w-0 flex-1">
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="font-semibold">{comment.alias}</span>
-        </div>
-        <!-- Comment Content -->
-        <!-- prettier-ignore -->
-        <p class="text-base-content wrap-break-words mt-1 whitespace-pre-wrap text-[10pt] font-light">{comment.message}</p>
-        <!-- Meta -->
-        <div class="text-base-content/50 mt-2 flex flex-wrap gap-2 text-xs">
-          <span
-            >{
-              comment.createdAt.toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })
-            }</span
-          >
-          <a
-            href={`/admin/articles/${comment.articleSlug}`}
-            rel="noopener noreferrer"
-            class="hover:underline">on "{comment.articleTitle}"</a
-          >
-        </div>
-      </div>
+<div class="slip">
+  <div class="tear-b">
+    {
+      comment.parent && (
+        <p class="parent-ctx">
+          Replying to <b>{comment.parent.alias}</b>: {comment.parent.message}
+        </p>
+      )
+    }
+    <div class="who">
+      <Avatar seed={comment.alias} />
+      <b>{comment.alias}</b>
+      <span class={getModerationStampClass(comment.moderationStatus)}>
+        {getModerationLabel(comment.moderationStatus)}
+      </span>
+      <i class="leader"></i>
+      <time datetime={comment.createdAt.toISOString()}>{formatDate(comment.createdAt)}</time>
     </div>
-
-    <!-- Moderation Reason -->
+    <p class="msg">{comment.message}</p>
     <ModerationReason comment={comment} />
-
-    <!-- Replies (children) -->
+    <p class="on">
+      on <a href={`/admin/articles/${comment.articleSlug}`}>{comment.articleTitle}</a>
+    </p>
     {comment.children.length > 0 && <CommentReplies comment={comment} />}
-
-    <!-- Actions -->
-    <div class="border-base-content/10 flex justify-end gap-2 border-t pt-2">
+    <!-- The endpoints redirect to the list, which replaces the page, not the button. -->
+    <div class="acts" hx-target="body">
       {
         comment.moderationStatus !== ModerationStatus.OK && (
           <button
-            class="btn btn-sm btn-outline hover:btn-success"
+            class="key key-sm key-signal"
             hx-post={`/api/admin/comments/${comment.id}/approve`}
-            hx-confirm="Mark this comment as safe?"
+            hx-confirm="Approve this comment?"
           >
-            Mark as Safe
+            Approve
           </button>
         )
       }
       <button
-        class="btn btn-sm btn-error"
+        class="key key-sm"
         hx-post={`/api/admin/comments/${comment.id}/hide`}
-        hx-confirm="Delete this comment?"
+        hx-confirm="Hide this comment?"
       >
-        Delete
+        Hide
       </button>
     </div>
   </div>

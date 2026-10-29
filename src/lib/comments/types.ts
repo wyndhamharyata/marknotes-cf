@@ -81,32 +81,16 @@ export function getModerationLabel(status: ModerationStatusType): string {
   }
 }
 
-export function getModerationBadgeClass(status: ModerationStatusType): string {
+// OK in ink; Warning and Alert in the author's chop red, Alert the larger stamp; Unmoderated grey.
+export function getModerationStampClass(status: ModerationStatusType): string {
   switch (status) {
-    case ModerationStatus.UNVERIFIED:
-      return "badge-ghost";
     case ModerationStatus.OK:
-      return "badge-success";
+      return "stamp stamp-ink";
     case ModerationStatus.WARNING:
-      return "badge-warning";
+      return "stamp";
     case ModerationStatus.DANGEROUS:
-      return "badge-error";
+      return "stamp stamp-lg";
     default:
-      return "badge-ghost";
-  }
-}
-
-export function getModerationBorderClass(status: ModerationStatusType): string {
-  switch (status) {
-    case ModerationStatus.UNVERIFIED:
-      return "border-l-base-content/30";
-    case ModerationStatus.OK:
-      return "border-l-success";
-    case ModerationStatus.WARNING:
-      return "border-l-warning";
-    case ModerationStatus.DANGEROUS:
-      return "border-l-error";
-    default:
-      return "border-l-base-content/30";
+      return "stamp stamp-dim";
   }
 }

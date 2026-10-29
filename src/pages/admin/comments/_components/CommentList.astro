@@ -28,20 +28,13 @@ const enrichedComments = comments.map((c) => ({
 }));
 ---
 
+<div id="comment-list">
+  {enrichedComments.length === 0 && <p class="on-counter">No comments found.</p>}
+  {enrichedComments.map((comment) => <CommentModerationItem comment={comment} />)}
+</div>
+
 {
   totalPages > 1 && (
     <Pagination currentPage={currentPage} totalPages={totalPages} baseUrl={baseUrl} />
   )
 }
-
-<div id="comment-list" class="space-y-2 md:w-3xl md:space-y-4">
-  {
-    enrichedComments.length === 0 && (
-      <div class="card bg-base-100/60 p-8 text-center">
-        <p class="text-base-content/60">No comments found</p>
-      </div>
-    )
-  }
-
-  {enrichedComments.map((comment) => <CommentModerationItem comment={comment} />)}
-</div>

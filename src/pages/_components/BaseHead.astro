@@ -16,7 +16,7 @@ const { title, description, image = FallbackImage } = Astro.props;
 ---
 
 <script is:inline>
-  (function(){try{var e=localStorage.getItem("dark-mode"),s=window.matchMedia("(prefers-color-scheme: dark)").matches,d="true"===e||null===e&&s,n=document.documentElement;n.classList.add("js"),n.setAttribute("data-theme",d?"marknotes-dark":"marknotes-light"),d&&n.classList.add("dark")}catch(e){}})();
+  (function(){try{var e=localStorage.getItem("dark-mode"),s=window.matchMedia("(prefers-color-scheme: dark)").matches,d="true"===e||null===e&&s,n=document.documentElement;n.classList.add("js"),d&&n.classList.add("dark")}catch(e){}})();
 </script>
 
 <!-- Global Metadata -->

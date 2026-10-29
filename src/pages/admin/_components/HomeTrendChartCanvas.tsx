@@ -2,7 +2,7 @@ import { useEffect, useRef } from "preact/hooks";
 import uPlot from "uplot";
 import "uplot/dist/uPlot.min.css";
 import { tooltipPlugin } from "../articles/_components/uplot-tooltip";
-import { readChartTheme } from "../articles/_components/chart-theme";
+import { INK, axes, lastPoint } from "../articles/_components/chart-theme";
 
 interface Props {
   ts: number[];
@@ -19,12 +19,10 @@ export default function HomeTrendChartCanvas({ ts, pv }: Props) {
     if (!el) return;
 
     let chart: uPlot | null = null;
-    let lastWidth = 0;
 
     const data: uPlot.AlignedData = [ts, pv];
 
     const buildOpts = (): uPlot.Options => {
-      const theme = readChartTheme(el);
       return {
         width: 0,
         height: HEIGHT,
@@ -35,13 +33,14 @@ export default function HomeTrendChartCanvas({ ts, pv }: Props) {
         legend: { show: false },
         cursor: {
           drag: { x: true, y: false, setScale: false },
-          points: { size: 8 },
+          points: { size: 8, fill: INK },
         },
         plugins: [
+          lastPoint,
           tooltipPlugin((u, idx) => [
             {
               label: "Pageviews (24h rolling)",
-              color: theme.primary,
+              color: INK,
               value: String(u.data[1][idx] ?? "—"),
             },
           ]),
@@ -50,27 +49,18 @@ export default function HomeTrendChartCanvas({ ts, pv }: Props) {
           { label: "Time" },
           {
             label: "Pageviews (24h rolling)",
-            stroke: theme.primary,
+            stroke: INK,
             width: 2,
-            fill: theme.fillPrimary,
             points: { show: false },
           },
         ],
-        axes: [
-          { stroke: theme.axisText, grid: { stroke: theme.grid } },
-          {
-            stroke: theme.axisText,
-            grid: { stroke: theme.grid },
-            values: (_u, vals) => vals.map((v) => `${v}`),
-          },
-        ],
+        axes: axes((_u, vals) => vals.map((v) => `${v}`)),
       };
     };
 
     const initChart = (width: number) => {
       chart?.destroy();
       chart = new uPlot({ ...buildOpts(), width }, data, el);
-      lastWidth = width;
     };
 
     const ro = new ResizeObserver((entries) => {
@@ -80,22 +70,12 @@ export default function HomeTrendChartCanvas({ ts, pv }: Props) {
         initChart(w);
       } else {
         chart.setSize({ width: w, height: HEIGHT });
-        lastWidth = w;
       }
     });
     ro.observe(el);
 
-    const themeObserver = new MutationObserver(() => {
-      if (lastWidth > 0) initChart(lastWidth);
-    });
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme", "class"],
-    });
-
     return () => {
       ro.disconnect();
-      themeObserver.disconnect();
       chart?.destroy();
       chart = null;
     };

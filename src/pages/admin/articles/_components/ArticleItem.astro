@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import type { ArticleAnalyticsRow } from "../../../../lib/analytics/types";
 import { getDoStub } from "../../../../lib/db/do-client";
 import FormattedDate from "../../../articles/_components/FormattedDate.astro";
@@ -13,26 +14,20 @@ type Props = {
 const prop: Props = Astro.props;
 const { article, analytic } = prop;
 const comments = await getDoStub().getCommentsBySlug(article.id);
+const { heroImage, title, pubDate, coffeeId } = article.data;
 ---
 
-<a
-  href={`/admin/articles/${article.id}`}
-  class="bg-base-100 flex w-full gap-6 p-4 md:my-4 md:rounded-2xl"
-  hx-boost="false"
->
-  <img src={article.data.heroImage?.src} class="aspect-video max-w-40 rounded-2xl object-cover" />
-  <div class="flex w-full min-w-0 flex-col">
-    <p class="line-clamp-2 font-bold md:text-lg">{article.data.title}</p>
-    <p class="mt-1 text-sm md:text-base">
-      Published at: <span>
-        <FormattedDate date={article.data.pubDate} />
-      </span>
-    </p>
-  </div>
-  <div class="m-auto my-auto hidden min-w-36 flex-col sm:block sm:flex">
-    <p class="text-xs">Views</p>
-    <p class="text-primary text-xl">{analytic?.pageviews7d ?? 0}</p>
-    <p class="decoration-base-content text-xs">Comments</p>
-    <p class="text-primary text-xl">{comments.length}</p>
-  </div>
+<a href={`/admin/articles/${article.id}`} class="ledger-row" hx-boost="false">
+  <span class="halftone thumb">
+    {heroImage && <Image src={heroImage} width={144} alt="" />}
+  </span>
+  <span>
+    <span class="nm">{title}</span>
+    <span class="date">
+      {coffeeId && <span class="stamp">Coffee review</span>}
+      <FormattedDate date={pubDate} />
+    </span>
+  </span>
+  <span class="num">{analytic?.pageviews7d ?? 0}</span>
+  <span class="num">{comments.length}</span>
 </a>

@@ -2,6 +2,7 @@
 import BaseHead from "../pages/_components/BaseHead.astro";
 import BaseAdminDock from "../pages/admin/_components/BaseAdminDock.astro";
 import DeployBanner from "../pages/admin/_components/DeployBanner";
+import NotaFilters from "../components/NotaFilters.astro";
 import type { ImageMetadata } from "astro";
 import type { ComponentProps } from "astro/types";
 
@@ -10,19 +11,11 @@ interface Props {
   description: string;
   image?: ImageMetadata;
   dockProp: ComponentProps<typeof BaseAdminDock>;
-  maxWidthClass?: string;
-  /** Full-height pages reclaim the dock clearance and manage it themselves. */
-  mainPaddingClass?: string;
+  /** "narrow" and "mid" for single-column pages. */
+  width?: "narrow" | "mid";
 }
 
-const {
-  title,
-  description,
-  image,
-  dockProp,
-  maxWidthClass = "max-w-4xl",
-  mainPaddingClass = "px-0 pb-32 md:px-4 md:py-8 md:pb-32",
-} = Astro.props;
+const { title, description, image, dockProp, width } = Astro.props;
 ---
 
 <html lang="en">
@@ -30,23 +23,16 @@ const {
     <BaseHead title={title} description={description} image={image} />
   </head>
   <body class="font-atkinson flex min-h-screen flex-col" hx-boost="true" hx-ext="head-support">
-    {/* Background layer */}
-    <div class="bg-base-200 dark:bg-base-300 fixed inset-0 -z-10">
-      <div class="grid-bg absolute inset-0"></div>
-      <div class="from-secondary/5 via-accent/5 absolute inset-0 bg-gradient-to-bl to-transparent">
-      </div>
-    </div>
-
-    <main id="main-content" class={`mx-auto w-full ${maxWidthClass} flex-1 ${mainPaddingClass}`}>
+    <NotaFilters />
+    <main id="main-content" class:list={["admin-main flex-1", width]}>
       <slot />
     </main>
 
     <BaseAdminDock menus={dockProp.menus} currentPath={dockProp.currentPath} />
     {/* Fixed, so a deploy in flight never shifts a page that owns its height. */}
     <DeployBanner client:idle />
-    {/* Loading indicator */}
-    <div id="htmx-indicator" class="htmx-indicator fixed top-0 right-0 left-0 z-50 h-1">
-      <div class="bg-primary h-full"></div>
+    <div id="htmx-indicator" class="htmx-indicator fixed top-0 right-0 left-0 z-50 h-[3px]">
+      <div class="h-full" style="background:var(--ink)"></div>
     </div>
 
     <script>

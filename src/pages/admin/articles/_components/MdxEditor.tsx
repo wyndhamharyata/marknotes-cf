@@ -80,13 +80,13 @@ export default function MdxEditor({
       // Seeded "Untitled" because image keys embed the slug: untitled cannot upload.
       setDraft(
         usable ??
-        article?.initial ?? {
-          title: shop?.name ?? "Untitled",
-          description: "",
-          body: "",
-          inlineAssets: [],
-          updatedAt: 0,
-        }
+          article?.initial ?? {
+            title: shop?.name ?? "Untitled",
+            description: "",
+            body: "",
+            inlineAssets: [],
+            updatedAt: 0,
+          }
       );
       setRestored(usable !== null && editing);
     });
@@ -103,7 +103,7 @@ export default function MdxEditor({
   }, [draft, draftId, base]);
 
   useEffect(() => {
-    const query = window.matchMedia("(min-width: 768px)");
+    const query = window.matchMedia("(min-width: 1024px)");
     const sync = () => setIsWide(query.matches);
     sync();
     query.addEventListener("change", sync);
@@ -222,9 +222,9 @@ export default function MdxEditor({
             setDraft((current) =>
               current
                 ? {
-                  ...current,
-                  inlineAssets: [...current.inlineAssets, asset],
-                }
+                    ...current,
+                    inlineAssets: [...current.inlineAssets, asset],
+                  }
                 : current
             );
 
@@ -309,14 +309,31 @@ export default function MdxEditor({
       if (payload?.sha)
         localStorage.setItem(
           "marknotes-deploy",
-          JSON.stringify({ sha: payload.sha, slug, startedAt: Date.now(), coffee: shop !== undefined })
+          JSON.stringify({
+            sha: payload.sha,
+            slug,
+            startedAt: Date.now(),
+            coffee: shop !== undefined,
+          })
         );
 
       await clearDraft(draftId);
       window.location.href = editing ? `/admin/articles/${slug}` : "/admin/articles";
     });
     if (error) setStatus({ kind: "error", message: error.message });
-  }, [draft, slug, slugError, shop, editing, pubDate, today, article, extraFrontmatter, committedKeys, draftId]);
+  }, [
+    draft,
+    slug,
+    slugError,
+    shop,
+    editing,
+    pubDate,
+    today,
+    article,
+    extraFrontmatter,
+    committedKeys,
+    draftId,
+  ]);
 
   const discardLocal = useCallback(async () => {
     if (!article) return;
@@ -346,101 +363,92 @@ export default function MdxEditor({
   }, []);
 
   if (!draft) {
-    return (
-      <div class="space-y-4 p-4">
-        <div class="skeleton h-10 w-full" />
-        <div class="skeleton h-[70vh] w-full" />
-      </div>
-    );
+    return <div class="tk-skel" style={{ height: "70vh" }} />;
   }
 
   const busy = status.kind === "busy";
-  const paneStyle = (share: number) => (isWide ? { width: `${share * 100}%` } : undefined);
+  const paneStyle = (share: number): Record<string, string> =>
+    isWide ? { width: `${share * 100}%` } : {};
+  // Hidden, not unmounted, so the textarea keeps its caret and scroll.
+  const shown = (pane: typeof view) => (isWide || view === pane ? {} : { display: "none" });
 
   const metaLine = editing
     ? `${slug}.mdx · ${pubDate} · updated ${today} · slug fixed`
     : `${slug || "untitled"}.mdx · ${pubDate}`;
 
   return (
-    <div class="flex flex-col gap-3 px-4 md:min-h-0 md:flex-1">
-      <div class="flex flex-wrap items-center justify-between gap-2 px-4 md:px-0">
-        <h1 class="text-2xl font-bold">{editing ? "Edit article" : "New article"}</h1>
-        <div class="flex items-center gap-2">
-          {pendingUploads > 0 && (
-            <span class="badge badge-neutral badge-lg gap-2">
-              <span class="loading loading-spinner loading-xs" />
-              {pendingUploads} uploading
-            </span>
-          )}
-          <a href={editing ? `/admin/articles/${slug}` : "/admin/articles"} class="btn btn-ghost">
-            Cancel
-          </a>
-          <button
-            type="button"
-            class="btn btn-primary"
-            disabled={busy || pendingUploads > 0}
-            onClick={publish}
-          >
-            {busy && <span class="loading loading-spinner loading-sm" />}
-            {editing ? "Update" : "Publish"}
-          </button>
-        </div>
+    <>
+      <div class="page-head">
+        <a href={editing ? `/admin/articles/${slug}` : "/admin/articles"} class="key">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M15 4 7 12l8 8"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.6"
+              stroke-linecap="square"
+            />
+          </svg>
+          Cancel
+        </a>
+        <h1 class="sm">{editing ? "Edit article" : "New article"}</h1>
+        {pendingUploads > 0 && <span class="tag">{pendingUploads} uploading</span>}
+        <button
+          type="button"
+          class={`key key-signal ${busy ? "down" : ""}`}
+          disabled={busy || pendingUploads > 0}
+          onClick={publish}
+        >
+          {busy ? (editing ? "Updating…" : "Publishing…") : editing ? "Update" : "Publish"}
+        </button>
       </div>
 
       {restored && (
-        <div class="alert alert-warning">
-          <span>Restored unsaved changes from a previous session.</span>
-          <button type="button" class="btn btn-ghost btn-sm" onClick={discardLocal}>
-            Discard
-          </button>
+        <div class="toast" role="status">
+          <div class="tear-b">
+            Restored unsaved changes
+            <button type="button" class="key key-sm" onClick={discardLocal}>
+              Discard
+            </button>
+          </div>
         </div>
       )}
       {status.kind === "error" && (
-        <div class="alert alert-error">
+        <div class="err-band" role="alert">
           <span>{status.message}</span>
-          <button
-            type="button"
-            class="btn btn-ghost btn-sm"
-            onClick={() => setStatus({ kind: "idle" })}
-          >
+          <button type="button" class="key key-sm" onClick={() => setStatus({ kind: "idle" })}>
             Dismiss
           </button>
         </div>
       )}
       {busy && (
-        <div class="alert alert-info">
-          <span>{status.message}</span>
+        <div class="toast" role="status">
+          <div class="tear-b">{status.message}</div>
         </div>
       )}
 
-      <div role="tablist" class="tabs tabs-lift tabs-lg md:hidden">
+      <div class="mb-4 flex gap-2 lg:hidden">
         <button
           type="button"
-          role="tab"
-          class={`tab ${view === "write" ? "tab-active" : ""}`}
+          class="key key-grow"
+          aria-pressed={view === "write"}
           onClick={() => setView("write")}
         >
           Write
         </button>
         <button
           type="button"
-          role="tab"
-          class={`tab ${view === "preview" ? "tab-active" : ""}`}
+          class="key key-grow"
+          aria-pressed={view === "preview"}
           onClick={() => setView("preview")}
         >
           Preview
         </button>
       </div>
 
-      {/* Bounded height is what makes `overflow-y-auto` engage on the panes. */}
-      <div
-        ref={splitRef}
-        class="card bg-base-100 border-base-300 md:rounded-t-box flex flex-col overflow-hidden rounded-t-none border shadow-sm md:min-h-0 md:flex-1 md:flex-row md:border-0"
-      >
-        <div
-          class={`flex flex-col ${view === "write" ? "min-w-0" : "hidden min-w-0 md:flex"}`}
-          style={paneStyle(ratio)}
-        >
+      {/* Bounded height is what makes the panes scroll on their own. */}
+      <div ref={splitRef} class="editor">
+        <div class="nota editor-nota" style={{ ...paneStyle(ratio), ...shown("write") }}>
           <MetaFields
             title={draft.title}
             description={draft.description}
@@ -461,16 +469,13 @@ export default function MdxEditor({
         </div>
 
         <div
-          class="bg-base-300 hover:bg-primary hidden w-1.5 shrink-0 cursor-col-resize md:block"
+          class="editor-split"
           onPointerDown={startResize}
           role="separator"
           aria-orientation="vertical"
         />
 
-        <div
-          class={view === "preview" ? "min-w-0" : "hidden min-w-0 md:block"}
-          style={paneStyle(1 - ratio)}
-        >
+        <div class="contents" style={shown("preview")}>
           <PreviewPane
             body={draft.body}
             assets={draft.inlineAssets}
@@ -478,6 +483,7 @@ export default function MdxEditor({
             title={draft.title}
             pubDate={pubDate}
             scrollRef={previewRef}
+            style={paneStyle(1 - ratio)}
             shop={shop}
             rating={draft.rating}
             hero={
@@ -494,6 +500,6 @@ export default function MdxEditor({
           />
         </div>
       </div>
-    </div>
+    </>
   );
 }

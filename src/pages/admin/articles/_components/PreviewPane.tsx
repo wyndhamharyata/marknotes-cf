@@ -4,6 +4,7 @@ import { renderPreview } from "../../../../lib/editor/preview-render";
 import type { InlineAsset } from "../../../../lib/editor/types";
 import type { KopimapShop } from "../../../../lib/kopimap";
 import ShopBlock from "../../../../components/ShopBlock";
+import { formatDate } from "../../../../lib/date";
 
 interface Props {
   body: string;
@@ -15,6 +16,8 @@ interface Props {
   hero: ComponentChildren;
   /** Owned by MdxEditor so it can drive scroll sync against the textarea. */
   scrollRef: RefObject<HTMLDivElement>;
+  /** The pane's share of the split, set by MdxEditor's divider. */
+  style?: Record<string, string>;
   shop?: KopimapShop;
   rating?: number;
 }
@@ -22,7 +25,7 @@ interface Props {
 /** Long enough to skip a burst of keystrokes, short enough to feel live. */
 const RENDER_DEBOUNCE_MS = 200;
 
-/** Mirrors the structure of BlogPost.astro: hero, date, title, divider, prose. */
+/** Mirrors BlogPost.astro: the sheet with its hero, headline, dateline, ticket and prose. */
 export default function PreviewPane({
   body,
   assets,
@@ -31,6 +34,7 @@ export default function PreviewPane({
   pubDate,
   hero,
   scrollRef,
+  style,
   shop,
   rating,
 }: Props) {
@@ -45,7 +49,7 @@ export default function PreviewPane({
           if (!cancelled) setHtml(rendered);
         })
         .catch((error) => {
-          if (!cancelled) setHtml(`<p class="text-error">Preview failed: ${error}</p>`);
+          if (!cancelled) setHtml(`<p class="err">Preview failed: ${error}</p>`);
         });
     }, RENDER_DEBOUNCE_MS);
 
@@ -55,25 +59,26 @@ export default function PreviewPane({
     };
   }, [body, assets]);
 
-  return (
-    <div ref={scrollRef} class="h-full min-h-[60vh] overflow-y-auto md:min-h-0">
-      {hero}
+  const date = new Date(pubDate);
 
-      <div class="p-4 md:p-6">
-        <div class="mb-6 text-center">
-          <p class="text-base-content/70 mb-2">{pubDate}</p>
-          <h1 class="justify-center text-3xl font-extrabold md:text-4xl">{title}</h1>
-          <div class="divider" />
-        </div>
+  return (
+    <div ref={scrollRef} class="editor-preview" style={style}>
+      <article class="sheet article">
+        {hero}
+        <h2 class="h1">{title}</h2>
+        <p class="dateline">
+          {shop && <span class="stamp">Coffee review</span>}
+          <b>{isNaN(date.valueOf()) ? pubDate : formatDate(date)}</b>
+        </p>
 
         {shop && <ShopBlock shop={shop} rating={rating} />}
 
         {body.trim() ? (
           <div class={proseClass} dangerouslySetInnerHTML={{ __html: html }} />
         ) : (
-          <p class="text-base-content/50 text-center text-sm">Preview appears as you type.</p>
+          <p class="plot-empty">Preview appears as you type.</p>
         )}
-      </div>
+      </article>
     </div>
   );
 }

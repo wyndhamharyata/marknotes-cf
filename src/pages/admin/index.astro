@@ -14,41 +14,31 @@ import HomeTopArticles from "./_components/HomeTopArticles.astro";
   title={SITE_TITLE}
   description={SITE_DESCRIPTION}
   dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin" }}
-  maxWidthClass="max-w-6xl"
 >
-  <div class="mx-auto flex w-full flex-col gap-6 px-4 pt-4 md:px-0 md:pt-0">
-    <!-- Each island in its own wrapper: see the note in BlogPost.astro. -->
-    <div class="contents"><HomeModerationAlert server:defer /></div>
+  <!-- Each island in its own wrapper: see the note in BlogPost.astro. -->
+  <div class="contents"><HomeModerationAlert server:defer /></div>
 
-    <div class="contents"><HomeKpiStrip server:defer /></div>
+  <div class="contents">
+    <HomeKpiStrip server:defer>
+      <div slot="fallback" class="till readouts"><div class="vfd"></div></div>
+    </HomeKpiStrip>
+  </div>
 
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-      <section class="card bg-base-100/60 px-4 py-2 shadow-2xl md:col-span-2">
-        <h3 class="card-title">Pageviews — last 30 days</h3>
-        <p class="text-base-content/60 text-sm">
-          Site-wide rolling 24-hour total at each snapshot.
-        </p>
+  <div class="grid grid-cols-1 gap-x-10 lg:grid-cols-[minmax(0,1fr)_440px]">
+    <div>
+      <section class="plot">
+        <h2>Pageviews — last 30 days</h2>
         <div class="contents">
           <HomeTrendChart server:defer>
-            <div
-              slot="fallback"
-              class="text-base-content/60 flex min-h-70 items-center justify-center"
-            >
-              Loading chart…
-            </div>
+            <div slot="fallback" class="min-h-[280px]"></div>
           </HomeTrendChart>
         </div>
       </section>
-
-      <section class="card bg-base-100/60 px-4 py-4 md:col-span-1">
-        <h3 class="card-title">Recent comments</h3>
-        <p class="text-base-content/60 text-sm">Newest first across all articles.</p>
-        <div class="mt-3">
-          <HomeRecentComments server:defer />
-        </div>
-      </section>
+      <div class="contents"><HomeTopArticles server:defer /></div>
     </div>
 
-    <div class="contents"><HomeTopArticles server:defer /></div>
+    <section class="comments" style="width:100%;margin:0">
+      <div class="contents"><HomeRecentComments server:defer /></div>
+    </section>
   </div>
 </BaseAdminLayout>

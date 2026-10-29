@@ -1,6 +1,4 @@
 ---
-import Icon from "../../../../components/Icon.astro";
-
 type Props = {
   currentPage: number;
   totalPages: number;
@@ -19,48 +17,38 @@ const hasPrev = currentPage > 1;
 const hasNext = currentPage < totalPages;
 ---
 
-<nav class="flex justify-center" aria-label="Pagination">
-  <div class="join">
-    {
-      hasPrev ? (
-        <a href={getPageUrl(currentPage - 1)} class="btn btn-ghost join-item">
-          <Icon name="heroicons:chevron-left" class="h-4 w-4" />
-          <span class="sr-only">Previous</span>
-        </a>
-      ) : (
-        <button class="btn btn-ghost join-item" disabled aria-disabled="true">
-          <Icon name="heroicons:chevron-left" class="h-4 w-4" />
-          <span class="sr-only">Previous</span>
-        </button>
-      )
-    }
-
-    {
-      pages.map((page) =>
-        page === currentPage ? (
-          <span class="btn btn-secondary join-item" aria-current="page">
-            {page}
-          </span>
-        ) : (
-          <a href={getPageUrl(page)} class="btn btn-ghost join-item">
-            {page}
-          </a>
-        )
-      )
-    }
-
-    {
-      hasNext ? (
-        <a href={getPageUrl(currentPage + 1)} class="btn btn-ghost join-item">
-          <span class="sr-only">Next</span>
-          <Icon name="heroicons:chevron-right" class="h-4 w-4" />
-        </a>
-      ) : (
-        <button class="btn btn-ghost join-item" disabled aria-disabled="true">
-          <span class="sr-only">Next</span>
-          <Icon name="heroicons:chevron-right" class="h-4 w-4" />
-        </button>
-      )
-    }
-  </div>
+<nav class="pager" aria-label="Pagination">
+  {
+    hasPrev ? (
+      <a href={getPageUrl(currentPage - 1)} class="key key-sm key-sq" aria-label="Previous">
+        ‹
+      </a>
+    ) : (
+      <button class="key key-sm key-sq" disabled aria-label="Previous">
+        ‹
+      </button>
+    )
+  }
+  {
+    pages.map((page) => (
+      <a
+        href={getPageUrl(page)}
+        class="key key-sm key-sq"
+        aria-current={page === currentPage ? "page" : undefined}
+      >
+        {page}
+      </a>
+    ))
+  }
+  {
+    hasNext ? (
+      <a href={getPageUrl(currentPage + 1)} class="key key-sm key-sq" aria-label="Next">
+        ›
+      </a>
+    ) : (
+      <button class="key key-sm key-sq" disabled aria-label="Next">
+        ›
+      </button>
+    )
+  }
 </nav>

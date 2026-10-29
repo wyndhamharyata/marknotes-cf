@@ -12,16 +12,9 @@ const { comment } = Astro.props;
   comment.moderationReason &&
     (comment.moderationStatus === ModerationStatus.WARNING ||
       comment.moderationStatus === ModerationStatus.DANGEROUS) && (
-      <div
-        class:list={[
-          "flex items-start gap-3 rounded-lg p-3 text-sm",
-          comment.moderationStatus === ModerationStatus.WARNING
-            ? "bg-warning/20 text-warning"
-            : "bg-error/20 text-error",
-        ]}
-      >
-        <span class="my-auto text-3xl">✦</span>
-        <p class="my-auto">{comment.moderationReason}</p>
+      <div class="reason">
+        <span class="staple" />
+        <div class="tear-b">✦ {comment.moderationReason}</div>
       </div>
     )
 }

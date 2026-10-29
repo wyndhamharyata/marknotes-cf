@@ -1,85 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500;700&family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800&family=Big+Shoulders:opsz,wght@10..72,700..900&family=Big+Shoulders+Stencil:opsz,wght@10..72,800&display=swap");
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
-@plugin "daisyui" {
-  themes:
-    marknotes-light,
-    marknotes-dark --prefersdark;
-}
-
-@plugin "daisyui/theme" {
-  name: "marknotes-light";
-  default: true;
-  prefersdark: false;
-  color-scheme: "light";
-  --color-base-100: oklch(98% 0 0);
-  --color-base-200: oklch(97% 0 0);
-  --color-base-300: oklch(92% 0 0);
-  --color-base-content: oklch(20% 0 0);
-  --color-primary: oklch(45% 0.15 150);
-  --color-primary-content: oklch(98% 0 0);
-  --color-secondary: oklch(0% 0 0);
-  --color-secondary-content: oklch(100% 0 0);
-  --color-accent: oklch(50% 0.134 242.749);
-  --color-accent-content: oklch(98% 0.014 180.72);
-  --color-neutral: oklch(14% 0 0);
-  --color-neutral-content: oklch(98% 0 0);
-  --color-info: oklch(58% 0.158 241.966);
-  --color-info-content: oklch(95% 0.026 236.824);
-  --color-success: oklch(52% 0.154 150.069);
-  --color-success-content: oklch(95% 0.052 163.051);
-  --color-warning: oklch(82% 0.189 84.429);
-  --color-warning-content: oklch(27% 0.072 132.109);
-  --color-error: oklch(52% 0.223 3.958);
-  --color-error-content: oklch(94% 0.03 12.58);
-  --radius-selector: 2rem;
-  --radius-field: 1rem;
-  --radius-box: 0.5rem;
-  --size-selector: 0.3125rem;
-  --size-field: 0.21875rem;
-  --border: 2px;
-  --depth: 1;
-  --noise: 1;
-}
-
-@plugin "daisyui/theme" {
-  name: "marknotes-dark";
-  default: false;
-  prefersdark: true;
-  color-scheme: "dark";
-  /* Base colors from sunset theme */
-  --color-base-100: oklch(25.33% 0.015 252.42);
-  --color-base-200: oklch(23.26% 0.014 253.1);
-  --color-base-300: oklch(21.15% 0.012 254.09);
-  --color-base-content: oklch(90% 0 0);
-  --color-primary: oklch(66.27% 0.2 22.22);
-  --color-primary-content: oklch(13.25% 0.04 22.22);
-  --color-secondary: oklch(56.86% 0.2 277.69);
-  --color-secondary-content: oklch(11.37% 0.04 277.69);
-  /* Blue accent */
-  --color-accent: oklch(55% 0.15 245);
-  --color-accent-content: oklch(98% 0.02 245);
-  --color-neutral: oklch(15% 0.02 252);
-  --color-neutral-content: oklch(90% 0.02 252);
-  --color-info: oklch(58% 0.158 241.966);
-  --color-info-content: oklch(95% 0.026 236.824);
-  /* Softer status colors (rich & darker) */
-  --color-success: oklch(55% 0.14 145);
-  --color-success-content: oklch(98% 0.02 145);
-  --color-warning: oklch(55% 0.14 75);
-  --color-warning-content: oklch(98% 0.02 75);
-  --color-error: oklch(52% 0.18 20);
-  --color-error-content: oklch(98% 0.02 20);
-  --radius-selector: 2rem;
-  --radius-field: 1rem;
-  --radius-box: 0.5rem;
-  --size-selector: 0.3125rem;
-  --size-field: 0.21875rem;
-  --border: 2px;
-  --depth: 1;
-  --noise: 1;
-}
-
 @theme {
   --font-atkinson: "Atkinson Hyperlegible Next", sans-serif;
   --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, Menlo, monospace;
@@ -276,7 +197,8 @@ button:focus-visible {
 .key:active,
 .key.down,
 .key[aria-current="page"],
-.key[aria-pressed="true"] {
+.key[aria-pressed="true"],
+.key:has(> input:checked) {
   transform: translateY(2px);
   box-shadow:
     inset 0 2px 4px rgb(0 0 0 / 0.3),
@@ -505,6 +427,11 @@ textarea.ruled:focus {
   background:
     repeating-linear-gradient(transparent 0 25px, rgb(20 20 20 / 0.9) 25px 27px),
     rgb(255 255 255 / 0.3);
+}
+/* The rules scroll with the writing. */
+textarea.ruled,
+textarea.ruled:focus {
+  background-attachment: local;
 }
 .err {
   justify-self: start;
@@ -1282,7 +1209,7 @@ html.dark .tk-map {
   font: 400 16px/1.5 var(--font-atkinson);
   color: var(--ink);
 }
-html.dark .fold,
+html.dark .comments .fold,
 html.dark .on-counter {
   color: #d4d4d4;
   border-color: #d4d4d4;
@@ -1719,8 +1646,736 @@ html.dark .replies > .slip::before {
     left: -22px;
     width: 18px;
   }
+  /* A long alias and its stamp push the date to its own line. */
+  .who {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+  .who time {
+    margin-left: auto;
+  }
   .acts .key {
     min-height: 40px;
+  }
+}
+
+/* ==========================================================================
+   Admin: the back of the counter
+   ========================================================================== */
+.admin-main {
+  width: min(1360px, 100% - 16px);
+  margin: 22px auto 0;
+  padding-bottom: 120px;
+}
+.admin-main.narrow {
+  width: min(1100px, 100% - 16px);
+}
+.admin-main.mid {
+  width: min(900px, 100% - 16px);
+}
+
+/* The dock: a till on the bottom edge. */
+.dock {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  z-index: 40;
+  display: flex;
+  gap: 8px;
+  width: min(600px, 100% - 16px);
+  padding: 10px 12px 12px;
+  transform: translateX(-50%);
+}
+.dock .key {
+  flex: 1;
+}
+.dock .key-sq {
+  flex: none;
+}
+
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 22px;
+}
+.page-head h1 {
+  margin: 0 auto 0 0;
+  min-width: 0;
+  font: 900 64px/0.85 var(--font-display);
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.page-head h1.sm {
+  margin-left: 8px;
+  font-size: 40px;
+  line-height: 0.9;
+}
+html.dark .page-head h1 {
+  color: #d4d4d4;
+}
+.tag {
+  padding: 5px 7px;
+  font: 700 13px/1 var(--font-mono);
+  color: #141414;
+  background: var(--thermal);
+  border: 1.5px solid #141414;
+}
+
+/* The only red block in admin: comments wait. */
+.alert-band {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin: 0 0 18px;
+  padding: 10px 12px 10px 18px;
+  color: #fff;
+  background: var(--chop);
+  box-shadow:
+    0 2px 0 rgb(0 0 0 / 0.2),
+    0 12px 18px -10px rgb(0 0 0 / 0.5);
+}
+.alert-band b {
+  font: 700 16px/1.2 var(--font-atkinson);
+}
+.alert-band span {
+  font: 400 14px/1.2 var(--font-mono);
+}
+.alert-band .key {
+  margin-left: auto;
+}
+
+/* Numbers on the register's display. */
+.readouts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 12px;
+}
+.readouts .vfd {
+  height: 56px;
+  font-size: 15px;
+}
+.readouts .vfd b {
+  flex: none;
+  font: 700 26px/1 var(--font-mono);
+}
+.vfd-leader {
+  flex: 1;
+  height: 2px;
+  margin-top: 10px;
+  background: repeating-linear-gradient(90deg, var(--vfd-dim) 0 2px, transparent 2px 6px);
+}
+
+/* Charts: ink plotted on blue graph paper. */
+.plot {
+  position: relative;
+  margin: 0 0 18px;
+  padding: 48px 12px 8px;
+  color: #141414;
+  background:
+    linear-gradient(rgb(30 63 217 / 0.1) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, rgb(30 63 217 / 0.1) 1px, transparent 1px) 0 0 / 24px 24px,
+    var(--grain),
+    var(--thermal);
+  border: 1px solid rgb(31 31 31 / 0.35);
+  box-shadow: 0 14px 22px -14px rgb(0 0 0 / 0.5);
+}
+.plot > h2 {
+  position: absolute;
+  left: 16px;
+  top: 14px;
+  margin: 0;
+  font: 800 22px/1 var(--font-display);
+  text-transform: uppercase;
+}
+.legend {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  display: flex;
+  gap: 14px;
+  font: 700 13px/1 var(--font-mono);
+}
+.legend i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  vertical-align: -1px;
+}
+.plot-empty {
+  padding: 48px 12px;
+  font: 400 14px/1.4 var(--font-mono);
+  text-align: center;
+}
+
+/* Thermal paper, torn at the foot: ledgers and receipts. */
+.paper {
+  margin: 0 0 18px;
+  filter: drop-shadow(0 1px 0 rgb(31 31 31 / 0.28)) drop-shadow(0 9px 10px rgb(0 0 0 / 0.2));
+}
+.paper > .receipt {
+  padding: 12px 18px 26px;
+}
+.paper .fold {
+  font-size: 22px;
+  min-height: 40px;
+  margin-bottom: 6px;
+}
+.top-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  font: 400 14px/1.3 var(--font-mono);
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dashed rgb(31 31 31 / 0.25);
+}
+.top-row b {
+  min-width: 0;
+  overflow: hidden;
+  font: 600 15px/1.25 var(--font-atkinson);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.top-row .d {
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ledger-head,
+.ledger-row {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) 96px 96px;
+  gap: 16px;
+  align-items: center;
+  padding: 9px 8px 9px 4px;
+}
+.ledger-head {
+  font: 400 13px/1 var(--font-mono);
+  color: var(--ink-2);
+  border-bottom: 2px dashed rgb(31 31 31 / 0.45);
+}
+.ledger-head span:nth-child(n + 3) {
+  text-align: right;
+}
+.ledger-row {
+  min-height: 72px;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dashed rgb(31 31 31 / 0.28);
+}
+.ledger-row:hover .nm {
+  text-decoration: underline;
+}
+.thumb {
+  width: 72px;
+  height: 48px;
+}
+.thumb::after {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--thermal) 68%, transparent) 0 1.5px,
+      transparent 1.5px 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--thermal) 68%, transparent) 0 1.5px,
+      transparent 1.5px 4px
+    );
+}
+.ledger-row .halftone {
+  background: var(--thermal);
+}
+.ledger-row .nm {
+  display: block;
+  font: 600 16px/1.3 var(--font-atkinson);
+}
+.ledger-row .date {
+  margin-top: 4px;
+  font-weight: 400;
+}
+.num {
+  font: 700 16px/1 var(--font-mono);
+  text-align: right;
+}
+
+/* An article's page: the sheet and its numbers side by side. */
+.detail {
+  display: grid;
+  grid-template-columns: minmax(0, 700px) minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+}
+.detail .sheet.article {
+  width: 100%;
+  margin: 0;
+  padding: 32px 36px 40px;
+}
+.detail .comments {
+  width: 100%;
+}
+.views {
+  display: none;
+}
+.views .key:has(:focus-visible) {
+  outline: 2px solid #141414;
+  outline-offset: 3px;
+}
+.side-numbers {
+  position: sticky;
+  top: 16px;
+}
+.side-numbers .readouts {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* Moderation. */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 22px;
+}
+.filters .n {
+  font: 700 12px/1 var(--font-mono);
+}
+.on {
+  margin: 0 0 12px 52px;
+  font: 400 13px/1.4 var(--font-mono);
+}
+.on a {
+  color: var(--biro);
+  font-weight: 700;
+}
+.parent-ctx {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  font: 400 14px/1.4 var(--font-atkinson);
+  color: var(--ink-2);
+  border-left: 3px solid rgb(31 31 31 / 0.45);
+}
+.parent-ctx b {
+  color: #141414;
+  font-weight: 700;
+}
+/* The moderator's reason: machine text, printed on a strip and stapled under the message. */
+.reason {
+  position: relative;
+  margin: 2px 0 12px 52px;
+  filter: drop-shadow(0 1px 0 rgb(31 31 31 / 0.25)) drop-shadow(0 3px 4px rgb(0 0 0 / 0.12));
+}
+.reason .staple {
+  left: 14px;
+}
+.reason > div {
+  padding: 8px 12px 14px;
+  font: 400 14px/1.35 var(--font-mono);
+  background: var(--grain), #fff;
+}
+.thread {
+  margin: 0 0 12px 52px;
+}
+.thread > summary {
+  list-style: none;
+}
+.thread > summary::-webkit-details-marker {
+  display: none;
+}
+.thread[open] > summary svg {
+  transform: rotate(180deg);
+}
+.thread-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+  padding-left: 12px;
+  border-left: 2px dashed rgb(31 31 31 / 0.4);
+  font: 400 14px/1.4 var(--font-atkinson);
+}
+.thread-row .ident {
+  width: 28px;
+  height: 28px;
+}
+.thread-row .ident img {
+  width: 28px;
+  height: 28px;
+}
+.pager {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 18px 0;
+}
+
+/* The editor: writing on the nota, the sheet beside it. */
+.editor {
+  display: flex;
+  gap: 0;
+  height: calc(100dvh - 210px);
+  min-height: 560px;
+}
+.editor-nota {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 18px 20px 20px;
+}
+.editor-split {
+  flex: none;
+  width: 14px;
+  margin: 0 6px;
+  cursor: col-resize;
+  background: linear-gradient(90deg, transparent 5px, #262626 5px 9px, transparent 9px);
+}
+.editor-split:hover {
+  background: linear-gradient(90deg, transparent 4px, var(--signal) 4px 10px, transparent 10px);
+}
+.editor-preview {
+  min-width: 0;
+  overflow-y: auto;
+}
+.editor-preview .sheet.article {
+  width: 100%;
+  margin: 0;
+  padding: 32px 36px 40px;
+}
+.field {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  margin: 0 0 14px;
+}
+.field > .lb {
+  font: 700 14px/1.2 var(--font-atkinson);
+}
+.ruled.title-line {
+  font: 600 24px/1.3 var(--font-mono);
+}
+.cupin > i {
+  width: 30px;
+  height: 30px;
+}
+.cupin button {
+  position: absolute;
+  inset: 0 50% 0 0;
+  z-index: 1;
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+.cupin button + button {
+  inset: 0 0 0 50%;
+}
+.cupin button:focus-visible {
+  outline: 2px solid #141414;
+  outline-offset: 2px;
+}
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 10px 0 8px;
+}
+.tools .key {
+  font: 700 13px/1 var(--font-mono);
+}
+.tools select {
+  min-height: 32px;
+  padding: 0 8px;
+  font: 700 13px/1 var(--font-atkinson);
+  color: #141414;
+  background: var(--brush), linear-gradient(180deg, #ededed, #bdbdbd);
+  border: 1px solid #5a5a5a;
+}
+textarea.ruled.source {
+  flex: 1;
+  min-height: 55vh;
+  font-size: 14px;
+  overflow-y: auto;
+}
+@media (min-width: 1024px) {
+  textarea.ruled.source {
+    min-height: 240px;
+  }
+}
+.drop {
+  position: absolute;
+  inset: 8px;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  font: 700 16px/1 var(--font-atkinson);
+  background: rgb(255 255 255 / 0.6);
+  border: 2px dashed #141414;
+}
+/* Photos to choose a hero from: a contact sheet, film with sprocket holes. */
+.contact {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px 10px 18px;
+  background: #1c1c1c;
+}
+.contact::before,
+.contact::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 5px,
+    #ccc 5px 11px,
+    transparent 11px 14px
+  );
+}
+.contact::before {
+  top: 4px;
+}
+.contact::after {
+  bottom: 3px;
+}
+.frame {
+  position: relative;
+  flex: none;
+  width: 112px;
+  height: 80px;
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  outline: 1px solid #000;
+}
+.frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.frame.add {
+  display: grid;
+  place-items: center;
+  font: 700 13px/1.2 var(--font-atkinson);
+  color: #e4e4e4;
+  text-align: center;
+  outline: 1.5px dashed #959595;
+}
+.frame.add.over {
+  outline-color: var(--marker);
+  color: var(--marker);
+}
+.frame .busy {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font: 700 13px/1 var(--font-mono);
+  color: #141414;
+  background: rgb(246 246 246 / 0.75);
+}
+.hero-pick {
+  position: relative;
+}
+.hero-pick .key {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+}
+.toast {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+  filter: drop-shadow(0 1px 0 rgb(31 31 31 / 0.3)) drop-shadow(0 6px 8px rgb(0 0 0 / 0.25));
+}
+.toast > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 14px 16px;
+  font: 700 14px/1.3 var(--font-mono);
+  color: #141414;
+  background: var(--grain), var(--thermal);
+}
+.err-band {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0 0 14px;
+  padding: 6px 8px 6px 12px;
+  font: 700 14px/1.35 var(--font-atkinson);
+  color: #fff;
+  background: var(--chop);
+}
+
+/* The deploy on the register's display, across the top. */
+.deploy {
+  position: fixed;
+  left: 50%;
+  top: 12px;
+  z-index: 50;
+  display: flex;
+  width: min(760px, 100% - 16px);
+  transform: translateX(-50%);
+}
+.deploy .vfd {
+  flex: 1;
+  height: 44px;
+  font-size: 15px;
+}
+.deploy .vfd a,
+.deploy .vfd button {
+  position: relative;
+  z-index: 2;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.deploy .msg-txt {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.blocks {
+  display: inline-flex;
+  flex: none;
+  gap: 3px;
+}
+.blocks > i {
+  width: 9px;
+  height: 16px;
+  background: #1e3a33;
+}
+.blocks > i.on {
+  background: var(--vfd);
+  box-shadow: 0 0 6px rgb(143 240 210 / 0.7);
+}
+.deploy .err-band {
+  flex: 1;
+  margin: 0;
+}
+.deploy .err-band a,
+.deploy .err-band button {
+  color: #fff;
+  font: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+@media (max-width: 1023px) {
+  .detail {
+    display: block;
+  }
+  .side-numbers {
+    position: static;
+  }
+  /* Phones and tablets show one side at a time, picked with two latched keys. */
+  .views {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 16px;
+  }
+  .detail:has(#view-numbers:checked) > .side-article,
+  .detail:has(#view-article:checked) > .side-numbers {
+    display: none;
+  }
+  .editor {
+    display: block;
+    height: auto;
+  }
+  .editor-split {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .admin-main {
+    margin-top: 12px;
+  }
+  .dock {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    padding: 10px 8px calc(12px + env(safe-area-inset-bottom));
+    transform: none;
+  }
+  .dock .key {
+    min-height: 44px;
+    padding: 0 6px;
+    font-size: 13px;
+    gap: 6px;
+  }
+  .dock .key-sq {
+    width: 44px;
+  }
+  .page-head h1 {
+    font-size: 44px;
+  }
+  .page-head h1.sm {
+    flex-basis: 100%;
+    order: 3;
+    margin-left: 0;
+    font-size: 32px;
+  }
+  .ledger-head,
+  .ledger-row {
+    grid-template-columns: 56px minmax(0, 1fr) 44px 44px;
+    gap: 10px;
+  }
+  .thumb {
+    width: 56px;
+    height: 40px;
+  }
+  .ledger-row .nm {
+    font-size: 15px;
+  }
+  .num {
+    font-size: 14px;
+  }
+  .readouts {
+    grid-template-columns: 1fr 1fr;
+  }
+  .readouts .vfd {
+    font-size: 13px;
+  }
+  .readouts .vfd b {
+    font-size: 20px;
+  }
+  .on,
+  .reason,
+  .thread {
+    margin-left: 0;
+  }
+  .detail .sheet.article,
+  .editor-preview .sheet.article {
+    padding: 16px 16px 24px;
+  }
+  .editor-nota {
+    padding: 14px 12px 16px;
+  }
+  .legend {
+    position: static;
+    margin: -8px 4px 8px;
   }
 }
 

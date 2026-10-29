@@ -1,20 +1,9 @@
-function updateTheme(isDark: boolean) {
-  const html = document.documentElement;
-  if (isDark) {
-    html.classList.add("dark");
-    html.setAttribute("data-theme", "marknotes-dark");
-  } else {
-    html.classList.remove("dark");
-    html.setAttribute("data-theme", "marknotes-light");
-  }
-}
-
 document.addEventListener("click", (e) => {
   const key = (e.target as Element).closest("#night-key");
   if (!key) return;
   const isDark = !document.documentElement.classList.contains("dark");
   localStorage.setItem("dark-mode", String(isDark));
-  updateTheme(isDark);
+  document.documentElement.classList.toggle("dark", isDark);
   syncKey();
 });
 

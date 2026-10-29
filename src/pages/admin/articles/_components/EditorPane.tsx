@@ -55,9 +55,9 @@ export default function EditorPane({ body, onBody, onImages, textareaRef }: Prop
 
   return (
     <div class="flex min-h-0 flex-1 flex-col">
-      <div class="border-base-300 flex flex-wrap items-center gap-1 border-b p-2">
+      <div class="tools">
         <select
-          class="select select-bordered w-40"
+          aria-label="Text style"
           value={String(heading)}
           onChange={(event) => {
             const level = Number(event.currentTarget.value);
@@ -75,76 +75,74 @@ export default function EditorPane({ body, onBody, onImages, textareaRef }: Prop
           ))}
         </select>
 
-        <div class="join">
-          <button
-            type="button"
-            class="btn btn-ghost join-item font-bold"
-            title="Bold"
-            onClick={withTextarea((t) => wrapSelection(t, "**", "**", "bold text"))}
-          >
-            B
-          </button>
-          <button
-            type="button"
-            class="btn btn-ghost join-item italic"
-            title="Italic"
-            onClick={withTextarea((t) => wrapSelection(t, "_", "_", "italic text"))}
-          >
-            I
-          </button>
-          <button
-            type="button"
-            class="btn btn-ghost join-item font-mono"
-            title="Inline code"
-            onClick={withTextarea((t) => wrapSelection(t, "`", "`", "code"))}
-          >
-            {"</>"}
-          </button>
-          <button
-            type="button"
-            class="btn btn-ghost join-item"
-            title="Link"
-            onClick={withTextarea((t) => wrapSelection(t, "[", "](https://)", "label"))}
-          >
-            Link
-          </button>
-          <button
-            type="button"
-            class="btn btn-ghost join-item"
-            title="Quote"
-            onClick={withTextarea((t) => prefixLines(t, "> "))}
-          >
-            &ldquo;
-          </button>
-          <button
-            type="button"
-            class="btn btn-ghost join-item"
-            title="Bullet list"
-            onClick={withTextarea(toBulletList)}
-          >
-            &bull; List
-          </button>
-          <button
-            type="button"
-            class="btn btn-ghost join-item"
-            title="Numbered list"
-            onClick={withTextarea(toOrderedList)}
-          >
-            1. List
-          </button>
-          <button
-            type="button"
-            class="btn btn-ghost join-item"
-            title="Code block"
-            onClick={withTextarea((t) => insertAtCursor(t, "\n```\n\n```\n"))}
-          >
-            Block
-          </button>
-        </div>
+        <button
+          type="button"
+          class="key key-sm"
+          title="Bold"
+          onClick={withTextarea((t) => wrapSelection(t, "**", "**", "bold text"))}
+        >
+          B
+        </button>
+        <button
+          type="button"
+          class="key key-sm italic"
+          title="Italic"
+          onClick={withTextarea((t) => wrapSelection(t, "_", "_", "italic text"))}
+        >
+          I
+        </button>
+        <button
+          type="button"
+          class="key key-sm"
+          title="Inline code"
+          onClick={withTextarea((t) => wrapSelection(t, "`", "`", "code"))}
+        >
+          {"</>"}
+        </button>
+        <button
+          type="button"
+          class="key key-sm"
+          title="Link"
+          onClick={withTextarea((t) => wrapSelection(t, "[", "](https://)", "label"))}
+        >
+          Link
+        </button>
+        <button
+          type="button"
+          class="key key-sm"
+          title="Quote"
+          onClick={withTextarea((t) => prefixLines(t, "> "))}
+        >
+          &ldquo;
+        </button>
+        <button
+          type="button"
+          class="key key-sm"
+          title="Bullet list"
+          onClick={withTextarea(toBulletList)}
+        >
+          &bull; List
+        </button>
+        <button
+          type="button"
+          class="key key-sm"
+          title="Numbered list"
+          onClick={withTextarea(toOrderedList)}
+        >
+          1. List
+        </button>
+        <button
+          type="button"
+          class="key key-sm"
+          title="Code block"
+          onClick={withTextarea((t) => insertAtCursor(t, "\n```\n\n```\n"))}
+        >
+          Block
+        </button>
       </div>
 
       <div
-        class={`relative min-h-0 flex-1 ${dragging ? "bg-primary/5" : ""}`}
+        class="relative flex min-h-0 flex-1 flex-col"
         onDragOver={(event) => {
           event.preventDefault();
           setDragging(true);
@@ -158,8 +156,8 @@ export default function EditorPane({ body, onBody, onImages, textareaRef }: Prop
       >
         <textarea
           ref={textareaRef}
-          class="textarea h-full min-h-[55vh] w-full resize-none overflow-y-auto rounded-none border-0 font-mono text-base leading-relaxed focus:outline-none md:min-h-0"
-          placeholder="Write in Markdown. Drop or paste an image to upload it."
+          class="ruled source"
+          aria-label="Article body"
           value={body}
           onInput={(event) => {
             onBody(event.currentTarget.value);
@@ -184,11 +182,7 @@ export default function EditorPane({ body, onBody, onImages, textareaRef }: Prop
           }}
         />
 
-        {dragging && (
-          <div class="border-primary bg-base-100/80 pointer-events-none absolute inset-2 flex items-center justify-center rounded-lg border-2 border-dashed">
-            <span class="font-semibold">Drop to upload</span>
-          </div>
-        )}
+        {dragging && <div class="drop">Drop to upload</div>}
       </div>
     </div>
   );

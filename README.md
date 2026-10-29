@@ -4,7 +4,7 @@ Personal blog at [mwyndham.dev](https://mwyndham.dev) (staging: [devread.mwyndha
 
 ## Stack
 
-- **Astro 5** with the Cloudflare adapter, **Preact** islands, **Tailwind v4 + daisyUI 5**
+- **Astro 7** with the Cloudflare adapter, **Preact** islands, **Tailwind v4** with Kopimap's Nota styles copied into `src/styles/global.css` (see `docs/redesign/koran/`)
 - **SST 4** (`sst.config.ts`) provisioning everything on Cloudflare: the Astro site, a Durable Object host worker, two cron workers, and an R2 bucket
 - **Drizzle** on Durable Object SQLite in production, **better-sqlite3** locally
 - **OpenAuth** for admin login, **Gemini** for comment moderation, **Shiki** for syntax highlighting

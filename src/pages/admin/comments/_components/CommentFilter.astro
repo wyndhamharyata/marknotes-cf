@@ -12,8 +12,6 @@ type Props = {
 
 type Filter = {
   link: string;
-  color: string;
-  badgeColor: string;
   label: string;
   key: keyof CommentCounts;
   moderationStatus: ModerationStatusType | null;
@@ -25,40 +23,30 @@ const counts = await getDoStub().getCommentCounts();
 const filters: Filter[] = [
   {
     link: "/admin/comments",
-    color: "btn-accent",
-    badgeColor: "badge-accent",
     label: "All",
     key: "all",
     moderationStatus: null,
   },
   {
     link: "/admin/comments?status=0",
-    color: "btn-secondary",
-    badgeColor: "badge-secondary",
     label: "Unmoderated",
     key: "unverified",
     moderationStatus: ModerationStatus.UNVERIFIED,
   },
   {
     link: "/admin/comments?status=1",
-    color: "btn-success",
-    badgeColor: "badge-success",
     label: "OK",
     key: "ok",
     moderationStatus: ModerationStatus.OK,
   },
   {
     link: "/admin/comments?status=2",
-    color: "btn-warning",
-    badgeColor: "badge-warning",
     label: "Warning",
     key: "warning",
     moderationStatus: ModerationStatus.WARNING,
   },
   {
     link: "/admin/comments?status=3",
-    color: "btn-error",
-    badgeColor: "badge-error",
     label: "Alert",
     key: "dangerous",
     moderationStatus: ModerationStatus.DANGEROUS,
@@ -66,20 +54,17 @@ const filters: Filter[] = [
 ];
 ---
 
-<div class="mx-auto flex w-full flex-wrap items-center gap-2 p-4 md:w-fit" role="tablist">
+<nav class="filters" aria-label="Filter">
   {
     filters.map((filter) => (
       <a
         href={filter.link}
-        role="tab"
-        class:list={[
-          "btn",
-          filterStatus === filter.moderationStatus ? filter.color : "btn-dash md:btn-ghost",
-        ]}
+        class="key"
+        aria-current={filterStatus === filter.moderationStatus ? "page" : undefined}
       >
-        {filter.label}{" "}
-        <span class:list={["badge badge-xs ml-1", filter.badgeColor]}>{counts[filter.key]}</span>
+        <span class="led" />
+        {filter.label} <span class="n">{counts[filter.key]}</span>
       </a>
     ))
   }
-</div>
+</nav>

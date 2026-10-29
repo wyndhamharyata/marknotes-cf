@@ -6,19 +6,7 @@ export const ARTICLE_PROSE_CLASS =
   "prose article-prose [&_ol_ol]:list-[lower-alpha] [&_ol_ol_ol]:list-[lower-roman] [&_ol_ol_ol_ol]:list-[decimal]";
 
 export const ADMIN_DOCK = [
-  {
-    path: "/admin",
-    iconName: "heroicons:home",
-    label: "Home",
-  },
-  {
-    path: "/admin/articles",
-    iconName: "heroicons:document-text",
-    label: "Articles",
-  },
-  {
-    path: "/admin/comments",
-    iconName: "heroicons:chat-bubble-left",
-    label: "Comments",
-  },
+  { path: "/admin", label: "Home" },
+  { path: "/admin/articles", label: "Articles" },
+  { path: "/admin/comments", label: "Comments" },
 ];

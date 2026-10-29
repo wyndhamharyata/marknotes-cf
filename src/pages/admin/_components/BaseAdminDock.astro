@@ -8,70 +8,30 @@ type Props = {
 
 type Menu = {
   path: string;
-  iconName: string;
   label: string;
 };
 
 const { menus, currentPath } = Astro.props;
-
-const DIVIDER = "bg-base-content/15 mx-1 hidden h-6 w-px p-0 md:block";
 ---
 
-<div class="fixed right-0 bottom-0 left-0 z-40">
-  <!-- Gradient fade overlay - semi-transparent even at bottom -->
-  <div
-    class="from-base-200/80 dark:from-base-300/80 pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-linear-to-t to-transparent md:h-24"
-  >
-  </div>
-
-  <!-- Dock container -->
-  <div class="relative flex justify-center pt-3 pb-7">
-    {
-      /*
-      shadow, not drop-shadow: the latter is a filter, and stacking it with
-      backdrop-filter on one element breaks compositing.
-    */
-    }
-    <ul
-      class="menu menu-horizontal bg-base-100/90 supports-[backdrop-filter]:bg-base-100/65 border-base-content/10 items-center gap-1 rounded-2xl border px-2 py-2 shadow-2xl backdrop-blur-xl backdrop-saturate-150 md:py-1.5"
-    >
-      <li>
-        <a href="/" hx-boost="false" aria-label="Back to site" class="btn btn-ghost btn-circle md:btn-sm">
-          <Icon name="heroicons:arrow-uturn-left" class="h-5 w-5 fill-current" />
-        </a>
-      </li>
-
-      <li class={DIVIDER} aria-hidden="true"></li>
-
-      {
-        menus.map((menu) => (
-          <li>
-            <a
-              href={menu.path}
-              hx-boost="false"
-              class={`${currentPath === menu.path ? "menu-active" : ""} flex w-16 flex-col px-6 md:h-10 md:w-auto md:flex-row md:items-center md:gap-2 md:px-4`}
-            >
-              <Icon name={menu.iconName} class="h-5 w-5" />
-              <p class="hidden md:block">{menu.label}</p>
-            </a>
-          </li>
-        ))
-      }
-
-      <li class={DIVIDER} aria-hidden="true"></li>
-
-      <li>
-        <button class="btn btn-ghost btn-circle md:btn-sm">
-          <label class="swap swap-rotate" for="dark-toggle">
-            <span class="hidden">Theme Switcher</span>
-            <input type="checkbox" id="dark-toggle" class="theme-controller" />
-            <!-- Sun icon -->
-            <Icon name="heroicons:sun" class="swap-off h-5 w-5 fill-current" />
-            <!-- Moon icon -->
-            <Icon name="heroicons:moon" class="swap-on h-5 w-5 fill-current" />
-          </label>
-        </button>
-      </li>
-    </ul>
-  </div>
-</div>
+<nav class="till dock" aria-label="Admin">
+  <a href="/" hx-boost="false" class="key key-sq" aria-label="Back to the site">
+    <Icon name="nota:back" />
+  </a>
+  {
+    menus.map((menu) => (
+      <a
+        href={menu.path}
+        hx-boost="false"
+        class="key"
+        aria-current={currentPath === menu.path ? "page" : undefined}
+      >
+        <span class="led" />
+        {menu.label}
+      </a>
+    ))
+  }
+  <button class="key" type="button" id="night-key" aria-pressed="false">
+    <span class="led"></span>Night
+  </button>
+</nav>

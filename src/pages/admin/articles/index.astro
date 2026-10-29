@@ -2,6 +2,7 @@
 export const prerender = false;
 
 import BaseAdminLayout from "../../../layouts/BaseAdminLayout.astro";
+import Icon from "../../../components/Icon.astro";
 import { SITE_DESCRIPTION, SITE_TITLE, ADMIN_DOCK } from "../../../consts";
 import { getCollection } from "astro:content";
 import ArticleItem from "./_components/ArticleItem.astro";
@@ -18,14 +19,22 @@ const analyticsMap = await getDoStub().getLatestAnalyticsBySlugs(articles.map((a
   title={SITE_TITLE}
   description={SITE_DESCRIPTION}
   dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin/articles" }}
+  width="narrow"
 >
-  <div class="mx-auto flex flex-col py-4 md:w-3xl">
-    <div class="mx-4 flex items-center justify-between md:mx-0">
-      <h1 class="text-2xl font-bold">Articles</h1>
-      {/* hx-boost's AJAX body swap does not reliably hydrate an Astro island. */}
-      <a href="/admin/articles/new" class="btn btn-primary btn-sm" hx-boost="false">New article</a>
-    </div>
-    <div class="mt-4 md:mt-0">
+  <div class="page-head">
+    <h1>Articles</h1>
+    {/* hx-boost's AJAX body swap does not reliably hydrate an Astro island. */}
+    <a href="/admin/articles/new" class="key key-cobalt" hx-boost="false"
+      ><Icon name="nota:plus" />New article</a
+    >
+  </div>
+  <div class="paper">
+    <div class="receipt tear-b">
+      <div class="ledger-head">
+        <span></span><span>{articles.length} articles</span><span>Views 7d</span><span
+          >Comments</span
+        >
+      </div>
       {
         articles.map((article) => (
           <ArticleItem article={article} analytic={analyticsMap.get(article.id)} />

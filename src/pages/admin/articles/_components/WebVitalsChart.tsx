@@ -2,7 +2,7 @@ import { useEffect, useRef } from "preact/hooks";
 import uPlot from "uplot";
 import "uplot/dist/uPlot.min.css";
 import { tooltipPlugin } from "./uplot-tooltip";
-import { readChartTheme, type ChartTheme } from "./chart-theme";
+import { BIRO, CHOP, INK, SIGNAL, axes } from "./chart-theme";
 
 interface Props {
   ts: number[];
@@ -15,11 +15,12 @@ interface Props {
 const HEIGHT = 320;
 
 type VitalKey = "lcp" | "inp" | "cls" | "ttfb";
-const VITALS: Array<{ key: VitalKey; label: string; themeColor: keyof ChartTheme }> = [
-  { key: "lcp", label: "LCP", themeColor: "info" },
-  { key: "inp", label: "INP", themeColor: "success" },
-  { key: "cls", label: "CLS", themeColor: "warning" },
-  { key: "ttfb", label: "TTFB", themeColor: "accent" },
+// Matches the legend in Analytics.astro.
+export const VITALS: Array<{ key: VitalKey; label: string; stroke: string; dash?: number[] }> = [
+  { key: "lcp", label: "LCP", stroke: INK },
+  { key: "inp", label: "INP", stroke: BIRO },
+  { key: "cls", label: "CLS", stroke: SIGNAL, dash: [6, 4] },
+  { key: "ttfb", label: "TTFB", stroke: CHOP },
 ];
 
 export default function WebVitalsChart(props: Props) {
@@ -30,7 +31,6 @@ export default function WebVitalsChart(props: Props) {
     if (!el) return;
 
     let chart: uPlot | null = null;
-    let lastWidth = 0;
 
     const data: uPlot.AlignedData = [
       props.ts,
@@ -41,8 +41,7 @@ export default function WebVitalsChart(props: Props) {
     ] as uPlot.AlignedData;
 
     const buildOpts = (): uPlot.Options => {
-      const theme = readChartTheme(el);
-      const series = VITALS.map((v) => ({ ...v, stroke: theme[v.themeColor] }));
+      const series = VITALS;
 
       return {
         width: 0,
@@ -54,7 +53,7 @@ export default function WebVitalsChart(props: Props) {
         legend: { show: false },
         cursor: {
           drag: { x: true, y: false, setScale: false },
-          points: { size: 8 },
+          points: { size: 8, fill: INK },
         },
         plugins: [
           tooltipPlugin((u, idx) =>
@@ -65,7 +64,7 @@ export default function WebVitalsChart(props: Props) {
                 color: s.stroke,
                 value: v == null ? "—" : `${(v * 100).toFixed(0)}%`,
               };
-            }),
+            })
           ),
         ],
         series: [
@@ -73,26 +72,19 @@ export default function WebVitalsChart(props: Props) {
           ...series.map((s) => ({
             label: `${s.label} % good`,
             stroke: s.stroke,
+            dash: s.dash,
             width: 2,
             spanGaps: false,
             points: { show: false },
           })),
         ],
-        axes: [
-          { stroke: theme.axisText, grid: { stroke: theme.grid } },
-          {
-            stroke: theme.axisText,
-            grid: { stroke: theme.grid },
-            values: (_u, vals) => vals.map((v) => `${Math.round(v * 100)}%`),
-          },
-        ],
+        axes: axes((_u, vals) => vals.map((v) => `${Math.round(v * 100)}%`)),
       };
     };
 
     const initChart = (width: number) => {
       chart?.destroy();
       chart = new uPlot({ ...buildOpts(), width }, data, el);
-      lastWidth = width;
     };
 
     const ro = new ResizeObserver((entries) => {
@@ -102,22 +94,12 @@ export default function WebVitalsChart(props: Props) {
         initChart(w);
       } else {
         chart.setSize({ width: w, height: HEIGHT });
-        lastWidth = w;
       }
     });
     ro.observe(el);
 
-    const themeObserver = new MutationObserver(() => {
-      if (lastWidth > 0) initChart(lastWidth);
-    });
-    themeObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme", "class"],
-    });
-
     return () => {
       ro.disconnect();
-      themeObserver.disconnect();
       chart?.destroy();
       chart = null;
     };

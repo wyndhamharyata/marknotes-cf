@@ -29,25 +29,14 @@ const baseUrl =
   title={SITE_TITLE}
   description={SITE_DESCRIPTION}
   dockProp={{ menus: ADMIN_DOCK, currentPath: "/admin/comments" }}
+  width="mid"
 >
-  <div class="mx-auto flex flex-col space-y-6 md:w-3xl">
-    <h1 class="p-4 text-2xl font-bold">Comment Moderation</h1>
-
-    <CommentFilter filterStatus={filterStatus}>
-      <div slot="fallback" class="text-base-content/60 flex min-h-12 items-center justify-center">
-        Loading filters…
-      </div>
-    </CommentFilter>
-
-    <CommentList
-      filterStatus={filterStatus}
-      currentPage={currentPage}
-      limit={limit}
-      baseUrl={baseUrl}
-    >
-      <div slot="fallback" class="card bg-base-100/60 p-8 text-center">
-        <p class="text-base-content/60">Loading comments…</p>
-      </div>
-    </CommentList>
-  </div>
+  <div class="page-head"><h1>Comments</h1></div>
+  <CommentFilter filterStatus={filterStatus} />
+  <CommentList
+    filterStatus={filterStatus}
+    currentPage={currentPage}
+    limit={limit}
+    baseUrl={baseUrl}
+  />
 </BaseAdminLayout>
