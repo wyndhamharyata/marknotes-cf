@@ -1,95 +1,25 @@
 ---
-import HeaderLink from "./HeaderLink.astro";
 import Icon from "../../components/Icon.astro";
+
+const RESUME = "/articles/m-wyndham-haryata-permana-sr-full-stack-engineer";
+const path = Astro.url.pathname.replace(/\/+$/, "");
+// The till latches the section, so an article keeps Blog down.
+const section =
+  path === RESUME ? "Resume" : path.startsWith("/articles") ? "Blog" : path === "" ? "Home" : null;
+const current = (name: string) => (section === name ? "page" : undefined);
 ---
 
-<div
-  class="navbar bg-base-100 dark:bg-base-300 md:rounded-field relative mx-auto shadow-xl md:mt-5 md:max-w-2xl"
->
-  <!-- Identity display - hidden until comment section loads -->
-  <div
-    id="identity-display"
-    class="text-base-content/70 absolute left-2 hidden items-center gap-2 text-xs md:hidden"
-  >
-    <span>Viewing as:</span>
-    <span id="identity-alias" class="text-primary font-semibold"></span>
-  </div>
-
-  <!-- Mobile hamburger menu - only on mobile -->
-  <div class="dropdown md:hidden">
-    <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
-      <Icon name="heroicons:bars-3" class="h-5 w-5" />
-    </div>
-    <ul
-      tabindex="0"
-      class="dropdown-content menu bg-base-100 fixed right-0 left-0 z-50 w-full p-4 shadow-lg"
+<nav class="till top-till" aria-label="Site">
+  <i class="bolt l"></i><i class="bolt r"></i>
+  <div class="till-keys">
+    <a class="key" href="/" aria-current={current("Home")}><span class="led"></span>Home</a>
+    <a class="key" href="/articles/" aria-current={current("Blog")}><span class="led"></span>Blog</a
     >
-      <li><a href="/" data-nav-link onclick="document.activeElement?.blur()">Home</a></li>
-      <li><a href="/articles/" data-nav-link onclick="document.activeElement?.blur()">Blog</a></li>
-      <li><a href="https://kopimap.mwyndham.dev" hx-boost="false">Kopimap</a></li>
-      <li>
-        <a
-          href="/articles/m-wyndham-haryata-permana-sr-full-stack-engineer"
-          data-nav-link
-          onclick="document.activeElement?.blur()">Resume</a
-        >
-      </li>
-      <li>
-        <a href="/admin" hx-boost="false" data-nav-link onclick="document.activeElement?.blur()"
-          >Admin Panel</a
-        >
-      </li>
-    </ul>
+    <a class="key" href="https://kopimap.mwyndham.dev" hx-boost="false"
+      ><span class="led"></span>Kopimap<Icon name="nota:out" class="out" /></a
+    >
+    <a class="key" href={RESUME} aria-current={current("Resume")}><span class="led"></span>Resume</a
+    >
   </div>
-
-  <!-- Desktop nav - truly centered (full width) -->
-  <div class="hidden w-full justify-center md:flex">
-    <ul class="menu menu-horizontal gap-2 px-1">
-      <li><HeaderLink href="/">Home</HeaderLink></li>
-      <li><HeaderLink href="/articles/">Blog</HeaderLink></li>
-      <li><HeaderLink href="https://kopimap.mwyndham.dev" hx-boost="false">Kopimap</HeaderLink></li>
-      <li>
-        <HeaderLink href="/articles/m-wyndham-haryata-permana-sr-full-stack-engineer"
-          >Resume</HeaderLink
-        >
-      </li>
-      <li><HeaderLink href="/admin" hx-boost="false">Admin Panel</HeaderLink></li>
-    </ul>
-  </div>
-
-  <!-- Theme toggle - absolute positioned so it doesn't affect centering -->
-  <div class="absolute right-2">
-    <button class="btn btn-ghost btn-circle">
-      <label class="swap swap-rotate" for="dark-toggle">
-        <span class="hidden">Theme Switcher</span>
-        <input type="checkbox" id="dark-toggle" class="theme-controller" />
-        <!-- Sun icon -->
-        <Icon name="heroicons:sun" class="swap-off h-6 w-6 fill-current" />
-        <!-- Moon icon -->
-        <Icon name="heroicons:moon" class="swap-on h-6 w-6 fill-current" />
-      </label>
-    </button>
-  </div>
-</div>
-
-<script>
-  import "../../scripts/theme";
-
-  // Listen for comment alias loaded event from CommentSection
-  function initIdentity() {
-    window.addEventListener("comment-alias-loaded", ((event: CustomEvent<{ alias: string }>) => {
-      const identityDisplay = document.getElementById("identity-display");
-      const identityAlias = document.getElementById("identity-alias");
-
-      if (identityDisplay && identityAlias && event.detail.alias) {
-        identityAlias.textContent = event.detail.alias;
-        identityDisplay.classList.remove("hidden");
-        identityDisplay.classList.add("flex");
-        identityDisplay.classList.remove("md:hidden");
-        identityDisplay.classList.add("md:flex");
-      }
-    }) as EventListener);
-  }
-
-  initIdentity();
-</script>
+  <div class="till-slot"></div>
+</nav>

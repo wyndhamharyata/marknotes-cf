@@ -5,6 +5,7 @@ import cloudflare from "@astrojs/cloudflare";
 import preact from "@astrojs/preact";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, envField } from "astro/config";
+import { SHIKI_THEMES, printout } from "./src/lib/shiki-ink.ts";
 
 // https://astro.build/config
 export default defineConfig({
@@ -18,6 +19,9 @@ export default defineConfig({
     imageService: "cloudflare",
   }),
   compressHTML: true,
+  markdown: {
+    shikiConfig: { themes: SHIKI_THEMES, defaultColor: "light", transformers: [printout] },
+  },
   image: {
     domains: ["resource.mwyndham.dev"],
   },

@@ -77,7 +77,7 @@ export async function renderPreview(body: string, assets: InlineAsset[]): Promis
         const className = lang ? ` class="language-${escapeHtml(lang)}"` : "";
         return (
           highlighted.get(fenceKey(lang, text)) ??
-          `<pre><code${className}>${escapeHtml(text)}\n</code></pre>`
+          `<div class="printout"><pre><code${className}>${escapeHtml(text)}\n</code></pre></div>`
         );
       },
     },

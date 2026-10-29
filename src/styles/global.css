@@ -1,14 +1,10 @@
-@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500;700&family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800&family=Big+Shoulders:opsz,wght@10..72,700..900&family=Big+Shoulders+Stencil:opsz,wght@10..72,800&display=swap");
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @plugin "daisyui" {
   themes:
     marknotes-light,
     marknotes-dark --prefersdark;
-}
-
-@theme {
-  --font-atkinson: "Atkinson Hyperlegible Next", sans-serif;
 }
 
 @plugin "daisyui/theme" {
@@ -84,61 +80,1400 @@
   --noise: 1;
 }
 
-@layer utilities {
-  .grid-bg {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23ddd'%3E%3Cpath d='M10 0v1M10 19v1M0 10h1M19 10h1'/%3E%3C/svg%3E");
-    background-size: 40px 40px;
-  }
-
-  .dark .grid-bg {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%23444'%3E%3Cpath d='M10 0v1M10 19v1M0 10h1M19 10h1'/%3E%3C/svg%3E");
-    background-size: 40px 40px;
-  }
+@theme {
+  --font-atkinson: "Atkinson Hyperlegible Next", sans-serif;
+  --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, Menlo, monospace;
+  --font-display: "Big Shoulders", "Arial Narrow", sans-serif;
+  --font-stencil: "Big Shoulders Stencil", "Big Shoulders", "Arial Narrow", sans-serif;
 }
 
 @custom-variant dark (&:is(.dark *));
 
-html.dark .swap-rotate .swap-off {
-  opacity: 0 !important;
-  transform: rotate(45deg) !important;
+/* ==========================================================================
+   Koran: Kopimap's Nota language on Marknotes. The Nota pieces are copied from
+   petakopi client/src/index.css, not shared; change both when one changes.
+   ========================================================================== */
+:root {
+  --ink: #141414;
+  --ink-2: #4d4d4d;
+  --thermal: #f6f6f6;
+  --news: #dcdcdc;
+  --ticket: #cdebdf;
+  --nota: #ffb8d2;
+  --counter: #d6d6d6;
+  --chop: #b80f2a;
+  --biro: #1e3fd9;
+  --signal: #ff5a1f;
+  --marker: #e2ff2e;
+  --vfd: #8ff0d2;
+  --vfd-dim: #5fa592;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)' opacity='.10'/%3E%3C/svg%3E");
+  --fiber: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011 .32' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='320' height='320' filter='url(%23f)' opacity='.10'/%3E%3C/svg%3E");
+  --mottle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.035' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23f)' opacity='.12'/%3E%3C/svg%3E");
+  --brush: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='80'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.004 .95' numOctaves='2' seed='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='80' filter='url(%23f)' opacity='.24'/%3E%3C/svg%3E");
+  --cup: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 2.2h12v2.6H2zM3.3 5.8h9.4l-1.4 8.6H4.7z'/%3E%3C/svg%3E");
+  /* The counter: neutral grey, chips in the palette colours. */
+  --terrazzo: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cg opacity='.6'%3E%3Cpolygon points='94.1,42.2 90.3,44.3 88.0,42.2 91.2,38.6' fill='%23FF9EC0'/%3E%3Cpolygon points='266.7,161.6 265.3,163.5 262.8,161.6 265.8,159.4' fill='%23B8B8B8'/%3E%3Cpolygon points='160.3,173.3 158.9,175.8 156.4,175.5 155.8,173.3 158.0,171.8 159.8,171.7' fill='%23FF5A1F'/%3E%3Cpolygon points='119.3,269.4 118.4,270.5 117.1,270.8 116.9,269.4 117.8,267.9 119.0,268.3' fill='%23F4F4F4'/%3E%3Cpolygon points='7.8,129.3 6.0,131.2 4.8,129.3 6.4,127.8' fill='%239FD8C2'/%3E%3Cpolygon points='80.6,116.3 78.3,118.2 76.1,117.1 76.6,115.0 79.6,114.3' fill='%23B8B8B8'/%3E%3Cpolygon points='132.2,243.9 128.4,246.1 126.3,246.3 124.6,243.9 126.6,241.0 129.9,240.5' fill='%23B8B8B8'/%3E%3Cpolygon points='179.5,267.5 177.8,269.4 175.9,268.9 175.1,266.4 179.6,265.6' fill='%231E3FD9'/%3E%3Cpolygon points='258.2,212.3 256.7,214.2 254.4,213.7 254.5,212.3 255.7,210.3 257.3,210.6' fill='%23F4F4F4'/%3E%3Cpolygon points='207.2,277.1 204.2,281.1 200.9,278.6 202.7,275.6 207.1,273.3' fill='%236E6E6E'/%3E%3Cpolygon points='256.6,96.3 254.8,98.7 252.9,99.5 251.4,96.3 253.7,93.1 256.0,93.9' fill='%23B8B8B8'/%3E%3Cpolygon points='173.0,166.8 171.1,168.5 168.9,168.7 170.3,165.9 172.3,164.2' fill='%23F4F4F4'/%3E%3Cpolygon points='73.9,117.3 73.2,118.9 71.6,118.6 71.7,117.3 72.5,116.4 73.7,116.0' fill='%23F4F4F4'/%3E%3Cpolygon points='194.0,148.6 191.0,150.9 189.6,148.6 192.0,146.1' fill='%239C9C9C'/%3E%3Cpolygon points='196.5,126.7 193.5,129.7 191.2,128.1 192.3,125.4 195.4,124.7' fill='%23F4F4F4'/%3E%3Cpolygon points='221.1,251.2 219.8,252.7 218.6,252.2 217.8,251.2 218.9,249.9 220.2,250.0' fill='%23F4F4F4'/%3E%3Cpolygon points='156.3,123.3 155.0,124.2 154.0,123.9 154.1,122.6 156.1,122.1' fill='%239C9C9C'/%3E%3Cpolygon points='116.5,150.2 113.9,151.9 110.6,152.0 112.8,149.2 115.2,148.2' fill='%239FD8C2'/%3E%3Cpolygon points='119.8,256.3 116.9,258.5 114.6,256.3 117.6,254.2' fill='%23F4F4F4'/%3E%3Cpolygon points='226.3,278.5 224.5,279.3 223.6,278.5 225.3,277.3' fill='%239C9C9C'/%3E%3Cpolygon points='278.9,96.0 275.5,97.9 272.1,98.7 272.9,96.0 275.0,92.9 277.0,93.7' fill='%239C9C9C'/%3E%3Cpolygon points='128.1,73.7 126.1,76.5 123.2,77.2 122.0,73.7 122.9,70.3 127.0,70.2' fill='%23B8B8B8'/%3E%3Cpolygon points='167.6,148.2 164.6,150.9 162.0,150.2 160.4,148.2 163.5,145.5 167.1,145.4' fill='%23B8B8B8'/%3E%3Cpolygon points='235.7,163.5 231.9,167.5 229.2,165.7 229.1,163.5 230.5,161.4 235.1,161.3' fill='%231E3FD9'/%3E%3Cpolygon points='20.6,206.3 18.0,208.0 16.3,206.3 18.5,204.4' fill='%239C9C9C'/%3E%3Cpolygon points='23.6,41.3 22.2,43.3 20.9,42.8 19.7,41.3 21.6,39.7 22.5,39.8' fill='%23F4F4F4'/%3E%3Cpolygon points='133.3,229.6 129.8,232.1 124.7,231.5 126.2,227.7 129.8,226.1' fill='%23FF5A1F'/%3E%3Cpolygon points='113.8,44.5 111.5,48.4 108.4,48.4 107.9,44.5 108.6,41.7 113.2,41.2' fill='%23F4F4F4'/%3E%3Cpolygon points='261.4,211.6 259.9,214.3 256.2,213.4 257.0,209.2 261.7,207.4' fill='%239FD8C2'/%3E%3Cpolygon points='60.2,22.6 57.8,27.0 54.5,24.5 55.3,19.8 58.8,19.6' fill='%239FD8C2'/%3E%3Cpolygon points='189.3,33.5 186.3,37.3 184.6,33.5 187.6,31.5' fill='%239C9C9C'/%3E%3Cpolygon points='105.0,226.6 102.8,228.1 102.0,226.6 103.4,224.9' fill='%239C9C9C'/%3E%3Cpolygon points='27.7,251.1 27.2,252.4 23.9,252.9 23.7,251.1 25.6,248.8 27.6,249.7' fill='%23B8B8B8'/%3E%3Cpolygon points='44.0,272.1 42.7,272.9 41.8,273.0 41.2,272.1 42.2,270.7 43.2,270.6' fill='%239C9C9C'/%3E%3Cpolygon points='111.1,62.6 107.7,64.8 106.0,62.6 109.5,60.7' fill='%239C9C9C'/%3E%3Cpolygon points='141.3,188.8 139.5,191.3 137.7,189.7 138.6,187.9 140.4,186.4' fill='%239C9C9C'/%3E%3Cpolygon points='66.8,62.0 64.9,65.8 62.5,64.4 62.9,60.0 66.5,59.7' fill='%236E6E6E'/%3E%3Cpolygon points='255.4,247.4 250.0,249.5 248.2,247.4 251.7,245.4' fill='%239C9C9C'/%3E%3Cpolygon points='27.1,117.7 23.1,120.5 20.9,120.4 18.2,117.7 20.5,114.8 25.9,115.6' fill='%23B8B8B8'/%3E%3Cpolygon points='131.2,224.9 129.4,226.3 129.0,224.9 129.9,223.5' fill='%23B8B8B8'/%3E%3Cpolygon points='9.8,65.5 6.9,68.4 5.0,67.1 5.3,64.0 7.7,63.4' fill='%23B8B8B8'/%3E%3Cpolygon points='144.4,109.7 143.1,111.5 141.6,110.3 142.6,108.7 143.9,108.3' fill='%239C9C9C'/%3E%3Cpolygon points='212.8,237.2 209.1,239.6 206.7,237.2 210.5,234.9' fill='%23B8B8B8'/%3E%3Cpolygon points='113.6,277.9 110.9,281.0 108.9,277.9 111.3,276.2' fill='%23FF9EC0'/%3E%3Cpolygon points='56.7,21.0 54.2,23.7 51.7,21.0 54.6,19.0' fill='%239C9C9C'/%3E%3Cpolygon points='229.8,229.3 228.2,230.7 226.7,230.6 226.3,228.3 229.4,227.5' fill='%23F4F4F4'/%3E%3Cpolygon points='119.9,14.4 117.0,17.1 114.1,16.1 115.2,13.1 118.5,10.9' fill='%23B8B8B8'/%3E%3Cpolygon points='6.1,154.4 4.8,156.7 1.3,155.7 2.7,152.3 5.0,151.0' fill='%236E6E6E'/%3E%3Cpolygon points='91.5,170.1 87.2,172.4 85.7,170.1 88.3,167.5' fill='%231E3FD9'/%3E%3Cpolygon points='45.6,100.6 44.2,102.0 43.0,101.8 42.1,100.6 43.3,99.4 44.8,99.6' fill='%23B8B8B8'/%3E%3Cpolygon points='175.3,137.1 174.1,138.2 172.4,138.5 171.6,137.1 173.1,135.3 174.2,135.6' fill='%23F4F4F4'/%3E%3Cpolygon points='184.2,219.6 182.3,220.7 181.4,219.6 183.4,218.8' fill='%23F4F4F4'/%3E%3Cpolygon points='172.4,70.6 171.0,72.0 169.8,72.1 169.6,70.6 170.5,68.5 172.1,69.4' fill='%231E3FD9'/%3E%3Cpolygon points='17.3,240.3 13.1,244.1 10.3,242.1 10.6,238.4 15.8,237.6' fill='%23B8B8B8'/%3E%3Cpolygon points='85.2,144.5 83.9,145.9 81.6,146.0 81.7,144.5 82.4,142.8 84.2,142.8' fill='%236E6E6E'/%3E%3Cpolygon points='165.4,164.9 163.7,166.3 162.8,166.5 162.1,164.9 163.3,163.2 164.7,163.4' fill='%231E3FD9'/%3E%3Cpolygon points='207.9,69.6 204.2,72.2 201.8,69.6 206.2,65.7' fill='%236E6E6E'/%3E%3Cpolygon points='229.6,48.9 227.8,50.6 225.9,49.7 226.2,47.4 228.7,47.5' fill='%239C9C9C'/%3E%3Cpolygon points='201.9,74.5 198.9,77.6 197.5,75.7 197.6,73.3 200.7,72.5' fill='%23F4F4F4'/%3E%3Cpolygon points='96.0,67.0 93.0,70.1 90.8,71.0 89.4,67.0 91.2,63.8 93.4,64.7' fill='%239C9C9C'/%3E%3Cpolygon points='97.4,39.7 96.5,41.1 95.2,39.7 96.9,38.3' fill='%23F4F4F4'/%3E%3Cpolygon points='31.6,57.6 29.6,59.1 28.6,57.6 30.2,56.4' fill='%239C9C9C'/%3E%3Cpolygon points='7.8,71.9 6.4,73.2 4.2,73.0 4.0,71.9 5.6,70.1 7.5,70.5' fill='%236E6E6E'/%3E%3Cpolygon points='2.4,56.6 0.0,59.7 -2.2,56.6 0.9,54.0' fill='%239C9C9C'/%3E%3Cpolygon points='142.0,30.8 139.2,32.8 136.3,30.8 140.4,28.2' fill='%23F4F4F4'/%3E%3Cpolygon points='76.8,252.3 73.7,254.9 71.6,253.8 72.5,251.0 74.8,250.1' fill='%239C9C9C'/%3E%3Cpolygon points='164.1,35.3 162.4,36.8 161.1,37.1 159.8,35.3 162.1,33.0 163.6,33.8' fill='%23F4F4F4'/%3E%3Cpolygon points='44.1,41.5 42.6,43.2 41.1,42.9 40.9,40.3 43.0,39.6' fill='%23F4F4F4'/%3E%3Cpolygon points='4.8,67.8 2.0,71.5 -1.5,71.5 -2.0,67.8 0.9,65.7 4.1,64.5' fill='%239C9C9C'/%3E%3Cpolygon points='72.8,118.6 70.2,120.4 68.8,121.1 68.3,118.6 69.9,117.0 71.7,116.7' fill='%239C9C9C'/%3E%3Cpolygon points='203.6,143.4 200.8,145.9 198.1,145.6 198.8,142.0 201.7,140.9' fill='%236E6E6E'/%3E%3Cpolygon points='178.0,189.0 175.7,192.1 173.6,189.0 177.2,186.1' fill='%236E6E6E'/%3E%3Cpolygon points='182.6,201.8 178.9,204.6 176.4,201.8 181.0,199.0' fill='%23F4F4F4'/%3E%3Cpolygon points='194.3,275.2 192.9,277.9 189.8,277.1 191.3,273.1 193.9,271.7' fill='%23B8B8B8'/%3E%3Cpolygon points='150.2,96.6 149.6,98.4 146.9,98.7 146.7,96.6 148.4,94.2 151.0,93.7' fill='%23F4F4F4'/%3E%3Cpolygon points='58.2,194.0 55.8,196.6 53.5,196.1 52.3,194.0 54.8,191.5 56.5,191.5' fill='%23FF5A1F'/%3E%3Cpolygon points='188.9,235.4 186.3,236.7 184.9,237.0 184.3,234.1 187.2,233.7' fill='%236E6E6E'/%3E%3Cpolygon points='177.9,94.8 175.8,97.7 172.7,96.5 173.1,93.0 178.2,91.9' fill='%239C9C9C'/%3E%3Cpolygon points='185.5,221.7 183.0,223.5 181.4,223.0 181.8,220.9 184.5,219.5' fill='%23B8B8B8'/%3E%3Cpolygon points='222.9,254.8 222.5,256.4 218.7,256.6 218.2,254.8 220.8,253.2 222.8,252.7' fill='%239C9C9C'/%3E%3Cpolygon points='242.5,51.7 241.3,52.5 240.7,51.7 241.8,50.9' fill='%23F4F4F4'/%3E%3Cpolygon points='169.0,278.1 165.9,280.3 164.3,278.1 167.3,276.0' fill='%23B8B8B8'/%3E%3Cpolygon points='38.8,5.0 35.1,8.4 34.0,5.0 36.9,1.6' fill='%239C9C9C'/%3E%3Cpolygon points='256.5,14.7 255.7,16.1 255.0,14.7 255.9,13.5' fill='%236E6E6E'/%3E%3Cpolygon points='134.7,46.6 130.9,51.0 127.1,46.6 131.6,41.8' fill='%23F4F4F4'/%3E%3Cpolygon points='244.7,203.2 243.2,204.5 242.4,203.2 243.5,202.3' fill='%236E6E6E'/%3E%3Cpolygon points='46.7,257.8 43.7,261.9 40.4,257.8 44.9,254.5' fill='%23FF5A1F'/%3E%3Cpolygon points='226.0,56.1 221.7,59.4 221.2,56.1 223.8,53.9' fill='%23F4F4F4'/%3E%3Cpolygon points='165.2,251.1 163.6,254.8 160.1,253.9 158.5,251.1 161.1,247.4 164.5,249.0' fill='%23F4F4F4'/%3E%3Cpolygon points='169.0,96.6 166.5,98.6 164.1,96.6 167.9,93.9' fill='%23B8B8B8'/%3E%3C/g%3E%3C/svg%3E");
+  /* Newsprint: grain, specks, inclusions and fibres, a few of them in the palette's colours. */
+  --newsprint: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' seed='1' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.28'/%3E%3Cfilter id='s9' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -24 0 0 0 6.0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s9)' opacity='0.5'/%3E%3Cfilter id='s3' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -24 0 0 0 6.0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s3)' opacity='0.45'/%3E%3Cfilter id='f4' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.09 .8' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  14 0 0 0 -9.799999999999999'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f4)' opacity='0.1'/%3E%3Cpath d='M98.6 48.0Q102.1 48.3 105.3 49.6' stroke='%231E3FD9' stroke-width='0.63' fill='none' stroke-linecap='round' opacity='0.73'/%3E%3Cpath d='M14.9 130.6Q16.3 132.4 18.2 131.6' stroke='%23B80F2A' stroke-width='0.66' fill='none' stroke-linecap='round' opacity='0.63'/%3E%3Cpath d='M187.2 280.7Q190.1 282.0 189.3 286.9' stroke='%234FA88A' stroke-width='1.03' fill='none' stroke-linecap='round' opacity='0.65'/%3E%3Cpath d='M46.1 38.4Q42.8 40.0 42.1 41.0' stroke='%23FF5A1F' stroke-width='0.92' fill='none' stroke-linecap='round' opacity='0.68'/%3E%3Cpath d='M163.9 22.3Q166.0 23.1 166.6 24.4' stroke='%231E3FD9' stroke-width='0.76' fill='none' stroke-linecap='round' opacity='0.75'/%3E%3Cpath d='M136.3 91.5Q133.0 95.0 131.8 97.8' stroke='%23B80F2A' stroke-width='0.86' fill='none' stroke-linecap='round' opacity='0.86'/%3E%3Cpath d='M217.0 88.1Q220.8 90.7 225.3 91.3' stroke='%234FA88A' stroke-width='0.68' fill='none' stroke-linecap='round' opacity='0.72'/%3E%3Cpath d='M15.4 199.1Q16.1 202.1 13.7 206.5' stroke='%23FF5A1F' stroke-width='0.95' fill='none' stroke-linecap='round' opacity='0.76'/%3E%3Cpath d='M173.3 137.2Q169.3 138.6 165.4 138.6' stroke='%231E3FD9' stroke-width='0.63' fill='none' stroke-linecap='round' opacity='0.80'/%3E%3Cpath d='M193.0 294.0Q195.0 297.8 197.9 300.2' stroke='%23B80F2A' stroke-width='0.61' fill='none' stroke-linecap='round' opacity='0.71'/%3E%3Cpath d='M53.1 38.2Q50.3 38.3 50.6 40.4' stroke='%234FA88A' stroke-width='0.80' fill='none' stroke-linecap='round' opacity='0.85'/%3E%3Cpath d='M27.5 135.2Q25.9 137.7 21.7 137.4' stroke='%23FF5A1F' stroke-width='0.74' fill='none' stroke-linecap='round' opacity='0.70'/%3E%3Cpath d='M108.8 262.2Q111.4 263.1 116.5 266.2' stroke='%231E3FD9' stroke-width='0.72' fill='none' stroke-linecap='round' opacity='0.72'/%3E%3Cpath d='M176.0 80.7Q175.9 82.5 176.8 83.6' stroke='%23B80F2A' stroke-width='1.08' fill='none' stroke-linecap='round' opacity='0.79'/%3E%3C/svg%3E");
 }
-html.dark .swap-rotate .swap-on {
-  opacity: 1 !important;
-  transform: rotate(0deg) !important;
+
+/* Night: the papers dim, the inks hold, nothing changes hue. */
+html.dark {
+  --ink-2: #3d3d3d;
+  --thermal: #d4d4d4;
+  --news: #bdbdbd;
+  --ticket: #a9c7bb;
+  --nota: #d9a0b5;
+  --chop: #900b20;
+  --biro: #1730a6;
+  --counter: #1c1c1c;
+}
+
+/* Every edge is cut square. */
+*,
+*::before,
+*::after {
+  border-radius: 0 !important;
 }
 
 html {
   font-size: 16px;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 14px;
+body {
+  color: var(--ink);
+  background: var(--terrazzo), var(--grain), var(--counter);
+}
+html.dark body {
+  background:
+    linear-gradient(rgb(28 28 28 / 0.45), rgb(28 28 28 / 0.45)), var(--terrazzo), var(--grain),
+    var(--counter);
+}
+/* A lamp over the counter at night. */
+@media (min-width: 1024px) {
+  html.dark body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    pointer-events: none;
+    background: radial-gradient(ellipse 62% 78% at 50% 30%, transparent 46%, rgb(0 0 0 / 0.5));
   }
 }
 
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+::selection {
+  background: var(--marker);
+  color: var(--ink);
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* ---------- Nota hardware ---------- */
+/* The till: perforated graphite. */
+.till {
+  position: relative;
+  background:
+    radial-gradient(circle, rgb(0 0 0 / 0.7) 0 1.15px, transparent 1.6px) 0 0 / 6px 6px,
+    radial-gradient(circle, rgb(255 255 255 / 0.09) 0 1.15px, transparent 1.6px) 0.6px 0.8px / 6px
+      6px,
+    linear-gradient(180deg, rgb(255 255 255 / 0.07), transparent 40%),
+    var(--grain),
+    linear-gradient(180deg, #3a3a3a, #222);
+  border: 1px solid #0d0d0d;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.14),
+    0 8px 16px -4px rgb(0 0 0 / 0.45);
+}
+.bolt {
+  position: absolute;
+  top: 4px;
+  width: 9px;
+  height: 9px;
+  background: linear-gradient(135deg, #e8e8e8, #828282);
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+}
+.bolt.l {
+  left: 4px;
+}
+.bolt.r {
+  right: 4px;
+}
+
+/* The VFD: admin's numbers. */
+.vfd {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 12px;
+  overflow: hidden;
+  background: radial-gradient(120% 160% at 50% 0, #1c2c29 0, #0b1311 70%);
+  border: 2px solid #050807;
+  box-shadow:
+    inset 0 3px 8px rgb(0 0 0 / 0.85),
+    0 1px 0 rgb(255 255 255 / 0.16);
+  color: var(--vfd);
+  font: 500 17px/1 var(--font-mono);
+  letter-spacing: 0.03em;
+  text-shadow:
+    0 0 3px rgb(143 240 210 / 0.8),
+    0 0 10px rgb(143 240 210 / 0.35);
+}
+.vfd::before,
+.vfd::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.vfd::before {
+  background: linear-gradient(162deg, rgb(255 255 255 / 0.13) 0 26%, transparent 26.5%);
+}
+.vfd::after {
+  background:
+    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.26) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.16) 0 1px, transparent 1px 3px);
+}
+
+/* Keys: aluminium caps. .key-signal is the main action, .key-cobalt is Add. */
+.key {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  font: 700 14px/1 var(--font-atkinson);
+  color: #141414;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  background:
+    radial-gradient(130% 80% at 50% 0, rgb(255 255 255 / 0.55), transparent 62%), var(--brush),
+    linear-gradient(180deg, #ededed, #bdbdbd);
+  border: 1px solid #5a5a5a;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    inset 0 -3px 0 rgb(0 0 0 / 0.14),
+    0 2px 0 #4a4a4a,
+    0 3px 5px rgb(0 0 0 / 0.28);
+  transition:
+    transform 0.06s,
+    box-shadow 0.06s;
+}
+.key:hover {
+  background:
+    radial-gradient(130% 80% at 50% 0, rgb(255 255 255 / 0.7), transparent 62%), var(--brush),
+    linear-gradient(180deg, #f6f6f6, #cbcbcb);
+}
+/* Latched: the current page, a switch that is on, a key held down while it works. */
+.key:active,
+.key.down,
+.key[aria-current="page"],
+.key[aria-pressed="true"] {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 2px 4px rgb(0 0 0 / 0.3),
+    0 0 0 #4a4a4a,
+    0 1px 1px rgb(0 0 0 / 0.2);
+}
+.key:focus-visible {
+  outline: 2px solid #141414;
+  outline-offset: 3px;
+}
+.till .key:focus-visible {
+  outline-color: var(--vfd);
+}
+.key:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+.key.down:disabled {
+  opacity: 1;
+  cursor: progress;
+  transform: translateY(2px);
+}
+.key-signal {
+  background:
+    radial-gradient(130% 80% at 50% 0, rgb(255 255 255 / 0.4), transparent 62%), var(--brush),
+    linear-gradient(180deg, #ff8a55, #f04a0e);
+  border-color: #7a2200;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.55),
+    inset 0 -3px 0 rgb(0 0 0 / 0.16),
+    0 2px 0 #6e1f00,
+    0 3px 6px rgb(0 0 0 / 0.3);
+}
+.key-cobalt {
+  color: #fff;
+  background:
+    radial-gradient(130% 80% at 50% 0, rgb(255 255 255 / 0.3), transparent 62%), var(--brush),
+    linear-gradient(180deg, #4a68f0, #1e3fd9);
+  border-color: #0e1f70;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.4),
+    inset 0 -3px 0 rgb(0 0 0 / 0.2),
+    0 2px 0 #0b1a5e,
+    0 3px 6px rgb(0 0 0 / 0.3);
+}
+.key-signal:hover,
+.key-cobalt:hover {
+  background-blend-mode: normal;
+  filter: brightness(1.08);
+}
+.key-signal.down,
+.key-signal:active {
+  box-shadow:
+    inset 0 2px 4px rgb(0 0 0 / 0.35),
+    0 0 0 #6e1f00;
+}
+.key-sm {
+  min-height: 32px;
+  padding: 0 10px;
+  font-size: 13px;
+}
+.key-sq {
+  width: 40px;
+  padding: 0;
+}
+.key-sq.key-sm {
+  width: 32px;
+}
+.key-grow {
+  flex: 1;
+}
+.key svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+.key svg.out {
+  width: 12px;
+  height: 12px;
+  margin-left: -2px;
+}
+.led {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  background: #404040;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.5);
+}
+[aria-current="page"] > .led,
+[aria-pressed="true"] > .led {
+  background: var(--signal);
+  box-shadow: 0 0 6px 1px rgb(255 90 31 / 0.8);
+}
+
+/* ---------- Nota paper ---------- */
+.receipt {
+  background:
+    linear-gradient(90deg, rgb(0 0 0 / 0.055), transparent 5%, transparent 95%, rgb(0 0 0 / 0.055)),
+    var(--grain), var(--thermal);
+  color: #141414;
+}
+.tear-b {
+  mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
+}
+.leader {
+  flex: 1 1 12px;
+  min-width: 12px;
+  height: 2px;
+  margin-top: 6px;
+  background: repeating-linear-gradient(90deg, rgb(77 77 77 / 0.75) 0 2px, transparent 2px 6px);
+}
+
+/* Rubber stamps. The rough edge comes from the #rough filter in NotaFilters.astro. */
+.stamp {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 5px 2px;
+  border: 2px solid currentColor;
+  font: 800 12px/1 var(--font-stencil);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--chop);
+  transform: rotate(var(--r, -2deg));
+  filter: url(#rough);
+  white-space: nowrap;
+}
+.stamp-ink {
+  color: #141414;
+}
+.stamp-dim {
+  color: var(--ink-2);
+}
+.stamp-lg {
+  padding: 5px 8px 4px;
+  border-width: 2.5px;
+  outline: 1.5px solid currentColor;
+  outline-offset: 2px;
+  font-size: 15px;
+  letter-spacing: 0.09em;
+}
+
+/* The rating: a stamp card of five cups. */
+.cups {
+  display: inline-flex;
+  gap: 3px;
+}
+.cups > i {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid #141414;
+}
+.cups > i::after {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background: var(--signal);
+  mask: var(--cup) center / contain no-repeat;
+  opacity: 0;
+}
+.cups > i.f::after {
+  opacity: 1;
+}
+.cups > i.h::after {
+  opacity: 1;
+  clip-path: inset(0 50% 0 0);
+}
+.score {
+  font: 700 15px/1 var(--font-mono);
+}
+
+.staple {
+  position: absolute;
+  top: -3px;
+  z-index: 3;
+  width: 28px;
+  height: 6px;
+  background: linear-gradient(180deg, #f2f2f2, #8d8d8d);
+  border: 1px solid #4f4f4f;
+}
+
+/* The pink carbon nota: what you write, in blue ballpoint on ruled lines. Kopimap calls .ruled .line,
+   which here is taken by Shiki's code lines. */
+.nota {
+  position: relative;
+  color: #141414;
+  background-color: var(--nota);
+  background-image:
+    radial-gradient(60% 40% at 20% 30%, rgb(30 63 217 / 0.05), transparent), var(--fiber),
+    var(--grain);
+  border: 1px solid rgb(20 20 20 / 0.3);
+  box-shadow:
+    0 2px 0 rgb(20 20 20 / 0.12),
+    0 18px 28px -12px rgb(0 0 0 / 0.5);
+}
+.ruled {
+  display: block;
+  width: 100%;
+  padding: 6px 2px 5px;
+  font: 500 16px/1.35 var(--font-mono);
+  color: var(--biro);
+  background: none;
+  border: 0;
+  border-bottom: 1.5px solid #141414;
+  outline: 0;
+}
+.ruled:focus {
+  border-bottom-width: 3px;
+  padding-bottom: 3.5px;
+  background: rgb(255 255 255 / 0.35);
+}
+.ruled::placeholder {
+  color: rgb(20 20 20 / 0.45);
+}
+textarea.ruled {
+  resize: none;
+  line-height: 26px;
+  padding: 0 2px;
+  border-bottom: 0;
+  background: repeating-linear-gradient(transparent 0 25px, rgb(20 20 20 / 0.55) 25px 26.5px);
+}
+textarea.ruled:focus {
+  background:
+    repeating-linear-gradient(transparent 0 25px, rgb(20 20 20 / 0.9) 25px 27px),
+    rgb(255 255 255 / 0.3);
+}
+.err {
+  justify-self: start;
+  display: inline-block;
+  margin: 8px 0 0;
+  padding: 3px 8px;
+  font: 700 14px/1.35 var(--font-atkinson);
+  color: #fff;
+  background: var(--chop);
+}
+/* A dotted line on a slip: a label, a leader, a value. */
+.from {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  margin: 0 0 8px;
+  font: 400 14px/1.3 var(--font-mono);
+  border-bottom: 1px dashed rgb(31 31 31 / 0.3);
+}
+.from dt {
+  color: var(--ink-2);
+}
+.from dd {
+  margin: 0;
+  color: var(--biro);
+  font-weight: 700;
+}
+
+/* Photo corners. */
+.pc {
+  position: absolute;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  background: #1c1c1c;
+  pointer-events: none;
+}
+.pc:nth-of-type(1) {
+  left: 2px;
+  top: 2px;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+.pc:nth-of-type(2) {
+  right: 2px;
+  top: 2px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+.pc:nth-of-type(3) {
+  left: 2px;
+  bottom: 2px;
+  clip-path: polygon(0 0, 0 100%, 100% 100%);
+}
+.pc:nth-of-type(4) {
+  right: 2px;
+  bottom: 2px;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+/* Map marks: the reviewed shop's chop in crop marks. */
+.map-stamp {
+  position: relative;
+  display: block;
+  width: 21px;
+  height: 21px;
+  background: #b80f2a;
+  filter: url(#rough);
+}
+.map-stamp::after {
+  content: "";
+  position: absolute;
+  inset: 3.5px;
+  background: #f6f6f6;
+  clip-path: polygon(
+    50% 0,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
+}
+.crop {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+}
+.crop::before {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  background: var(--marker);
+  transform: rotate(-5deg);
+  box-shadow: inset 0 0 0 1.5px rgb(20 20 20 / 0.55);
+}
+.crop > i {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  border: 0 solid #141414;
+}
+.crop > i:nth-of-type(1) {
+  left: 0;
+  top: 0;
+  border-left-width: 2px;
+  border-top-width: 2px;
+}
+.crop > i:nth-of-type(2) {
+  right: 0;
+  top: 0;
+  border-right-width: 2px;
+  border-top-width: 2px;
+}
+.crop > i:nth-of-type(3) {
+  left: 0;
+  bottom: 0;
+  border-left-width: 2px;
+  border-bottom-width: 2px;
+}
+.crop > i:nth-of-type(4) {
+  right: 0;
+  bottom: 0;
+  border-right-width: 2px;
+  border-bottom-width: 2px;
+}
+html.dark .crop > i {
+  border-color: #f6f6f6;
+}
+
+/* ==========================================================================
+   Marknotes objects
+   ========================================================================== */
+/* The till at the top: the site's keys, the current section latched. */
+.top-till {
+  z-index: 30;
+  width: min(600px, 100% - 16px);
+  margin: 18px auto 0;
+  padding: 12px 12px 0;
+}
+.till-keys {
+  display: flex;
+  gap: 8px;
+}
+.till-keys .key {
+  flex: 1;
+}
+.till-slot {
+  height: 8px;
+  margin: 12px -12px 0;
+  background: #090909;
+  box-shadow: inset 0 3px 3px #000;
+}
+
+/* The colophon: the till's base plate. */
+.colophon {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: min(1200px, 100% - 16px);
+  margin: 48px auto 24px;
+  padding: 12px 12px 12px 18px;
+}
+.colophon .engr {
+  margin-right: auto;
+  font: 700 13px/1.4 var(--font-mono);
+  color: #c6c6c6;
+}
+.colophon .key-sq svg {
+  width: 17px;
+  height: 17px;
+}
+.colophon .rss {
+  font: 700 12px/1 var(--font-mono);
+}
+
+/* Newsprint. */
+.sheet {
+  position: relative;
+  width: min(1200px, 100% - 16px);
+  margin: 28px auto 0;
+  color: var(--ink);
+  background: var(--newsprint), var(--mottle), var(--news);
+  border: 1px solid rgb(31 31 31 / 0.22);
+  box-shadow:
+    0 1px 0 rgb(0 0 0 / 0.14),
+    0 24px 36px -18px rgb(0 0 0 / 0.6);
+}
+html.dark .sheet {
+  box-shadow: 0 24px 36px -18px rgb(0 0 0 / 0.9);
+}
+.masthead {
+  margin: 0;
+  padding: 34px 0 10px;
+  text-align: center;
+  font: 900 clamp(64px, 15.5vw, 196px)/0.8 var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.004em;
+}
+.rule2 {
+  height: 11px;
+  margin: 0 40px;
+  border-top: 6px solid var(--ink);
+  border-bottom: 1.5px solid var(--ink);
+}
+
+/* Halftone prints: one ink until the pointer is on them. */
+.halftone {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: var(--news);
+  outline: 1px solid rgb(31 31 31 / 0.35);
+}
+.halftone img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.3) brightness(1.06);
+  mix-blend-mode: multiply;
+  transition: filter 0.25s;
+}
+.halftone::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--news) 72%, transparent) 0 2px,
+      transparent 2px 6px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--news) 72%, transparent) 0 2px,
+      transparent 2px 6px
+    );
+  mix-blend-mode: lighten;
+  transition: opacity 0.25s;
+}
+.halftone.fine::after {
+  background:
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, var(--news) 68%, transparent) 0 1.5px,
+      transparent 1.5px 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--news) 68%, transparent) 0 1.5px,
+      transparent 1.5px 4px
+    );
+}
+.halftone:hover img,
+.halftone.colour img {
+  filter: none;
+  mix-blend-mode: normal;
+}
+.halftone:hover::after,
+.halftone.colour::after {
+  opacity: 0;
+}
+html.dark .halftone img {
+  filter: grayscale(1) contrast(1.3) brightness(0.92);
+}
+
+.hl {
+  margin: 16px 0 10px;
+  font: 900 54px/0.9 var(--font-display);
+  text-transform: uppercase;
+  text-wrap: balance;
+  letter-spacing: 0.003em;
+}
+.date {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font: 700 13px/1 var(--font-mono);
+}
+.story > a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+.story > a:hover .hl {
+  text-decoration: underline;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+}
+
+/* A coffee review: the shop's ticket stub, stapled to the print. */
+/* The extra 12px under the print clears the stub that hangs off it. */
+.pr {
+  position: relative;
+  padding-bottom: 12px;
+}
+.stub {
+  position: absolute;
+  right: -8px;
+  bottom: -6px;
+  z-index: 3;
+  width: 206px;
+  padding: 13px 12px 16px;
+  color: #141414;
+  background: var(--fiber), var(--grain), var(--ticket);
+  border: 1px solid rgb(31 31 31 / 0.3);
+  box-shadow:
+    0 2px 0 rgb(31 31 31 / 0.12),
+    0 12px 18px -10px rgb(0 0 0 / 0.5);
+}
+.stub::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, rgb(31 31 31 / 0.35) 0 4px, transparent 4px 8px);
+}
+.stub .staple {
+  top: -4px;
+  left: 18px;
+}
+.stub .nm {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font: 800 19px/1 var(--font-display);
+  text-transform: uppercase;
+}
+.stub .r {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.stub .cups {
+  gap: 2px;
+}
+.stub .cups > i {
+  width: 16px;
+  height: 16px;
+}
+.stub .score {
+  font-size: 13px;
+}
+
+/* Home: the front page. */
+.front {
+  display: grid;
+  grid-template-columns: 1fr 1fr 352px;
+  grid-template-areas: "lead lead hello" "s1 s2 hello";
+  padding: 0 40px 36px;
+}
+.front > .lead {
+  grid-area: lead;
+  padding: 24px 24px 26px 0;
+  border-bottom: 1px solid rgb(31 31 31 / 0.5);
+}
+.front > .lead .halftone {
+  aspect-ratio: 2 / 1;
+}
+.front > .s1,
+.front > .s2 {
+  padding: 22px 22px 0 0;
+}
+.front > .s1 {
+  grid-area: s1;
+}
+.front > .s2 {
+  grid-area: s2;
+  padding-left: 22px;
+  border-left: 1px solid rgb(31 31 31 / 0.5);
+}
+.front > .s1 .halftone,
+.front > .s2 .halftone {
+  aspect-ratio: 16 / 9;
+}
+.front > .s1 .hl,
+.front > .s2 .hl {
+  margin-top: 14px;
+  font-size: 31px;
+  line-height: 0.94;
+}
+.hello {
+  grid-area: hello;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 0 0 24px;
+  border-left: 1px solid rgb(31 31 31 / 0.5);
+}
+.hello .mug {
+  float: left;
+  width: 84px;
+  height: 84px;
+  margin: 3px 14px 8px 0;
+}
+.hello h2 {
+  margin: 0 0 14px;
+  font: 800 40px/0.9 var(--font-display);
+  text-transform: uppercase;
+}
+.hello p {
+  margin: 0 0 12px;
+  font: 400 16px/1.55 var(--font-atkinson);
+}
+.hello strong {
+  font-weight: 700;
+}
+.hello a:not(.key) {
+  color: var(--biro);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+.hello .key {
+  margin-top: 6px;
+  align-self: stretch;
+}
+
+/* Blog: the back pages, one band per year. */
+.flag {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 30px 40px 12px;
+}
+.flag h1 {
+  margin: 0;
+  font: 900 168px/0.78 var(--font-display);
+  text-transform: uppercase;
+}
+.flag .key {
+  margin-bottom: 8px;
+}
+.years {
+  padding: 22px 40px 40px;
+}
+.year {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  border-top: 3px solid var(--ink);
+}
+.year > h2 {
+  position: sticky;
+  top: 16px;
+  align-self: start;
+  margin: 0;
+  padding: 16px 0 0;
+  font: 900 80px/0.82 var(--font-display);
+}
+.year-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.year-grid > .story {
+  padding: 20px 22px 30px;
+  box-shadow: -1px 0 0 rgb(31 31 31 / 0.5);
+  border-bottom: 1px solid rgb(31 31 31 / 0.35);
+}
+.year-grid > .wide {
+  grid-column: span 2;
+}
+.year-grid .halftone {
+  aspect-ratio: 16 / 10;
+}
+.year-grid .wide .halftone {
+  aspect-ratio: 2 / 1;
+}
+.year-grid .hl {
+  margin: 16px 0 8px;
+  font-size: 28px;
+  line-height: 0.93;
+}
+.year-grid .wide .hl {
+  font-size: 46px;
+  line-height: 0.9;
+}
+
+/* An article: the sheet. */
+.sheet.article {
+  width: min(880px, 100% - 16px);
+  padding: 40px 56px 48px;
+}
+.hero img {
+  height: auto;
+  max-height: 75vh;
+}
+.h1 {
+  margin: 26px 0 16px;
+  font: 900 70px/0.89 var(--font-display);
+  text-transform: uppercase;
+  text-wrap: balance;
+  letter-spacing: 0.003em;
+}
+.dateline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin: 0 0 28px;
+  padding: 10px 0 9px;
+  border-top: 1.5px solid var(--ink);
+  border-bottom: 1.5px solid var(--ink);
+  font: 400 14px/1.2 var(--font-mono);
+}
+.dateline b {
+  font-weight: 700;
+}
+.dateline a {
+  margin-left: auto;
+  color: var(--biro);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+
+/* The prose: ink, biro links, display heads under rules. */
+.article-prose {
+  --tw-prose-body: var(--ink);
+  --tw-prose-headings: var(--ink);
+  --tw-prose-lead: var(--ink);
+  --tw-prose-links: var(--biro);
+  --tw-prose-bold: var(--ink);
+  --tw-prose-counters: var(--ink);
+  --tw-prose-bullets: var(--ink);
+  --tw-prose-hr: var(--ink);
+  --tw-prose-quotes: var(--ink);
+  --tw-prose-quote-borders: var(--ink);
+  --tw-prose-captions: var(--ink-2);
+  --tw-prose-kbd: var(--ink);
+  --tw-prose-code: var(--ink);
+  --tw-prose-pre-code: var(--ink);
+  --tw-prose-pre-bg: var(--thermal);
+  --tw-prose-th-borders: var(--ink);
+  --tw-prose-td-borders: rgb(31 31 31 / 0.3);
+  max-width: none;
+  font-size: 18px;
+  line-height: 1.65;
+}
+.article-prose :where(h2) {
+  margin: 1.8em 0 16px;
+  padding-top: 12px;
+  border-top: 5px solid var(--ink);
+  font: 900 42px/0.95 var(--font-display);
+  text-transform: uppercase;
+}
+.article-prose :where(h3) {
+  margin: 34px 0 12px;
+  padding-top: 10px;
+  border-top: 3px solid var(--ink);
+  font: 800 30px/1 var(--font-display);
+  text-transform: uppercase;
+}
+.article-prose :where(h4) {
+  margin: 28px 0 10px;
+  font: 800 24px/1 var(--font-display);
+  text-transform: uppercase;
+}
+.article-prose :where(h2, h3) + * {
+  margin-top: 0;
+}
+.article-prose :where(a) {
+  font-weight: 700;
+  text-underline-offset: 3px;
+}
+.article-prose :where(strong) {
+  font-weight: 700;
+}
+.article-prose :where(ul) {
+  list-style-type: square;
+}
+.article-prose :where(blockquote) {
+  padding-left: 20px;
+  border-left: 5px solid var(--ink);
+  font-weight: 400;
+}
+.article-prose :where(blockquote p)::before,
+.article-prose :where(blockquote p)::after {
+  content: none;
+}
+.article-prose :where(:not(pre) > code) {
+  padding: 2px 5px;
+  font: 500 0.84em/1 var(--font-mono);
+  background: var(--grain), var(--thermal);
+  border: 1px solid rgb(31 31 31 / 0.5);
+}
+.article-prose :where(:not(pre) > code)::before,
+.article-prose :where(:not(pre) > code)::after {
+  content: none;
+}
+.article-prose :where(hr) {
+  border-top-width: 1.5px;
+}
+
+/* A code block: a thermal printout in one ink, torn at both ends; colour under the pointer. */
+.printout {
+  margin: 4px -14px 24px;
+  filter: drop-shadow(0 1px 0 rgb(31 31 31 / 0.3)) drop-shadow(0 7px 9px rgb(0 0 0 / 0.18));
+}
+.printout pre {
+  margin: 0;
+  padding: 24px 24px 26px;
+  overflow-x: auto;
+  font: 400 14.5px/1.6 var(--font-mono);
+  color: var(--ink);
+  background:
+    linear-gradient(90deg, rgb(0 0 0 / 0.05), transparent 4%, transparent 96%, rgb(0 0 0 / 0.05)),
+    var(--grain), var(--thermal) !important;
+  mask:
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) 50% 0 / 14px 51%
+      repeat-x,
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% 100% / 14px 51%
+      repeat-x;
+}
+.printout pre code {
+  font: inherit;
+}
+.printout span {
+  font-weight: var(--shiki-light-font-weight);
+  font-style: var(--shiki-light-font-style);
+  transition: color 0.2s;
+}
+.printout:hover span {
+  color: var(--shiki-colour) !important;
+}
+
+/* A photo: a colour print with photo corners. */
+.photo-fig {
+  margin: 6px auto 24px;
+}
+.photo {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 8px;
+  background: var(--thermal);
+  border: 1px solid rgb(31 31 31 / 0.25);
+  box-shadow:
+    0 2px 4px rgb(0 0 0 / 0.2),
+    0 12px 18px -10px rgb(0 0 0 / 0.35);
+}
+.photo img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+}
+.photo-fig figcaption {
+  margin: 10px 2px 0;
+  font: 400 13px/1.4 var(--font-mono);
+  color: var(--ink);
+  text-align: center;
+}
+
+/* The shop's ticket, as Kopimap prints it, stapled to the review. */
+.tk {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 264px;
+  margin: 2px 0 32px;
+  color: #141414;
+  background: var(--fiber), var(--grain), var(--ticket);
+  border: 1px solid rgb(31 31 31 / 0.3);
+  box-shadow:
+    0 2px 0 rgb(31 31 31 / 0.12),
+    0 16px 24px -14px rgb(0 0 0 / 0.5);
+}
+.tk-b {
+  min-width: 0;
+  padding: 24px 20px 18px;
+}
+.tk-name {
+  margin: 0;
+  font: 900 32px/0.94 var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.004em;
+  text-wrap: balance;
+}
+.tk-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 8px;
+}
+.facts {
+  margin: 0 0 16px;
+  font: 400 14px/1.35 var(--font-mono);
+}
+.facts > div {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  border-bottom: 1px dashed rgb(31 31 31 / 0.25);
+}
+.facts dt {
+  color: var(--ink-2);
+}
+.facts dd {
+  margin: 0;
+  font-weight: 700;
+}
+.facts .now {
+  font-weight: 400;
+}
+.facts .addr {
+  display: block;
+  padding: 8px 0;
+}
+.facts .addr dd {
+  margin-top: 3px;
+  font: 400 14px/1.4 var(--font-atkinson);
+}
+.tk-actions {
+  display: flex;
+  gap: 8px;
+}
+.tk-map {
+  position: relative;
+  overflow: hidden;
+  min-height: 200px;
+  background: #d2d2d2;
+  border-left: 1px solid rgb(31 31 31 / 0.3);
+}
+html.dark .tk-map {
+  background: #1c1c1c;
+}
+.tk-map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: var(--grain);
+  opacity: 0.8;
+}
+.tk-skel {
+  height: 200px;
+  margin: 2px 0 32px;
+  border: 1.5px dashed rgb(31 31 31 / 0.35);
+}
+
+/* Comments: the nota and the slips. */
+.comments {
+  width: min(880px, 100% - 16px);
+  margin: 40px auto 0;
+}
+.fold {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  margin: 0 0 18px;
+  color: var(--ink);
+  border-top: 1.5px solid var(--ink);
+  border-bottom: 1.5px solid var(--ink);
+  font: 800 26px/1 var(--font-display);
+  text-transform: uppercase;
+}
+.fold .ct {
+  margin-left: auto;
+  font: 700 15px/1 var(--font-mono);
+}
+.on-counter {
+  font: 400 16px/1.5 var(--font-atkinson);
+  color: var(--ink);
+}
+html.dark .fold,
+html.dark .on-counter {
+  color: #d4d4d4;
+  border-color: #d4d4d4;
+}
+.comment-nota {
+  margin: 0 0 26px;
+  padding: 14px 18px 16px;
+}
+.comment-nota textarea.ruled {
+  min-height: 79px;
+}
+.nota-end {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+.reply-nota {
+  margin: -6px 0 22px 52px;
+}
+.slip {
+  position: relative;
+  margin: 0 0 18px;
+  filter: drop-shadow(0 1px 0 rgb(31 31 31 / 0.28)) drop-shadow(0 6px 8px rgb(0 0 0 / 0.16));
+}
+.slip > .tear-b {
+  padding: 14px 16px 26px;
+  color: #141414;
+  background:
+    linear-gradient(90deg, rgb(0 0 0 / 0.045), transparent 4%, transparent 96%, rgb(0 0 0 / 0.045)),
+    var(--grain), var(--thermal);
+}
+.who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+.who b {
+  font: 700 16px/1.2 var(--font-atkinson);
+  white-space: nowrap;
+}
+.who .leader {
+  margin-top: 8px;
+}
+.who time {
+  font: 700 13px/1 var(--font-mono);
+  white-space: nowrap;
+}
+/* The alias's identicon, printed as a rubber stamp. */
+.ident {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  background: var(--thermal);
+  outline: 1.5px solid var(--ink);
+  outline-offset: -1.5px;
+}
+.ident img {
+  width: 40px;
+  height: 40px;
+  filter: url(#rough-sm);
+}
+.ident.ph img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(1) contrast(1.3) brightness(1.05);
+  mix-blend-mode: multiply;
+}
+.ident.ph::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      color-mix(in srgb, #f6f6f6 68%, transparent) 0 1.5px,
+      transparent 1.5px 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, #f6f6f6 68%, transparent) 0 1.5px,
+      transparent 1.5px 4px
+    );
+  mix-blend-mode: lighten;
+}
+.msg {
+  margin: 10px 0 12px 52px;
+  font: 400 16px/1.55 var(--font-atkinson);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.msg.gone {
+  display: flex;
+  align-items: center;
+  min-height: 46px;
+}
+.acts {
+  display: flex;
+  gap: 8px;
+  margin-left: 52px;
+}
+.replies {
+  position: relative;
+  margin: -2px 0 0 52px;
+  padding-left: 28px;
+}
+.replies::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -16px;
+  bottom: 40px;
+  width: 2px;
+  background: repeating-linear-gradient(180deg, rgb(31 31 31 / 0.5) 0 4px, transparent 4px 8px);
+}
+.replies > .slip::before {
+  content: "";
+  position: absolute;
+  left: -28px;
+  top: 34px;
+  width: 24px;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, rgb(31 31 31 / 0.5) 0 4px, transparent 4px 8px);
+}
+html.dark .replies::before,
+html.dark .replies > .slip::before {
+  filter: invert(0.8);
+}
+
+/* The print reveal: a print rasters in, four lines, as it scrolls into view. Desktop only. */
+@property --print-y {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+@property --print-x {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+@keyframes print-y {
+  from {
+    --print-y: 0%;
+  }
+  to {
+    --print-y: 100%;
+  }
+}
+@keyframes print-x {
+  from {
+    --print-x: 0%;
+  }
+  to {
+    --print-x: 100%;
+  }
+}
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .js [data-print] .halftone:not(.in) {
+    clip-path: inset(0 0 100% 0);
+  }
+  .js [data-print] .halftone.in {
+    --band: 25%;
+    clip-path: polygon(
+      -1px -1px,
+      calc(100% + 1px) -1px,
+      calc(100% + 1px) var(--print-y),
+      var(--print-x) var(--print-y),
+      var(--print-x) calc(var(--print-y) + var(--band)),
+      -1px calc(var(--print-y) + var(--band))
+    );
+    animation:
+      print-y 0.72s steps(4, end) var(--d, 0ms) both,
+      print-x 180ms steps(4, end) var(--d, 0ms) 4 both;
   }
 }
 
-/* htmx loading indicator */
+/* The htmx progress bar: an ink line along the top edge. */
 .htmx-indicator {
   opacity: 0;
   transition: opacity 200ms ease-in;
 }
-
 .htmx-request .htmx-indicator,
 .htmx-request.htmx-indicator {
   opacity: 1;
 }
-
-/* Progress bar animation */
 @keyframes htmx-progress {
   0% {
     width: 0%;
@@ -150,7 +1485,261 @@ html {
     width: 100%;
   }
 }
-
 .htmx-request #htmx-indicator > div {
   animation: htmx-progress 0.8s ease-out forwards;
+}
+
+/* ---------- Tablets ---------- */
+@media (max-width: 1199px) {
+  .front {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "lead lead" "s1 s2" "hello hello";
+  }
+  .front > .lead {
+    padding-right: 0;
+  }
+  .front > .s2 {
+    padding-right: 0;
+  }
+  .hello {
+    display: block;
+    margin-top: 28px;
+    padding: 24px 0 0;
+    border-left: 0;
+    border-top: 1px solid rgb(31 31 31 / 0.5);
+  }
+  .hello .key {
+    display: flex;
+    max-width: 320px;
+  }
+  .year {
+    grid-template-columns: 100px minmax(0, 1fr);
+  }
+  .year > h2 {
+    font-size: 56px;
+  }
+  .year-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Phones ---------- */
+@media (max-width: 767px) {
+  .top-till {
+    margin-top: 8px;
+    padding: 8px 8px 0;
+  }
+  .till-keys {
+    gap: 6px;
+  }
+  .top-till .key {
+    min-height: 44px;
+    padding: 0 8px;
+    font-size: 13px;
+    gap: 6px;
+  }
+  .top-till .till-slot {
+    height: 6px;
+    margin: 8px -8px 0;
+  }
+  .sheet {
+    margin-top: 12px;
+  }
+  .masthead {
+    padding: 20px 0 6px;
+  }
+  .rule2 {
+    height: 9px;
+    margin: 0 16px;
+    border-top-width: 5px;
+  }
+  .colophon {
+    margin-top: 32px;
+    margin-bottom: 8px;
+    padding-left: 12px;
+  }
+  .colophon .engr {
+    flex-basis: 100%;
+    padding: 4px 0 4px 6px;
+  }
+  .colophon .key {
+    min-height: 44px;
+  }
+  .colophon .key-sq {
+    width: 44px;
+  }
+
+  .front {
+    display: block;
+    padding: 16px 16px 20px;
+  }
+  .front > .lead {
+    padding: 0 0 18px;
+    border-bottom: 0;
+  }
+  .front > .lead .hl {
+    font-size: 36px;
+  }
+  .hello {
+    padding-top: 20px;
+  }
+  /* Lists become rows: a small print beside the headline, the stub under it. */
+  :is(.front > .s1, .front > .s2, .year-grid > .story) {
+    padding: 14px 0;
+    border: 0;
+    border-top: 1px solid rgb(31 31 31 / 0.5);
+    box-shadow: none;
+  }
+  :is(.front > .s1, .front > .s2, .year-grid > .story) > a {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    column-gap: 12px;
+    align-items: start;
+  }
+  :is(.front > .s1, .front > .s2, .year-grid > .story) .pr {
+    display: contents;
+  }
+  :is(.front > .s1, .front > .s2, .year-grid > .story) .halftone {
+    grid-row: 1 / span 3;
+    height: 64px;
+    aspect-ratio: auto;
+  }
+  :is(.front > .s1, .front > .s2, .year-grid > .story) .hl {
+    grid-column: 2;
+    margin: 0 0 8px;
+    font-size: 22px;
+    line-height: 0.95;
+  }
+  :is(.front > .s1, .front > .s2, .year-grid > .story) .date {
+    grid-column: 2;
+  }
+  :is(.front > .s1, .front > .s2, .year-grid > .story) .stub {
+    position: static;
+    grid-column: 2;
+    grid-row: 3;
+    width: auto;
+    margin: 8px 0 0;
+    padding: 9px 10px 13px;
+  }
+  :is(.front > .s1, .front > .s2, .year-grid > .story) .stub .staple {
+    display: none;
+  }
+  :is(.front > .s1, .front > .s2, .year-grid > .story) .stub .nm {
+    font-size: 16px;
+  }
+
+  .flag {
+    padding: 18px 16px 8px;
+  }
+  .flag h1 {
+    font-size: 80px;
+  }
+  .years {
+    padding: 4px 16px 20px;
+  }
+  .year {
+    display: block;
+    margin-top: 18px;
+  }
+  .year > h2 {
+    position: static;
+    padding-top: 8px;
+    font-size: 46px;
+    line-height: 0.85;
+  }
+  .year-grid {
+    display: block;
+    margin-top: 6px;
+  }
+
+  .sheet.article {
+    padding: 16px 16px 24px;
+  }
+  .h1 {
+    margin: 18px 0 12px;
+    font-size: 42px;
+  }
+  .dateline {
+    gap: 4px 12px;
+    margin-bottom: 22px;
+    font-size: 13px;
+  }
+  .article-prose {
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .article-prose :where(h2) {
+    font-size: 34px;
+  }
+  .article-prose :where(h3) {
+    font-size: 26px;
+  }
+  .printout {
+    margin: 4px -8px 22px;
+  }
+  .printout pre {
+    padding: 22px 14px 24px;
+    font-size: 13.5px;
+  }
+  .tk {
+    grid-template-columns: minmax(0, 1fr);
+    margin: 0 -4px 26px;
+  }
+  .tk-b {
+    padding: 16px 14px 14px;
+  }
+  .tk-name {
+    font-size: 28px;
+  }
+  .tk-map {
+    order: -1;
+    min-height: 140px;
+    border-left: 0;
+    border-bottom: 1px solid rgb(31 31 31 / 0.3);
+  }
+  .tk-actions .key {
+    min-height: 46px;
+  }
+
+  .comments {
+    margin-top: 28px;
+  }
+  .msg,
+  .acts {
+    margin-left: 0;
+  }
+  .reply-nota {
+    margin-left: 0;
+  }
+  .replies {
+    margin-left: 14px;
+    padding-left: 22px;
+  }
+  .replies > .slip::before {
+    left: -22px;
+    width: 18px;
+  }
+  .acts .key {
+    min-height: 40px;
+  }
+}
+
+/* Phones and tablets: nothing animates, and the prints skip the blend modes so a long list scrolls. */
+@media (max-width: 1023px) {
+  .key,
+  .halftone img,
+  .halftone::after,
+  .printout span {
+    transition: none;
+  }
+  .halftone img {
+    mix-blend-mode: normal;
+  }
+  .halftone::after {
+    mix-blend-mode: normal;
+  }
+}
+
+.key[aria-expanded="true"] svg {
+  transform: rotate(180deg);
 }

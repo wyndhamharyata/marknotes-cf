@@ -1,0 +1,62 @@
+---
+import { Image } from "astro:assets";
+import type { CollectionEntry } from "astro:content";
+import FormattedDate from "./FormattedDate.astro";
+import Cups from "../../../components/Cups";
+
+interface Props {
+  post: CollectionEntry<"blog">;
+  /** Kopimap's name for a review's shop, for its stub. */
+  shopName?: string;
+  class?: string;
+  heading?: "h2" | "h3";
+  width?: number;
+  eager?: boolean;
+}
+
+const {
+  post,
+  shopName,
+  class: className,
+  heading: H = "h2",
+  width = 640,
+  eager = false,
+} = Astro.props;
+const { title, heroImage, pubDate, coffeeId, rating } = post.data;
+---
+
+<article class:list={["story", className]}>
+  <a href={`/articles/${post.id}/`}>
+    {
+      coffeeId ? (
+        <div class="pr">
+          {heroImage && (
+            <div class="halftone">
+              <Image src={heroImage} width={width} alt="" loading={eager ? "eager" : "lazy"} />
+            </div>
+          )}
+          <div class="stub">
+            <span class="staple" />
+            {shopName && <div class="nm">{shopName}</div>}
+            {rating && (
+              <div class="r">
+                <Cups score={rating} />
+              </div>
+            )}
+          </div>
+        </div>
+      ) : (
+        heroImage && (
+          <div class="halftone">
+            <Image src={heroImage} width={width} alt="" loading={eager ? "eager" : "lazy"} />
+          </div>
+        )
+      )
+    }
+    <H class="hl">{title}</H>
+    <p class="date">
+      {coffeeId && <span class="stamp">Coffee review</span>}
+      <FormattedDate date={pubDate} />
+    </p>
+  </a>
+</article>

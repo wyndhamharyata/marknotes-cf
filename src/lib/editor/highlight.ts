@@ -1,5 +1,6 @@
 import { tryCatch } from "@maxmorozoff/try-catch-tuple";
 import type { HighlighterCore } from "shiki/core";
+import { inkTheme, printout } from "../shiki-ink";
 
 // shiki/core, not the full bundle whose index makes Vite emit a chunk per grammar.
 const LANGUAGE_LOADERS: Record<string, () => Promise<unknown>> = {
@@ -33,11 +34,11 @@ function getHighlighter(): Promise<HighlighterCore> {
     const [{ createHighlighterCore }, { createJavaScriptRegexEngine }, theme] = await Promise.all([
       import("shiki/core"),
       import("shiki/engine/javascript"),
-      import("shiki/themes/github-dark.mjs"),
+      import("shiki/themes/github-light.mjs"),
     ]);
 
     return createHighlighterCore({
-      themes: [theme.default],
+      themes: [inkTheme, theme.default],
       langs: [],
       engine: createJavaScriptRegexEngine({ forgiving: true }),
     });
@@ -66,8 +67,13 @@ export async function highlightCode(
       loadedLanguages.add(resolved);
     }
 
-    // github-dark is Astro's default, so the preview matches the published page.
-    return highlighter.codeToHtml(code, { lang: resolved, theme: "github-dark" });
+    // The same themes as astro.config.mjs, so the preview matches the published page.
+    return highlighter.codeToHtml(code, {
+      lang: resolved,
+      themes: { light: "ink", colour: "github-light" },
+      defaultColor: "light",
+      transformers: [printout],
+    });
   });
   return html;
 }

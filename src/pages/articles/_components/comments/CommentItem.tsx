@@ -2,6 +2,7 @@ import Avatar from "./Avatar";
 import CommentForm from "./CommentForm";
 import type { CommentNode } from "./types";
 import { AUTHOR_ALIAS } from "../../../../lib/comments/author";
+import { formatDate } from "../../../../lib/date";
 
 interface CommentItemProps {
   comment: CommentNode;
@@ -16,27 +17,17 @@ interface CommentItemProps {
   onClearError: () => void;
 }
 
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
+// A removed comment keeps its slip; a black stamp takes the message's place.
 function CommentContent({ comment }: { comment: CommentNode }) {
-  if (comment.hidePublicity) {
-    return <p class="text-base-content/50 italic">Comment deleted by Admin</p>;
+  if (comment.hidePublicity || comment.moderationStatus === 3) {
+    return (
+      <div class="msg gone">
+        <span class="stamp stamp-lg stamp-ink">{comment.hidePublicity ? "Removed" : "Hidden"}</span>
+      </div>
+    );
   }
 
-  if (comment.moderationStatus === 3) {
-    return <p class="text-base-content/50 italic">Comment hidden by Auto Moderation</p>;
-  }
-
-  return (
-    <p class="text-base-content/80 text-[10pt] wrap-break-word whitespace-pre-wrap">{comment.message}</p>
-  );
+  return <p class="msg">{comment.message}</p>;
 }
 
 export default function CommentItem({
@@ -55,66 +46,65 @@ export default function CommentItem({
   const isCollapsed = collapsedIds.has(comment.id);
   const maxDepth = 3;
   const canReply = depth < maxDepth && !comment.hidePublicity && comment.moderationStatus !== 3;
-
-  // Progressive background darkness based on depth (using accent color)
-  const bgClasses = [
-    "border border-transparent hover:border-base-content/20 rounded-lg p-3 transition-colors", // depth 0: outline on hover
-    "bg-accent/5 rounded-lg px-4", // depth 1
-    "bg-accent/10 rounded-lg px-4", // depth 2
-    "bg-accent/15 rounded-lg px-4", // depth 3
-  ];
-  const bgClass = bgClasses[Math.min(depth, 3)];
+  const replies = comment.children.length === 1 ? "1 reply" : `${comment.children.length} replies`;
 
   return (
-    <div class={`py-4 ${bgClass}`}>
-      <div class="flex gap-3">
-        <div class="shrink-0">
-          <Avatar seed={comment.alias} size={40} />
-        </div>
-        <div class="min-w-0 flex-1">
-          <div class="mb-1 flex flex-wrap items-center gap-2">
-            <span class="text-sm font-semibold">{comment.alias}</span>
-            {comment.alias === AUTHOR_ALIAS && (
-              <span class="badge badge-primary badge-soft badge-xs">Author</span>
-            )}
-            <span class="text-base-content/50 text-xs">{formatDate(comment.createdAt)}</span>
-            {hasChildren && (
-              <button
-                class="btn btn-ghost btn-xs hover:btn-primary"
-                onClick={() => onToggleCollapse(comment.id)}
-                title={isCollapsed ? "Expand replies" : "Collapse replies"}
-              >
-                {isCollapsed ? "▶" : "▼"} {comment.children.length}{" "}
-                {comment.children.length === 1 ? "reply" : "replies"}
-              </button>
-            )}
+    <>
+      <div class="slip">
+        <div class="tear-b">
+          <div class="who">
+            <Avatar seed={comment.alias} />
+            <b>{comment.alias}</b>
+            {comment.alias === AUTHOR_ALIAS && <span class="stamp">Author</span>}
+            <i class="leader" />
+            <time dateTime={comment.createdAt}>{formatDate(new Date(comment.createdAt))}</time>
           </div>
 
           <CommentContent comment={comment} />
 
-          {canReply && (
-            <button class="btn btn-sm btn-ghost mt-2 hover:btn-accent -ms-3" onClick={() => onOpenReply(comment.id)}>
-              Reply
-            </button>
-          )}
-
-          <div class="h-2" />
-
-          {activeReplyId === comment.id && (
-            <CommentForm
-              onSubmit={(msg) => onSubmitReply(msg, comment.id)}
-              isSubmitting={isSubmitting}
-              isReply={true}
-              onCancel={() => onOpenReply(null)}
-              error={formError?.parentId === comment.id ? formError.message : undefined}
-              onMessageChange={onClearError}
-            />
+          {(canReply || hasChildren) && (
+            <div class="acts">
+              {canReply && (
+                <button class="key key-sm" onClick={() => onOpenReply(comment.id)}>
+                  Reply
+                </button>
+              )}
+              {hasChildren && (
+                <button
+                  class="key key-sm"
+                  aria-expanded={!isCollapsed}
+                  onClick={() => onToggleCollapse(comment.id)}
+                >
+                  {replies}
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M5 9l7 7 7-7"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.4"
+                      stroke-linecap="square"
+                    />
+                  </svg>
+                </button>
+              )}
+            </div>
           )}
         </div>
       </div>
 
+      {activeReplyId === comment.id && (
+        <CommentForm
+          onSubmit={(msg) => onSubmitReply(msg, comment.id)}
+          isSubmitting={isSubmitting}
+          isReply={true}
+          onCancel={() => onOpenReply(null)}
+          error={formError?.parentId === comment.id ? formError.message : undefined}
+          onMessageChange={onClearError}
+        />
+      )}
+
       {hasChildren && !isCollapsed && (
-        <div class="mt-2 ml-6">
+        <div class="replies">
           {comment.children.map((child) => (
             <CommentItem
               key={child.id}
@@ -132,6 +122,6 @@ export default function CommentItem({
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 }

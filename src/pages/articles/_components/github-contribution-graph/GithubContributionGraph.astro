@@ -38,11 +38,5 @@ const error = fetchErr?.message ?? "";
 ---
 
 <div class="contribution-graph not-prose mx-auto -my-6 w-full max-w-[720px]">
-  {
-    error ? (
-      <p class="text-base-content/50 text-sm italic">{error}</p>
-    ) : (
-      <Fragment set:html={tableHtml} />
-    )
-  }
+  {error ? <p class="err">{error}</p> : <Fragment set:html={tableHtml} />}
 </div>

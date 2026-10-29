@@ -1,33 +1,48 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import ArticleThumbnail from "./_components/ArticleThumbnail.astro";
+import Story from "./_components/Story.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
+import { shopNames } from "../../lib/kopimap";
 
 export const prerender = true;
 
 const posts = (await getCollection("blog")).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
+const names = await shopNames(posts.map((post) => post.data.coffeeId));
+const years = Map.groupBy(posts, (post) =>
+  post.data.pubDate.toLocaleDateString("en-GB", { year: "numeric", timeZone: "Asia/Jakarta" })
+);
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
-  <div class="card bg-base-100 shadow-xl">
-    <div class="card-body">
-      <h1 class="mb-6 text-3xl font-extrabold">Blog Posts</h1>
-      <div class="grid grid-cols-1 gap-x-6 gap-y-2 md:grid-cols-2 lg:grid-cols-3">
-        {
-          posts.map((post, index) => (
-            <ArticleThumbnail
-              withVerticalGap={true}
-              post={post}
-              index={index}
-              totalPost={posts.length}
-              lazyThumbnail={index >= 9}
-            />
-          ))
-        }
-      </div>
+  <div class="sheet">
+    <div class="flag">
+      <h1>Blog</h1>
+      <a class="key" href="/rss.xml" hx-boost="false">RSS</a>
+    </div>
+    <div class="rule2"></div>
+    <div class="years" data-print>
+      {
+        [...years].map(([year, yearPosts], y) => (
+          <section class="year">
+            <h2>{year}</h2>
+            <div class="year-grid">
+              {yearPosts.map((post, i) => (
+                <Story
+                  post={post}
+                  class={i === 0 ? "wide" : undefined}
+                  shopName={names[post.data.coffeeId ?? ""]}
+                  heading="h3"
+                  width={i === 0 ? 960 : 640}
+                  eager={y === 0}
+                />
+              ))}
+            </div>
+          </section>
+        ))
+      }
     </div>
   </div>
 </BaseLayout>

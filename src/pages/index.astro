@@ -1,66 +1,53 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import ArticleThumbnail from "./articles/_components/ArticleThumbnail.astro";
+import Story from "./articles/_components/Story.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
+import { AUTHOR_AVATAR } from "../lib/comments/author";
+import { shopNames } from "../lib/kopimap";
 
 export const prerender = true;
 
-const latestPosts = (await getCollection("blog"))
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+const [lead, second, third] = posts;
+const names = await shopNames([lead, second, third].map((post) => post.data.coffeeId));
+const name = (post: (typeof posts)[number]) => names[post.data.coffeeId ?? ""];
 ---
 
 <BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
-  <!-- Intro Section -->
-  <div
-    class="prose prose-lg prose-strong:text-primary prose-a:text-accent prose-a:font-extrabold mx-auto mb-12 max-w-none px-4 text-center"
-  >
-    <p class="text-4xl">
-      Hello! 🖖 My name is <strong>Wyndham</strong>
-    </p>
-    <p>
-      Specializing in fullstack apps development on all platform, my stack mostly consist of <strong
-        >Mobile Development</strong
-      > (Kotlin, Swift, React Native),
-      <strong>Backend Development</strong> (Golang, Hono), and
-      <strong>Frontend Development</strong> (React, Solid, Astro, Remix).
-    </p>
-    <p>
-      More on my resume <a href="/articles/m-wyndham-haryata-permana-sr-full-stack-engineer">here</a
-      >.
-    </p>
-    <p>
-      Hit me up via
-      <a href="https://x.com/muhwyndham">Twitter</a>,
-      <a href="https://github.com/wyndhamharyata">Github</a>,
-      <a href="https://linkedin.com/in/mwyndham">LinkedIn</a> or
-      <a href="mailto:business@mwyndham.dev">Email</a> whenever you need help or just want to have some
-      chit-chat!
-    </p>
-  </div>
-
-  <!-- Latest Articles Section -->
-  <div class="card bg-base-100 shadow-xl">
-    <div class="card-body">
-      <h2 class="mb-6 text-2xl font-extrabold">Latest Articles</h2>
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {
-          latestPosts.map((post, index) => (
-            <ArticleThumbnail
-              post={post}
-              index={index}
-              totalPost={latestPosts.length}
-              lazyThumbnail={false}
-            />
-          ))
-        }
-      </div>
-      <div class="mt-6 text-center">
-        <a href="/articles/" class="text-primary font-extrabold hover:underline">
-          View all articles →
-        </a>
-      </div>
+  <div class="sheet">
+    <h1 class="masthead">Marknotes</h1>
+    <div class="rule2"></div>
+    <div class="front" data-print>
+      <Story post={lead} class="lead" shopName={name(lead)} width={960} eager />
+      <Story post={second} class="s1" shopName={name(second)} eager />
+      <Story post={third} class="s2" shopName={name(third)} eager />
+      <aside class="hello">
+        <div class="halftone fine mug"><img src={AUTHOR_AVATAR} alt="Wyndham" /></div>
+        <h2>Hello! 🖖 My name is Wyndham</h2>
+        <p>
+          Specializing in fullstack apps development on all platform, my stack mostly consist of <strong
+            >Mobile Development</strong
+          > (Kotlin, Swift, React Native), <strong>Backend Development</strong> (Golang, Hono), and
+          <strong>Frontend Development</strong> (React, Solid, Astro, Remix).
+        </p>
+        <p>
+          More on my resume <a href="/articles/m-wyndham-haryata-permana-sr-full-stack-engineer"
+            >here</a
+          >.
+        </p>
+        <p>
+          Hit me up via
+          <a href="https://x.com/muhwyndham">Twitter</a>,
+          <a href="https://github.com/wyndhamharyata">Github</a>,
+          <a href="https://linkedin.com/in/mwyndham">LinkedIn</a> or
+          <a href="mailto:business@mwyndham.dev">Email</a> whenever you need help or just want to have
+          some chit-chat!
+        </p>
+        <a class="key" href="/articles/">All {posts.length} articles</a>
+      </aside>
     </div>
   </div>
 </BaseLayout>

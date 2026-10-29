@@ -31,35 +31,20 @@ const serializedTree = data?.serializedTree ?? [];
 const error = loadErr ? loadErr.message : null;
 ---
 
-<section id="comments" class="card bg-base-100 w-full shadow-xl" data-comment-alias={alias}>
-  <div class="w-full">
-    <h2 class="card-title mb-4 w-full p-4 text-2xl">Comments</h2>
-    {
-      error ? (
-        <div class="alert alert-error">
-          <span>Failed to load comments: {error}</span>
-        </div>
-      ) : (
-        <CommentTree
-          client:load
-          comments={serializedTree}
-          articleSlug={articleSlug}
-          userAlias={alias}
-        />
-      )
-    }
-  </div>
+<section id="comments" class="comments">
+  {
+    error ? (
+      <>
+        <h2 class="fold">Comments</h2>
+        <p class="err">Failed to load comments: {error}</p>
+      </>
+    ) : (
+      <CommentTree
+        client:load
+        comments={serializedTree}
+        articleSlug={articleSlug}
+        userAlias={alias}
+      />
+    )
+  }
 </section>
-
-<script>
-  // Emit custom event when comment section loads with the alias
-  document.addEventListener("DOMContentLoaded", () => {
-    const section = document.querySelector("[data-comment-alias]");
-    if (section) {
-      const alias = section.getAttribute("data-comment-alias");
-      if (alias) {
-        window.dispatchEvent(new CustomEvent("comment-alias-loaded", { detail: { alias } }));
-      }
-    }
-  });
-</script>

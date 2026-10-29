@@ -28,12 +28,18 @@ function addToParent(nodes: CommentNode[], parentId: number, newNode: CommentNod
   });
 }
 
-export default function CommentTree({ comments: initialComments, articleSlug }: Props) {
+function count(nodes: CommentNode[]): number {
+  return nodes.reduce((sum, node) => sum + 1 + count(node.children), 0);
+}
+
+export default function CommentTree({ comments: initialComments, articleSlug, userAlias }: Props) {
   const [comments, setComments] = useState<CommentNode[]>(initialComments);
   const [collapsedIds, setCollapsedIds] = useState<Set<number>>(new Set());
   const [activeReplyId, setActiveReplyId] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formError, setFormError] = useState<{ parentId: number | null; message: string } | null>(null);
+  const [formError, setFormError] = useState<{ parentId: number | null; message: string } | null>(
+    null
+  );
 
   const toggleCollapse = (id: number) => {
     setCollapsedIds((prev) => {
@@ -99,16 +105,19 @@ export default function CommentTree({ comments: initialComments, articleSlug }: 
   const clearFormError = () => setFormError(null);
 
   return (
-    <div class="w-full">
+    <>
+      <h2 class="fold">
+        Comments<span class="ct">{count(comments)}</span>
+      </h2>
       <CommentForm
         onSubmit={(msg) => submitComment(msg, null)}
         isSubmitting={isSubmitting}
+        alias={userAlias}
         error={formError?.parentId === null ? formError.message : undefined}
         onMessageChange={clearFormError}
       />
-      <div class="divider"></div>
       {comments.length === 0 ? (
-        <p class="text-base-content/50 py-4 text-center italic">No comments yet. Be the first!</p>
+        <p class="on-counter">No comments yet.</p>
       ) : (
         comments.map((comment) => (
           <CommentItem
@@ -126,6 +135,6 @@ export default function CommentTree({ comments: initialComments, articleSlug }: 
           />
         ))
       )}
-    </div>
+    </>
   );
 }

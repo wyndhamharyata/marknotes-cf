@@ -2,55 +2,40 @@
 import Icon from "../../components/Icon.astro";
 
 const today = new Date();
+const profiles = [
+  { href: "https://twitter.com/muhwyndham", label: "Twitter", icon: "simple-icons:x" },
+  {
+    href: "https://www.youtube.com/channel/UCPmxWqF9kzhe-VrOylqH2AA",
+    label: "YouTube",
+    icon: "simple-icons:youtube",
+  },
+  { href: "https://github.com/wyndhamharyata", label: "GitHub", icon: "simple-icons:github" },
+  { href: "https://mwyndham.medium.com", label: "Medium", icon: "simple-icons:medium" },
+  {
+    href: "https://www.linkedin.com/in/mwyndham",
+    label: "LinkedIn",
+    icon: "simple-icons:linkedin",
+  },
+];
 ---
 
-<footer
-  class="footer footer-horizontal md:footer-vertical footer-center bg-base-100 text-base-content border-base-300 mt-10 border-t p-10"
->
-  <aside>
-    <p class="font-atkinson font-bold">Marknotes by Wyndham</p>
-    <p class="font-atkinson">&copy; {today.getFullYear()} - All rights reserved</p>
-  </aside>
-  <nav>
-    <div class="flex flex-wrap justify-center gap-4">
-      <a
-        href="https://twitter.com/muhwyndham"
-        aria-label="Twitter"
-        class="hover:text-primary transition-colors"
-      >
-        <Icon name="simple-icons:x" class="h-6 w-6 fill-current" />
+<footer class="till colophon">
+  <i class="bolt l"></i><i class="bolt r"></i>
+  <span class="engr">Marknotes by Wyndham · © {today.getFullYear()} · All rights reserved</span>
+  {
+    profiles.map(({ href, label, icon }) => (
+      <a class="key key-sq" href={href} aria-label={label}>
+        <Icon name={icon} />
       </a>
-      <a
-        href="https://www.youtube.com/channel/UCPmxWqF9kzhe-VrOylqH2AA"
-        aria-label="YouTube"
-        class="hover:text-primary transition-colors"
-      >
-        <Icon name="simple-icons:youtube" class="h-6 w-6 fill-current" />
-      </a>
-      <a
-        href="https://github.com/wyndhamharyata"
-        aria-label="GitHub"
-        class="hover:text-primary transition-colors"
-      >
-        <Icon name="simple-icons:github" class="h-6 w-6 fill-current" />
-      </a>
-      <a
-        href="https://mwyndham.medium.com"
-        aria-label="Medium"
-        class="hover:text-primary transition-colors"
-      >
-        <Icon name="simple-icons:medium" class="h-6 w-6 fill-current" />
-      </a>
-      <a
-        href="https://www.linkedin.com/in/mwyndham"
-        aria-label="LinkedIn"
-        class="hover:text-primary transition-colors"
-      >
-        <Icon name="simple-icons:linkedin" class="h-6 w-6 fill-current" />
-      </a>
-      <a href="/rss.xml" aria-label="RSS Feed" class="hover:text-primary transition-colors">
-        <Icon name="heroicons:rss" class="h-6 w-6 fill-current" />
-      </a>
-    </div>
-  </nav>
+    ))
+  }
+  <a class="key key-sq rss" href="/rss.xml" hx-boost="false" aria-label="RSS feed">RSS</a>
+  <button class="key" type="button" id="night-key" aria-pressed="false"
+    ><span class="led"></span>Night</button
+  >
+  <a class="key" href="/admin" hx-boost="false">Admin</a>
 </footer>
+
+<script>
+  import "../../scripts/theme";
+</script>

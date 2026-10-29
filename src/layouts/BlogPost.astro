@@ -4,7 +4,6 @@ import type { CollectionEntry } from "astro:content";
 import BaseLayout from "./BaseLayout.astro";
 import FormattedDate from "../pages/articles/_components/FormattedDate.astro";
 import CommentSection from "../pages/articles/_components/CommentSection.astro";
-import ScrollButtons from "../pages/articles/_components/ScrollButtons.astro";
 import ShopIsland from "../pages/articles/_components/ShopIsland.astro";
 import { ARTICLE_PROSE_CLASS } from "../consts";
 
@@ -14,65 +13,47 @@ const { title, description, pubDate, updatedDate, heroImage, slug, coffeeId, rat
 ---
 
 <BaseLayout title={title} description={description} image={heroImage}>
-  <article class="card bg-base-100 mx-auto w-screen shadow-xl md:w-4xl">
+  <article class="sheet article">
     {
       heroImage && (
-        <figure>
-          <Image
-            loading="eager"
-            height={510}
-            src={heroImage}
-            alt=""
-            class="max-h-64 w-full object-cover"
-          />
-        </figure>
+        // A tap brings the print to colour on touch screens, where nothing hovers.
+        <div class="halftone hero" onclick="this.classList.toggle('colour')">
+          <Image loading="eager" width={Math.min(heroImage.width, 1536)} src={heroImage} alt="" />
+        </div>
       )
     }
-    <div class="card-body">
-      <div class="mb-6 text-center">
-        <p class="text-base-content/70 mb-2">
-          <FormattedDate date={pubDate} />
-          {
-            updatedDate && (
-              <span class="italic">
-                {" "}
-                | Updated: <FormattedDate date={updatedDate} />
-              </span>
-            )
-          }
-        </p>
-        <h1 class="card-title justify-center text-3xl font-extrabold md:text-4xl">{title}</h1>
-        <div class="divider"></div>
-      </div>
+    <h1 class="h1">{title}</h1>
+    <p class="dateline">
+      {coffeeId && <span class="stamp">Coffee review</span>}
+      <b><FormattedDate date={pubDate} /></b>
       {
-        // Own wrapper: under hx-boost the island marker comment is lost, and Astro's swap
-        // then deletes every earlier sibling, which here is the title.
-        coffeeId && (
-          <div class="contents">
-            <ShopIsland server:defer coffeeId={coffeeId} rating={rating}>
-              <div slot="fallback" class="skeleton rounded-box mb-8 h-44 w-full" />
-            </ShopIsland>
-          </div>
+        updatedDate && (
+          <span>
+            Updated <FormattedDate date={updatedDate} />
+          </span>
         )
       }
-      <div class={ARTICLE_PROSE_CLASS}>
-        <slot />
-      </div>
+      <a href="#comments">Comments ↓</a>
+    </p>
+    {
+      // Own wrapper: under hx-boost the island marker comment is lost, and Astro's swap
+      // then deletes every earlier sibling, which here is the title.
+      coffeeId && (
+        <div class="contents">
+          <ShopIsland server:defer coffeeId={coffeeId} rating={rating}>
+            <div slot="fallback" class="tk-skel" />
+          </ShopIsland>
+        </div>
+      )
+    }
+    <div class={ARTICLE_PROSE_CLASS}>
+      <slot />
     </div>
   </article>
 
-  <!-- Comment Section with Server Island for lazy loading -->
-  <div class="mt-8">
-    <CommentSection server:defer articleSlug={slug}>
-      <div slot="fallback" class="card bg-base-100 mt-8 shadow-xl">
-        <div class="card-body">
-          <h2 class="card-title mb-4 text-2xl">Comments</h2>
-          <div class="skeleton h-24 w-full"></div>
-          <div class="skeleton mt-4 h-16 w-full"></div>
-        </div>
-      </div>
-    </CommentSection>
-  </div>
-
-  <ScrollButtons />
+  <CommentSection server:defer articleSlug={slug}>
+    <section slot="fallback" class="comments">
+      <h2 class="fold">Comments</h2>
+    </section>
+  </CommentSection>
 </BaseLayout>

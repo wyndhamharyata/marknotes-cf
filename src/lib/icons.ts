@@ -90,4 +90,20 @@ export const icons: Record<string, IconDef> = {
     width: 24,
     height: 24,
   },
+  // Nota's square-capped strokes, from Kopimap.
+  "nota:out": {
+    body: '<path d="M9 5h10v10M19 5 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square"/>',
+    width: 24,
+    height: 24,
+  },
+  "nota:back": {
+    body: '<path d="M15 4 7 12l8 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/>',
+    width: 24,
+    height: 24,
+  },
+  "nota:plus": {
+    body: '<path d="M12 4v16M4 12h16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="square"/>',
+    width: 24,
+    height: 24,
+  },
 };

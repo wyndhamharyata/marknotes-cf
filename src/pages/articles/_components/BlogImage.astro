@@ -18,32 +18,27 @@ const MAX_IMPORTED_WIDTH = 1200;
 const imported = typeof src === "string" ? null : src;
 ---
 
-<figure class="my-6">
-  {
-    imported ? (
-      <Image
-        src={imported}
-        alt={alt}
-        width={width ?? Math.min(imported.width, MAX_IMPORTED_WIDTH)}
-        class="mx-auto max-w-full rounded-lg shadow-md"
-        loading={loading}
-      />
-    ) : (
-      <Image
-        src={src as string}
-        alt={alt}
-        width={width ?? 800}
-        height={height ?? 600}
-        class="mx-auto max-w-full rounded-lg shadow-md"
-        loading={loading}
-      />
-    )
-  }
-  {
-    caption && (
-      <figcaption class="text-base-content/70 mt-2 text-center text-sm italic">
-        {caption}
-      </figcaption>
-    )
-  }
+<figure class="photo-fig not-prose">
+  <div class="photo">
+    {
+      imported ? (
+        <Image
+          src={imported}
+          alt={alt}
+          width={width ?? Math.min(imported.width, MAX_IMPORTED_WIDTH)}
+          loading={loading}
+        />
+      ) : (
+        <Image
+          src={src as string}
+          alt={alt}
+          width={width ?? 800}
+          height={height ?? 600}
+          loading={loading}
+        />
+      )
+    }
+    <i class="pc"></i><i class="pc"></i><i class="pc"></i><i class="pc"></i>
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
 </figure>

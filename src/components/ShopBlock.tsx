@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "preact/hooks";
 import type { KopimapShop } from "../lib/kopimap";
+import Cups from "./Cups";
 // Static: a dynamically imported stylesheet 404s in the Cloudflare build.
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -9,7 +10,8 @@ interface Props {
   rating?: number;
 }
 
-// Shared by the editor preview and the article, so the author sees what readers get.
+// Kopimap's ticket for the shop, stapled to the review. Shared by the editor preview and the
+// article, so the author sees what readers get.
 export default function ShopBlock({ shop, rating = 0 }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
 
@@ -27,15 +29,17 @@ export default function ShopBlock({ shop, rating = 0 }: Props) {
       const dark = document.documentElement.classList.contains("dark");
       const created = new Map({
         container,
-        style: `https://resource.mwyndham.dev/sono/alidade_smooth_${dark ? "dark" : "light"}.json`,
+        style: `https://resource.mwyndham.dev/sono/kopimap_print_${dark ? "dark" : "light"}.json`,
         center: [shop.lng, shop.lat],
         zoom: 15,
         interactive: false,
         attributionControl: { compact: true },
       });
-      new Marker({ color: getComputedStyle(container).color })
-        .setLngLat([shop.lng, shop.lat])
-        .addTo(created);
+      // The reviewed shop's chop, selected: Kopimap's crop marks around it.
+      const mark = document.createElement("div");
+      mark.className = "crop";
+      mark.innerHTML = '<i></i><i></i><i></i><i></i><span class="map-stamp"></span>';
+      new Marker({ element: mark }).setLngLat([shop.lng, shop.lat]).addTo(created);
       map = created;
     });
     observer.observe(container);
@@ -59,99 +63,88 @@ export default function ShopBlock({ shop, rating = 0 }: Props) {
   const closed = shop.status === "closed";
 
   return (
-    <div class="border-base-300 rounded-box not-prose mb-8 flex flex-col overflow-hidden border-2 md:flex-row">
-      <div class="flex min-w-0 flex-1 flex-col gap-2 p-4">
-        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <p class="text-lg font-extrabold">{shop.name}</p>
-          {rating > 0 && (
-            <div class="rating rating-xs rating-half" aria-label={`${rating} of 5`}>
-              {[...Array(10)].map((_, i) => (
-                <div
-                  key={i}
-                  class={`mask mask-star-2 ${i % 2 === 0 ? "mask-half-1" : "mask-half-2"} bg-accent`}
-                  aria-current={rating >= (i + 1) / 2}
-                />
-              ))}
-            </div>
+    <section class="tk not-prose">
+      <span class="staple" style={{ left: 22 }} />
+      <span class="staple" style={{ left: 58 }} />
+      <div class="tk-b">
+        <h2 class="tk-name">{shop.name}</h2>
+        <div class="tk-status">
+          <span class="stamp stamp-lg" style={{ "--r": "-3deg" }}>
+            Reviewed
+          </span>
+          {closed && (
+            <span class="stamp stamp-lg stamp-ink" style={{ "--r": "2deg" }}>
+              Closed
+            </span>
           )}
+          {rating > 0 && <Cups score={rating} />}
         </div>
-
-        <div class="flex items-center gap-2 text-sm">
-          <svg
-            class="h-5 w-5 shrink-0"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-            />
-          </svg>
-          <span>{allDay ? "Open 24 hours" : shop.open_hours}</span>
-          {closed ? (
-            <span class="badge badge-error badge-soft badge-sm">Closed permanently</span>
-          ) : (
-            !allDay && (
-              <span
-                class={`badge badge-soft badge-sm ${isOpen ? "badge-success" : "badge-warning"}`}
-              >
-                {isOpen ? "Open now" : "Closed now"}
-              </span>
-            )
-          )}
-        </div>
-
-        <div class="flex items-start gap-2 text-sm">
-          <svg
-            class="h-5 w-5 shrink-0"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-            />
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
-            />
-          </svg>
-          <span class="text-base-content/80">{shop.address}</span>
-        </div>
-
-        <div class="mt-1 flex flex-wrap gap-2">
+        <dl class="facts">
+          <div>
+            <dt>Hours</dt>
+            <i class="leader" />
+            <dd>
+              {closed ? (
+                "Closed permanently"
+              ) : allDay ? (
+                "Open 24 hours"
+              ) : (
+                <>
+                  {shop.open_hours.replace("-", " – ")}{" "}
+                  <span class="now">· {isOpen ? "open now" : "closed now"}</span>
+                </>
+              )}
+            </dd>
+          </div>
+          <div class="addr">
+            <dt>Address</dt>
+            <dd>{shop.address}</dd>
+          </div>
+        </dl>
+        <div class="tk-actions">
           <a
-            class="btn btn-primary btn-sm"
+            class="key key-signal key-grow"
             href={`https://kopimap.mwyndham.dev/?shop=${shop.id}`}
             target="_blank"
           >
             Open in Kopimap
+            <svg class="out" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M9 5h10v10M19 5 6 18"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="square"
+              />
+            </svg>
           </a>
           {!closed && (
             <a
-              class="btn btn-accent btn-outline btn-sm"
+              class="key key-grow"
               target="_blank"
               href={`https://www.google.com/maps/dir/?api=1&destination=${shop.lat},${shop.lng}&origin=My+Location&travelmode=driving`}
             >
-              Go Here
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M12 2.5 21.5 12 12 21.5 2.5 12z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <path
+                  d="M8.5 15v-4h6M12.5 8l3 3-3 3"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="square"
+                />
+              </svg>
+              Directions
             </a>
           )}
         </div>
       </div>
-
-      <div
-        ref={mapRef}
-        class="bg-base-200 text-accent order-first h-36 w-full shrink-0 md:order-none md:h-auto md:min-h-44 md:w-72"
-      />
-    </div>
+      <div ref={mapRef} class="tk-map" />
+    </section>
   );
 }

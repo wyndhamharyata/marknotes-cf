@@ -25,3 +25,12 @@ export async function fetchShop(coffeeId: string): Promise<KopimapShop | null> {
   const photos = photosResp?.ok ? ((await photosResp.json()) as KopimapShop["photos"]) : [];
   return { ...coffee, photos };
 }
+
+/** Shop names for the reviews' stubs on Home and Blog, read once at build. */
+export async function shopNames(
+  coffeeIds: (string | undefined)[]
+): Promise<Record<string, string>> {
+  const ids = [...new Set(coffeeIds.filter((id): id is string => !!id))];
+  const shops = await Promise.all(ids.map(fetchShop));
+  return Object.fromEntries(shops.flatMap((shop, i) => (shop ? [[ids[i], shop.name]] : [])));
+}

@@ -9,22 +9,20 @@ function updateTheme(isDark: boolean) {
   }
 }
 
-document.addEventListener("change", (e) => {
-  const target = e.target as HTMLInputElement;
-  if (target.id === "dark-toggle") {
-    const isDark = target.checked;
-    localStorage.setItem("dark-mode", String(isDark));
-    updateTheme(isDark);
-  }
+document.addEventListener("click", (e) => {
+  const key = (e.target as Element).closest("#night-key");
+  if (!key) return;
+  const isDark = !document.documentElement.classList.contains("dark");
+  localStorage.setItem("dark-mode", String(isDark));
+  updateTheme(isDark);
+  syncKey();
 });
 
-function syncToggle() {
-  const toggle = document.getElementById("dark-toggle") as HTMLInputElement | null;
-  if (toggle) {
-    toggle.checked = document.documentElement.classList.contains("dark");
-  }
+function syncKey() {
+  const key = document.getElementById("night-key");
+  key?.setAttribute("aria-pressed", String(document.documentElement.classList.contains("dark")));
 }
 
-syncToggle();
+syncKey();
 
-document.addEventListener("htmx:afterSettle", syncToggle);
+document.addEventListener("htmx:afterSettle", syncKey);
