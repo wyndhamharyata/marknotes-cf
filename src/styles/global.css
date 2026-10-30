@@ -314,7 +314,7 @@ button:focus-visible {
 @supports (mask-composite: subtract) {
   .tear-b {
     mask-image: linear-gradient(#000, #000), url("./tear-b.svg");
-    mask-size: 100% 100%, 2400px 30px;
+    mask-size: 100% 100%, 2400px 16px;
     mask-position: 0 0, var(--tear-x) 100%;
     mask-repeat: no-repeat, repeat-x;
     mask-composite: subtract;
@@ -1101,7 +1101,7 @@ html.dark .halftone:not(:hover, .colour) img {
 @supports (mask-composite: subtract) {
   .printout pre {
     mask-image: linear-gradient(#000, #000), url("./tear-t.svg"), url("./tear-b.svg");
-    mask-size: 100% 100%, 2400px 30px, 2400px 30px;
+    mask-size: 100% 100%, 2400px 16px, 2400px 16px;
     mask-position: 0 0, 0 0, 0 100%;
     mask-repeat: no-repeat, repeat-x, repeat-x;
     mask-composite: subtract, subtract;
