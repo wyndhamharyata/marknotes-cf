@@ -122,7 +122,7 @@ export default function DeployBanner() {
         <i class="vfd-leader" />
         <span class="blocks" aria-hidden="true">
           {[0, 1, 2, 3, 4].map((i) => (
-            <i key={i} class={i < lit ? "on" : undefined} />
+            <i key={i} class={i < lit ? "lit" : undefined} />
           ))}
         </span>
         {runLink}

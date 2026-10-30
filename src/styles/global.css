@@ -2322,9 +2322,11 @@ textarea.ruled.source {
 .blocks > i {
   width: 9px;
   height: 16px;
-  background: #1e3a33;
+  margin: 0;
+  background: rgb(143 240 210 / 0.16);
 }
-.blocks > i.on {
+/* Not .on: that class is the "on <article>" line under a comment, and its margin split these. */
+.blocks > i.lit {
   background: var(--vfd);
   box-shadow: 0 0 6px rgb(143 240 210 / 0.7);
 }
