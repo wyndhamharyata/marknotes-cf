@@ -447,11 +447,12 @@ textarea.ruled {
   line-height: 26px;
   padding: 0 2px;
   border-bottom: 0;
-  background: repeating-linear-gradient(transparent 0 25px, rgb(20 20 20 / 0.55) 25px 26.5px);
+  /* A hairline rule: typing over a heavy one reads as strikethrough. */
+  background: repeating-linear-gradient(transparent 0 25px, rgb(20 20 20 / 0.28) 25px 26px);
 }
 textarea.ruled:focus {
   background:
-    repeating-linear-gradient(transparent 0 25px, rgb(20 20 20 / 0.9) 25px 27px),
+    repeating-linear-gradient(transparent 0 25px, rgb(20 20 20 / 0.34) 25px 26px),
     rgb(255 255 255 / 0.3);
 }
 /* The rules scroll with the writing. */
