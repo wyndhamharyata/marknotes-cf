@@ -4,9 +4,9 @@ import type { CommentNode } from "./types";
 import { AUTHOR_ALIAS } from "../../../../lib/comments/author";
 import { formatDate } from "../../../../lib/date";
 
-// The strip holds five fracture characters, 900px each; each slip takes one, so a
-// thread of comments is not one edge repeated.
-const tearSlice = (id: number) => `${-(Math.abs(id * 617) % 5) * 900}px`;
+// The strip holds ten torn edges, 900px each. Neighbours advance by 7 (which shares
+// no factor with 10), so no two slips in a thread ever show the same edge.
+const tearSlice = (tear: number) => `${-(tear % 10) * 900}px`;
 
 interface CommentItemProps {
   comment: CommentNode;
@@ -19,6 +19,8 @@ interface CommentItemProps {
   isSubmitting: boolean;
   formError: { parentId: number | null; message: string } | null;
   onClearError: () => void;
+  // Which of the ten torn edges this slip wears.
+  tear: number;
 }
 
 // A removed comment keeps its slip; a black stamp takes the message's place.
@@ -45,6 +47,7 @@ export default function CommentItem({
   isSubmitting,
   formError,
   onClearError,
+  tear,
 }: CommentItemProps) {
   const hasChildren = comment.children.length > 0;
   const isCollapsed = collapsedIds.has(comment.id);
@@ -55,7 +58,7 @@ export default function CommentItem({
   return (
     <>
       <div class="slip">
-        <div class="tear-b" style={{ "--tear-x": tearSlice(comment.id) }}>
+        <div class="tear-b" style={{ "--tear-x": tearSlice(tear) }}>
           <div class="who">
             <Avatar seed={comment.alias} />
             <b>{comment.alias}</b>
@@ -109,11 +112,12 @@ export default function CommentItem({
 
       {hasChildren && !isCollapsed && (
         <div class="replies">
-          {comment.children.map((child) => (
+          {comment.children.map((child, i) => (
             <CommentItem
               key={child.id}
               comment={child}
               depth={depth + 1}
+              tear={(tear + 7 * (i + 1)) % 10}
               collapsedIds={collapsedIds}
               activeReplyId={activeReplyId}
               onToggleCollapse={onToggleCollapse}

@@ -119,11 +119,12 @@ export default function CommentTree({ comments: initialComments, articleSlug, us
       {comments.length === 0 ? (
         <p class="on-counter">No comments yet.</p>
       ) : (
-        comments.map((comment) => (
+        comments.map((comment, i) => (
           <CommentItem
             key={comment.id}
             comment={comment}
             depth={0}
+            tear={(i * 7) % 10}
             collapsedIds={collapsedIds}
             activeReplyId={activeReplyId}
             onToggleCollapse={toggleCollapse}

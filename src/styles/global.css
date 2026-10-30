@@ -306,7 +306,7 @@ button:focus-visible {
   color: #141414;
 }
 /* A torn edge is a seeded fracture subtracted from the paper, not a sawtooth.
-   --tear-x slides the 4500px tear along so stacked slips do not share an edge. */
+   --tear-x slides the 9000px tear along so stacked slips do not share an edge. */
 .tear-b {
   --tear-x: 0px;
   mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
@@ -314,7 +314,7 @@ button:focus-visible {
 @supports (mask-composite: subtract) {
   .tear-b {
     mask-image: linear-gradient(#000, #000), url("./tear-b.svg");
-    mask-size: 100% 100%, 4500px 16px;
+    mask-size: 100% 100%, 9000px 16px;
     mask-position: 0 0, var(--tear-x) 100%;
     mask-repeat: no-repeat, repeat-x;
     mask-composite: subtract;
@@ -1101,7 +1101,7 @@ html.dark .halftone:not(:hover, .colour) img {
 @supports (mask-composite: subtract) {
   .printout pre {
     mask-image: linear-gradient(#000, #000), url("./tear-t.svg"), url("./tear-b.svg");
-    mask-size: 100% 100%, 4500px 16px, 4500px 16px;
+    mask-size: 100% 100%, 9000px 16px, 9000px 16px;
     mask-position: 0 0, 0 0, 0 100%;
     mask-repeat: no-repeat, repeat-x, repeat-x;
     mask-composite: subtract, subtract;
