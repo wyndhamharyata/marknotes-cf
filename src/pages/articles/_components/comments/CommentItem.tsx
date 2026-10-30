@@ -4,6 +4,9 @@ import type { CommentNode } from "./types";
 import { AUTHOR_ALIAS } from "../../../../lib/comments/author";
 import { formatDate } from "../../../../lib/date";
 
+// Each slip takes its own slice of the 2400px tear, so a thread is not one edge repeated.
+const tearSlice = (id: number) => `${-(Math.abs(id * 617) % 1500)}px`;
+
 interface CommentItemProps {
   comment: CommentNode;
   depth: number;
@@ -51,7 +54,7 @@ export default function CommentItem({
   return (
     <>
       <div class="slip">
-        <div class="tear-b">
+        <div class="tear-b" style={{ "--tear-x": tearSlice(comment.id) }}>
           <div class="who">
             <Avatar seed={comment.alias} />
             <b>{comment.alias}</b>
