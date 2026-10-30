@@ -7,6 +7,11 @@ heroImage: "../../assets/hero-m-wyndham-haryata-permana-sr-full-stack-engineer.p
 
 import BlogImage from "../../pages/articles/_components/BlogImage.astro";
 import GithubContributionGraph from "../../pages/articles/_components/github-contribution-graph/GithubContributionGraph.astro"
+import kopimapImage from "../../assets/resume/kopimap.webp";
+import gouiImage from "../../assets/resume/goui.webp";
+import onlymuseImage from "../../assets/resume/onlymuse.webp";
+import warahanImage from "../../assets/resume/warahan.webp";
+import kelingImage from "./hero-images/building-keling-ios-alarm-app-with-alarmkit-and-liquid-glass-aeaa4899.png";
 
 ### Open to Opportunity
 
@@ -34,12 +39,33 @@ import GithubContributionGraph from "../../pages/articles/_components/github-con
 
 ### [Kopimap](https://kopimap.mwyndham.dev)
 
-<BlogImage
-  src="https://resource.mwyndham.dev/0-Screenshot_2025-09-02_at_23.40.07-20250902164114.webp"
-  alt="kopimap"
-/>
+<BlogImage src={kopimapImage} alt="kopimap" />
 
-My personal coffee shop review site, written in Hono.js, Pure React + Vite, and deployed to Cloudflare Workers via SST.
+My personal coffee shop review map, written in Hono.js (RPC, Valibot, Kysely), React + Vite with TanStack Router, MapLibre, and Turso, and deployed to Cloudflare Workers via SST. The latest redesign ("Nota") prints the map and the shop list like a paper receipt, puts edit and add in one panel (a bottom sheet on phones), and places a new shop from a pasted Google Maps link. This site reads its shop data straight from Kopimap.
+
+### [goui](https://goui.mwyndham.dev)
+
+<BlogImage src={gouiImage} alt="goui" />
+
+A parametric equalizer for a single browser tab (Chrome Web Store extension) or for all system audio on macOS. It stacks three layers: an AutoEQ correction for your headphones, an EQByEar curve measured for your own ears, and your own parametric bands, with Bass, Vocals, and Treble sliders across all three. [Source on GitHub.](https://github.com/wyndhamharyata/goui)
+
+### [onlymuse](https://github.com/wyndhamharyata/onlymuse)
+
+<BlogImage src={onlymuseImage} alt="onlymuse" />
+
+A native Mac client for Apple Music without the iTunes parts, written in Odin. It draws its own window with Metal, its own text with CoreText, and its own UI, while Music.app plays every song so playback stays lossless. A small Swift helper drives Music.app and also plays YouTube Music songs, matched to their Apple Music versions.
+
+### [Warahan](https://warahan.online) (WIP)
+
+<BlogImage src={warahanImage} alt="Warahan" />
+
+A multi-tenant booking platform for studios, where each studio gets its own subdomain. Built with Astro, HTMX, Cloudflare Workers via SST, one SQLite Durable Object per tenant (Drizzle), OpenAuth, and Midtrans QRIS payments. Bookings, class passes, and an append-only credit ledger run atomically inside each tenant's Durable Object. Private repository.
+
+### [Keling](/articles/building-keling-ios-alarm-app-with-alarmkit-and-liquid-glass)
+
+<BlogImage src={kelingImage} alt="Keling" />
+
+An Expo React Native app for one-off and recurring alarms on iOS, built on Apple's AlarmKit, with cron schedules and expo-sqlite storage. Private repository.
 
 ### [Lifecontrol](https://lifecontrol.mwyndham.dev)
 
