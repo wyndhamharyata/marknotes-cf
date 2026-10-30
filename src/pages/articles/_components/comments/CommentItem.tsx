@@ -4,8 +4,9 @@ import type { CommentNode } from "./types";
 import { AUTHOR_ALIAS } from "../../../../lib/comments/author";
 import { formatDate } from "../../../../lib/date";
 
-// Each slip takes its own slice of the 2400px tear, so a thread is not one edge repeated.
-const tearSlice = (id: number) => `${-(Math.abs(id * 617) % 1500)}px`;
+// The strip holds five fracture characters, 900px each; each slip takes one, so a
+// thread of comments is not one edge repeated.
+const tearSlice = (id: number) => `${-(Math.abs(id * 617) % 5) * 900}px`;
 
 interface CommentItemProps {
   comment: CommentNode;
