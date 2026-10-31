@@ -5,6 +5,7 @@ import {
   handleListKey,
   imageFilesFrom,
   insertAtCursor,
+  insertTable,
   prefixLines,
   setHeadingLevel,
   toBulletList,
@@ -138,6 +139,14 @@ export default function EditorPane({ body, onBody, onImages, textareaRef }: Prop
           onClick={withTextarea((t) => insertAtCursor(t, "\n```\n\n```\n"))}
         >
           Block
+        </button>
+        <button
+          type="button"
+          class="key key-sm"
+          title="Table"
+          onClick={withTextarea((t) => insertTable(t))}
+        >
+          Table
         </button>
       </div>
 

@@ -284,3 +284,19 @@ export function imageFilesFrom(transfer: DataTransfer | null): File[] {
   if (!transfer) return [];
   return Array.from(transfer.files).filter((file) => file.type.startsWith("image/"));
 }
+
+/** A GFM table to type into: header row, alignment row, two empty rows to fill. */
+export function insertTable(textarea: HTMLTextAreaElement, columns = 3): void {
+  const row = (fill: (index: number) => string) =>
+    `| ${Array.from({ length: columns }, (_, index) => fill(index)).join(" | ")} |`;
+
+  const table = [
+    row((index) => `Column ${index + 1}`),
+    row(() => "---"),
+    row(() => " "),
+    row(() => " "),
+  ].join("\n");
+
+  // The blank line above is what makes marked read the pipes as a table, not a paragraph.
+  insertAtCursor(textarea, `\n\n${table}\n`);
+}
