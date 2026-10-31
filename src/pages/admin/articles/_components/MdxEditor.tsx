@@ -111,10 +111,12 @@ export default function MdxEditor({
   }, []);
 
   // `driver` breaks the echo where moving one pane fires the other's scroll and bounces back.
+  // The draft loads after mount, so this must re-attach once the panes exist.
+  const panesReady = draft !== null;
   useEffect(() => {
     const editor = textareaRef.current;
     const preview = previewRef.current;
-    if (!isWide || !editor || !preview) return;
+    if (!isWide || !panesReady || !editor || !preview) return;
 
     let driver: EventTarget | null = null;
     let release: ReturnType<typeof setTimeout>;
@@ -143,7 +145,7 @@ export default function MdxEditor({
       editor.removeEventListener("scroll", onEditor);
       preview.removeEventListener("scroll", onPreview);
     };
-  }, [isWide]);
+  }, [isWide, panesReady]);
 
   // Autosave covers navigation; an in-flight upload would genuinely be lost.
   useEffect(() => {
