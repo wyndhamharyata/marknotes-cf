@@ -1,0 +1,8 @@
+# Kopimap reads these straight after a deploy to mark shops as reviewed. A cached copy from
+# before that deploy lists the old reviews, so they must never be served from an edge cache.
+/api/coffee-reviews*
+  Cache-Control: no-store
+
+# The same review card is read back from the embed when Kopimap opens a shop.
+/embed/coffee/*
+  Cache-Control: no-store
