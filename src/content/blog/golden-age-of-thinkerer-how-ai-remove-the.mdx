@@ -1,0 +1,38 @@
+---
+title: "Golden age of Thinkerer: How AI remove the last barier of Your Imagination"
+description: "AI makes software engineering feel riskier yet freer: LLMs now ship \"good enough\" code many engineers won't even read. Rather than debate the industry, the author follows small daily annoyances, building a Chrome EQ extension, then a system-level EQ, then music players, Grammarly forks, a revived blog, and Steam Deck game tweaks. The point: those minor irritations are solvable, if you want be. Skipped: I didn't verify the links or the Chrome extension listing. Risk: the Hogwarts Legacy frame-rate claim is the author's and unverified."
+pubDate: "Oct 31 2026"
+heroImage: "./hero-images/golden-age-of-thinkerer-how-ai-remove-the-b59b5c6b.webp"
+---
+
+import BlogImage from "../../pages/articles/_components/BlogImage.astro";
+import img_41b409c9 from "./content-images/golden-age-of-thinkerer-how-ai-remove-the/41b409c9-screenshot-2026-10-31-at-07-28-33.webp";
+
+This is the first article I've written in a while, and I think there's nothing more topical to think through these days than AI. Being a software engineer is both increasingly risky and incredibly refreshing: nothing stops you from doing what you want to do anymore. 
+
+Honestly, it is harder nowadays to find a SWE who is not actively using an LLM, going so far as to not even read the code they're making and confidently shipping it. I personally did not condone it, but it speaks to the model's capabilities, as it managed to make something that is apparently "good enough" on the surface that people are willing to take a bet on it. 
+
+### Why am I writing this?
+
+I am not going to talk about the industry, though. Instead, I'll talk about how sudden realizations sometimes in the last month trigger a surge of curiosity bug that makes me attempt, and partially succeed in making stuff that makes my life easier: There's nothing, literally nothing, to trying to think about what minor things bother you on a daily basis that you either consciously or not decided to live with, since solving the problem just took that much more effort than it is worth.
+
+It starts with small things: There isn't one good equalizer app that fits my particular case. The options at that time were either:
+
+- EQMac: Premium app with minimal capabilities on free tier when it comes to EQ-ing, alongside the baggage of old-style audio pipeline but very robust.
+- SoundSource: very good audio pipeline made by incredibly talented engineer, but it's too complicated and feature-rich. It feels like swatting a fly with a sledgehammer. All I need is just AutoEQ, added with couple of extra layers of EQ. I don't need to edit source, EQ Input, and many others.
+
+So I decided to make it myself. I started small, of course, just targeting a Chrome tab in the browser, since browsers already have built-in audio pipeline and applying EQ is as simple as passing a frequency filter to existing audio. And? it works! surprisingly well. So good that I decided to release it in the [chrome web store](https://chromewebstore.google.com/detail/goui/ghldfngciehgonecnnihpdeghejkndap). 
+
+Then the idea evolved: since I already have web baseline here, how hard is it to make it a system-level EQ? and again, surprisingly all I need to do is wrap some of Chrome's extension API and map it against Safari and Swift's own API, write some C audio modification with the help of Opus, and voila! I have a working system-level EQ in my hand:
+
+<BlogImage src={img_41b409c9} alt="Screenshot 2026-10-31 at 07.28.33" />
+
+And from here, it was like the final barrier that broke the dam: within a month, I was using LLM to tinker with anything, from unified music player that merges multiple music sources, to forking an open-source Bring-Your-Own-Token Grammarly alternative, and reviving my dead coffee review blog. 
+
+Hell, I was SSH-ing into my Steam Deck and hacking together games in it to squeeze as much performance out of the game as possible ([Managed to pretty much remove stutter from Hogwarts Legacy with 60++ FPS with Framegen](https://gist.github.com/wyndhamharyata/4f16cc139f491dc1c0132a1513f59c59)). It was glorious.
+
+### So, What Is This All About?
+
+I know this entire article sounds like rambling and pointing the obvious; sorry that I am a terrible writer. But consider this: What are the small things bother you this morning that you just brush off? I bet there's at least one of those. Do you think you can do something about it? I bet you can. 
+
+Now its just matter of whether you wanted it or not. But for me, the answer is obvious. Yes. I wanted to.
