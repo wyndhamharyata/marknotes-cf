@@ -19,6 +19,10 @@ const { title, description, image = FallbackImage } = Astro.props;
   (function(){try{var e=localStorage.getItem("dark-mode"),s=window.matchMedia("(prefers-color-scheme: dark)").matches,d="true"===e||null===e&&s,n=document.documentElement;n.classList.add("js"),d&&n.classList.add("dark")}catch(e){}})();
 </script>
 
+<!-- Only the body face is worth preloading: the other core files queue behind the stylesheet
+     and measurably delay first paint on a slow connection. -->
+<link rel="preload" href="/fonts/atkinson-next-core.woff2" as="font" type="font/woff2" crossorigin />
+
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />

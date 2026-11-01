@@ -35,3 +35,6 @@ pnpm-debug.log*
 #     doesn't see it; SST manages its own wrangler configs internally).
 #   - .dev/seed.sql — produced by `npm run dump:staging`.
 .dev/
+
+# Font sources for scripts/subset-fonts.py; the built woff2 are committed.
+scripts/.font-cache/

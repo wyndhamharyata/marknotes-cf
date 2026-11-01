@@ -1,4 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400;500;700&family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800&family=Bodoni+Moda:opsz,wght@6..96,400..900&family=Ultra&family=Big+Shoulders+Stencil:opsz,wght@10..72,800&display=swap");
+/* Subset and self-hosted: see scripts/subset-fonts.py. */
+@import "./fonts.css";
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @theme {
