@@ -21,12 +21,12 @@
   --ink: #141414;
   --ink-2: #4d4d4d;
   /* Ink on paper: a warm film, not black paint. Printed type uses this instead of --ink. */
-  --ink-print: #2b2620;
+  --ink-print: #211c17;
   /* A gentler film for small type, where a strong one stops the rule and counters reading. */
   --ink-blot-soft: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='m' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.07' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 .10 0 .90'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
   /* The press's uneven film: fine blotches that leave some strokes thinner than others. */
   /* Discrete steps, not a smooth gradient: a smooth one just reads as lighter type. */
-  --ink-blot: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='256'%20height='256'%3E%3Cfilter%20id='m'%20color-interpolation-filters='sRGB'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='.04'%20numOctaves='3'%20seed='4'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='matrix'%20values='0%200%200%200%200%20%200%200%200%200%200%20%200%200%200%200%200%20%201.8%200%200%200%20-.35'/%3E%3CfeComponentTransfer%3E%3CfeFuncA%20type='discrete'%20tableValues='.42%20.68%201'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url%28%23m%29'/%3E%3C/svg%3E");
+  --ink-blot: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='256'%20height='256'%3E%3Cfilter%20id='m'%20color-interpolation-filters='sRGB'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='.04'%20numOctaves='3'%20seed='4'%20stitchTiles='stitch'/%3E%3CfeColorMatrix%20type='matrix'%20values='0%200%200%200%200%20%200%200%200%200%200%20%200%200%200%200%200%20%201.45%200%200%200%20-.18'/%3E%3CfeComponentTransfer%3E%3CfeFuncA%20type='discrete'%20tableValues='.55%20.80%201'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url%28%23m%29'/%3E%3C/svg%3E");
   --thermal: #f6f6f6;
   --news: #dcdcdc;
   --ticket: #cdebdf;
@@ -1036,7 +1036,7 @@ html.dark .halftone:not(:hover, .colour) img {
   font-weight: 450;
 }
 /* Body copy, captions, tables and the date line all take the press's blot. */
-.sheet :where(p, li, blockquote, figcaption, dd, dt, td, th) {
+.sheet :where(p, li, blockquote, figcaption, dd, dt, td, th):not(:has(img)) {
   mix-blend-mode: multiply;
   -webkit-mask-image: var(--ink-blot);
   mask-image: var(--ink-blot);
@@ -1054,7 +1054,7 @@ html.dark .halftone:not(:hover, .colour) img {
 /* Display type gets the impression itself: a ragged edge and its own film. */
 .page-head h1,
 .masthead,
-.sheet :where(h1, h2, h3, h4, h5, h6, .hl, .h1, .tk-name, .nm, .fold) {
+.sheet :where(h1, h2, h3, h4, h5, h6, .hl, .h1, .tk-name, .nm, .fold):not(:has(img)) {
   mix-blend-mode: multiply;
   filter: url(#ink-display);
 }
