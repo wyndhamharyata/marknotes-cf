@@ -20,6 +20,12 @@
 :root {
   --ink: #141414;
   --ink-2: #4d4d4d;
+  /* Ink on paper: a warm film, not black paint. Printed type uses this instead of --ink. */
+  --ink-print: #2b2620;
+  /* A gentler film for small type, where a strong one stops the rule and counters reading. */
+  --ink-blot-soft: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='m' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.07' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 .10 0 .90'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+  /* The press's uneven film: fine blotches that leave some strokes thinner than others. */
+  --ink-blot: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='m' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.07' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 .42 0 .58'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
   --thermal: #f6f6f6;
   --news: #dcdcdc;
   --ticket: #cdebdf;
@@ -1019,6 +1025,39 @@ html.dark .halftone:not(:hover, .colour) img {
   max-width: none;
   font-size: 18px;
   line-height: 1.65;
+}
+
+/* ---------- Printed ink ----------
+   Type is a film of warm ink squeezed into the stock, not black paint: it multiplies into
+   the sheet, gains weight through the variable axis, and the press leaves it uneven. */
+/* Body, date and stamp take the uneven film directly. */
+.article-prose :is(p, li, blockquote, figcaption),
+.sheet .dateline {
+  color: var(--ink-print);
+  mix-blend-mode: multiply;
+  -webkit-mask-image: var(--ink-blot);
+  mask-image: var(--ink-blot);
+  -webkit-mask-size: 256px;
+  mask-size: 256px;
+}
+/* The stamp is 12px with a 2px rule, so it keeps its chop colour and takes a lighter film. */
+.sheet .stamp {
+  mix-blend-mode: multiply;
+  -webkit-mask-image: var(--ink-blot-soft);
+  mask-image: var(--ink-blot-soft);
+  -webkit-mask-size: 256px;
+  mask-size: 256px;
+}
+.article-prose {
+  font-weight: 450;
+}
+/* Display type gets the impression itself: a ragged edge and a mottled film. */
+.page-head h1,
+.masthead,
+.sheet :is(.h1, .hl) {
+  color: var(--ink-print);
+  mix-blend-mode: multiply;
+  filter: url(#ink-display);
 }
 .article-prose :where(h2) {
   margin: 1.8em 0 16px;

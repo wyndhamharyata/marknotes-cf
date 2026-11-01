@@ -38,6 +38,23 @@
       result="mask"></feColorMatrix>
     <feComposite in="d" in2="mask" operator="in"></feComposite>
   </filter>
+  <filter id="ink-display" x="-3%" y="-7%" width="106%" height="114%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency=".55" numOctaves="3" seed="7" result="n"></feTurbulence>
+    <feDisplacementMap
+      in="SourceGraphic"
+      in2="n"
+      scale=".8"
+      xChannelSelector="R"
+      yChannelSelector="G"
+      result="d"></feDisplacementMap>
+    <feTurbulence type="fractalNoise" baseFrequency=".07" numOctaves="2" seed="4" result="t"></feTurbulence>
+    <feColorMatrix
+      in="t"
+      type="matrix"
+      values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 .22 0 .78"
+      result="tm"></feColorMatrix>
+    <feComposite in="d" in2="tm" operator="in"></feComposite>
+  </filter>
   <filter id="grease" x="-10%" y="-10%" width="120%" height="120%">
     <feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="2" seed="5" result="n"
     ></feTurbulence>
