@@ -12,7 +12,7 @@ const TOOLTIP_STYLE = [
   "z-index: 10",
   "padding: 8px 12px",
   "background: var(--thermal)",
-  "color: #141414",
+  "color: var(--ink)",
   "border: 1px solid rgb(31 31 31 / .45)",
   "box-shadow: 0 6px 10px -4px rgba(0,0,0,0.3)",
   "font: 400 12px/1.25 var(--font-mono)",

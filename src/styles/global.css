@@ -22,6 +22,8 @@
   --ink-2: #4d4d4d;
   /* Ink on paper: a warm film, not black paint. Printed type uses this instead of --ink. */
   --ink-print: #211c17;
+  /* Rules and hairlines, as rgb channels so each can take its own alpha. */
+  --line: 31 31 31;
   /* A gentler film for small type, where a strong one stops the rule and counters reading. */
   --ink-blot-soft: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='m' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.07' numOctaves='2' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 .10 0 .90'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
   /* The press's uneven film: fine blotches that leave some strokes thinner than others. */
@@ -59,6 +61,20 @@ html.dark {
   --chop: #900b20;
   --biro: #1730a6;
   --counter: #1c1c1c;
+}
+/* Dark: night on black stock. The papers go dark and the ink turns to chalk. */
+html.black {
+  --ink: #ecebe6;
+  --ink-print: #e4dfd6;
+  --ink-2: #a3a3a0;
+  --line: 236 235 230;
+  --news: #1f1f1e;
+  --thermal: #2a2a2a;
+  --ticket: #17332a;
+  --nota: #3a1f2a;
+  --chop: #ff5a6e;
+  --biro: #7d93ff;
+  --counter: #0c0c0c;
 }
 
 /* Every edge is cut square. */
@@ -313,7 +329,7 @@ button:focus-visible {
   background:
     linear-gradient(90deg, rgb(0 0 0 / 0.055), transparent 5%, transparent 95%, rgb(0 0 0 / 0.055)),
     var(--grain), var(--thermal);
-  color: #141414;
+  color: var(--ink);
 }
 /* A torn edge is a seeded fracture subtracted from the paper, not a sawtooth.
    --tear-x slides the 9000px tear along so stacked slips do not share an edge. */
@@ -324,8 +340,12 @@ button:focus-visible {
 @supports (mask-composite: subtract) {
   .tear-b {
     mask-image: linear-gradient(#000, #000), url("./tear-b.svg");
-    mask-size: 100% 100%, 9000px 16px;
-    mask-position: 0 0, var(--tear-x) 100%;
+    mask-size:
+      100% 100%,
+      9000px 16px;
+    mask-position:
+      0 0,
+      var(--tear-x) 100%;
     mask-repeat: no-repeat, repeat-x;
     mask-composite: subtract;
   }
@@ -336,6 +356,9 @@ button:focus-visible {
   height: 2px;
   margin-top: 6px;
   background: repeating-linear-gradient(90deg, rgb(77 77 77 / 0.75) 0 2px, transparent 2px 6px);
+}
+html.black .leader {
+  background: repeating-linear-gradient(90deg, rgb(var(--line) / 0.5) 0 2px, transparent 2px 6px);
 }
 
 /* Rubber stamps. The rough edge comes from the #rough filter in NotaFilters.astro. */
@@ -355,7 +378,7 @@ button:focus-visible {
   white-space: nowrap;
 }
 .stamp-ink {
-  color: #141414;
+  color: var(--ink);
 }
 .stamp-dim {
   color: var(--ink-2);
@@ -369,6 +392,15 @@ button:focus-visible {
 }
 .stamp-alert {
   color: #c5005a;
+}
+html.black .stamp-ok {
+  color: #4fd88a;
+}
+html.black .stamp-warning {
+  color: #f0b04a;
+}
+html.black .stamp-alert {
+  color: #ff6aa8;
 }
 .stamp-lg {
   padding: 5px 8px 4px;
@@ -388,7 +420,7 @@ button:focus-visible {
   position: relative;
   width: 20px;
   height: 20px;
-  border: 1.5px solid #141414;
+  border: 1.5px solid var(--ink);
 }
 .cups > i::after {
   content: "";
@@ -423,14 +455,14 @@ button:focus-visible {
    which here is taken by Shiki's code lines. */
 .nota {
   position: relative;
-  color: #141414;
+  color: var(--ink);
   background-color: var(--nota);
   background-image:
     radial-gradient(60% 40% at 20% 30%, rgb(30 63 217 / 0.05), transparent), var(--fiber),
     var(--grain);
-  border: 1px solid rgb(20 20 20 / 0.3);
+  border: 1px solid rgb(var(--line) / 0.3);
   box-shadow:
-    0 2px 0 rgb(20 20 20 / 0.12),
+    0 2px 0 rgb(var(--line) / 0.12),
     0 18px 28px -12px rgb(0 0 0 / 0.5);
 }
 .ruled {
@@ -441,7 +473,7 @@ button:focus-visible {
   color: var(--biro);
   background: none;
   border: 0;
-  border-bottom: 1.5px solid #141414;
+  border-bottom: 1.5px solid var(--ink);
   outline: 0;
 }
 .ruled:focus {
@@ -450,7 +482,7 @@ button:focus-visible {
   background: rgb(255 255 255 / 0.35);
 }
 .ruled::placeholder {
-  color: rgb(20 20 20 / 0.45);
+  color: rgb(var(--line) / 0.45);
 }
 textarea.ruled {
   resize: none;
@@ -458,17 +490,20 @@ textarea.ruled {
   padding: 0 2px;
   border-bottom: 0;
   /* A hairline rule: typing over a heavy one reads as strikethrough. */
-  background: repeating-linear-gradient(transparent 0 25px, rgb(20 20 20 / 0.28) 25px 26px);
+  background: repeating-linear-gradient(transparent 0 25px, rgb(var(--line) / 0.28) 25px 26px);
 }
 textarea.ruled:focus {
   background:
-    repeating-linear-gradient(transparent 0 25px, rgb(20 20 20 / 0.34) 25px 26px),
+    repeating-linear-gradient(transparent 0 25px, rgb(var(--line) / 0.34) 25px 26px),
     rgb(255 255 255 / 0.3);
 }
 /* The rules scroll with the writing. */
 textarea.ruled,
 textarea.ruled:focus {
   background-attachment: local;
+}
+html.black .ruled:focus {
+  background-color: rgb(255 255 255 / 0.06);
 }
 .err {
   justify-self: start;
@@ -479,6 +514,9 @@ textarea.ruled:focus {
   color: #fff;
   background: var(--chop);
 }
+html.black .err {
+  color: #141414;
+}
 /* A dotted line on a slip: a label, a leader, a value. */
 .from {
   display: flex;
@@ -486,7 +524,7 @@ textarea.ruled:focus {
   min-height: 36px;
   margin: 0 0 8px;
   font: 400 14px/1.3 var(--font-mono);
-  border-bottom: 1px dashed rgb(31 31 31 / 0.3);
+  border-bottom: 1px dashed rgb(var(--line) / 0.3);
 }
 .from dt {
   color: var(--ink-2);
@@ -567,7 +605,7 @@ textarea.ruled:focus {
   inset: 7px;
   background: var(--marker);
   transform: rotate(-5deg);
-  box-shadow: inset 0 0 0 1.5px rgb(20 20 20 / 0.55);
+  box-shadow: inset 0 0 0 1.5px rgb(var(--line) / 0.55);
 }
 .crop > i {
   position: absolute;
@@ -646,10 +684,21 @@ html.dark .crop > i {
   width: 17px;
   height: 17px;
 }
-/* The Night switch: a square key whose moon lights like an LED. */
-#night-key[aria-pressed="true"] svg {
+/* The theme key: a sun by day, then a moon that lights like an LED, half for dim and full for dark. */
+html:not(.dark) #night-key .moon,
+html.dark #night-key .sun {
+  display: none;
+}
+html.dark #night-key .moon {
+  color: color-mix(in srgb, var(--signal) 70%, #141414);
+  filter: drop-shadow(0 0 2px rgb(255 90 31 / 0.4));
+}
+html.black #night-key .moon {
   color: var(--signal);
   filter: drop-shadow(0 0 3px rgb(255 90 31 / 0.8));
+}
+html.black #night-key .moon path {
+  fill: currentColor;
 }
 .colophon .rss {
   font: 700 12px/1 var(--font-mono);
@@ -662,7 +711,7 @@ html.dark .crop > i {
   margin: 28px auto 0;
   color: var(--ink);
   background: var(--newsprint), var(--mottle), var(--news);
-  border: 1px solid rgb(31 31 31 / 0.22);
+  border: 1px solid rgb(var(--line) / 0.22);
   box-shadow:
     0 1px 0 rgb(0 0 0 / 0.14),
     0 24px 36px -18px rgb(0 0 0 / 0.6);
@@ -691,7 +740,7 @@ html.dark .sheet {
   display: block;
   overflow: hidden;
   background: var(--news);
-  outline: 1px solid rgb(31 31 31 / 0.35);
+  outline: 1px solid rgb(var(--line) / 0.35);
 }
 .halftone img {
   display: block;
@@ -746,6 +795,18 @@ html.dark .sheet {
 html.dark .halftone:not(:hover, .colour) img {
   filter: grayscale(1) contrast(1.3) brightness(0.92);
 }
+/* On black stock the print sits on the paper and the screen darkens into it, so the dots read light. */
+html.black .halftone img,
+html.black .photo img {
+  mix-blend-mode: normal;
+  filter: brightness(0.85);
+}
+html.black .halftone:not(:hover, .colour) img {
+  filter: grayscale(1) contrast(1.3) brightness(0.75);
+}
+html.black .halftone::after {
+  mix-blend-mode: darken;
+}
 
 .hl {
   margin: 16px 0 10px;
@@ -785,11 +846,11 @@ html.dark .halftone:not(:hover, .colour) img {
   z-index: 3;
   width: 206px;
   padding: 13px 12px 16px;
-  color: #141414;
+  color: var(--ink);
   background: var(--fiber), var(--grain), var(--ticket);
-  border: 1px solid rgb(31 31 31 / 0.3);
+  border: 1px solid rgb(var(--line) / 0.3);
   box-shadow:
-    0 2px 0 rgb(31 31 31 / 0.12),
+    0 2px 0 rgb(var(--line) / 0.12),
     0 12px 18px -10px rgb(0 0 0 / 0.5);
 }
 .stub::after {
@@ -799,7 +860,7 @@ html.dark .halftone:not(:hover, .colour) img {
   right: 0;
   bottom: 6px;
   height: 2px;
-  background: repeating-linear-gradient(90deg, rgb(31 31 31 / 0.35) 0 4px, transparent 4px 8px);
+  background: repeating-linear-gradient(90deg, rgb(var(--line) / 0.35) 0 4px, transparent 4px 8px);
 }
 .stub .staple {
   top: -4px;
@@ -840,7 +901,7 @@ html.dark .halftone:not(:hover, .colour) img {
 .front > .lead {
   grid-area: lead;
   padding: 24px 24px 26px 0;
-  border-bottom: 1px solid rgb(31 31 31 / 0.5);
+  border-bottom: 1px solid rgb(var(--line) / 0.5);
 }
 .front > .lead .halftone {
   aspect-ratio: 2 / 1;
@@ -855,7 +916,7 @@ html.dark .halftone:not(:hover, .colour) img {
 .front > .s2 {
   grid-area: s2;
   padding-left: 22px;
-  border-left: 1px solid rgb(31 31 31 / 0.5);
+  border-left: 1px solid rgb(var(--line) / 0.5);
 }
 .front > .s1 .halftone,
 .front > .s2 .halftone {
@@ -872,7 +933,7 @@ html.dark .halftone:not(:hover, .colour) img {
   display: flex;
   flex-direction: column;
   padding: 24px 0 0 24px;
-  border-left: 1px solid rgb(31 31 31 / 0.5);
+  border-left: 1px solid rgb(var(--line) / 0.5);
 }
 .hello .mug {
   float: left;
@@ -945,8 +1006,8 @@ html.dark .halftone:not(:hover, .colour) img {
 }
 .year-grid > .story {
   padding: 20px 22px 30px;
-  box-shadow: -1px 0 0 rgb(31 31 31 / 0.5);
-  border-bottom: 1px solid rgb(31 31 31 / 0.35);
+  box-shadow: -1px 0 0 rgb(var(--line) / 0.5);
+  border-bottom: 1px solid rgb(var(--line) / 0.35);
 }
 .year-grid > .wide {
   grid-column: span 2;
@@ -1022,7 +1083,7 @@ html.dark .halftone:not(:hover, .colour) img {
   --tw-prose-pre-code: var(--ink);
   --tw-prose-pre-bg: var(--thermal);
   --tw-prose-th-borders: var(--ink);
-  --tw-prose-td-borders: rgb(31 31 31 / 0.3);
+  --tw-prose-td-borders: rgb(var(--line) / 0.3);
   max-width: none;
   font-size: 18px;
   line-height: 1.65;
@@ -1057,6 +1118,14 @@ html.dark .halftone:not(:hover, .colour) img {
 .sheet :where(h1, h2, h3, h4, h5, h6, .hl, .h1, .tk-name, .nm, .fold):not(:has(img)) {
   mix-blend-mode: multiply;
   filter: url(#ink-display);
+}
+/* Chalk on black stock: it lightens into the paper instead. */
+html.black .sheet :where(p, li, blockquote, figcaption, dd, dt, td, th):not(:has(img)),
+html.black .sheet :where(h1, h2, h3, h4, h5, h6, .hl, .h1, .tk-name, .nm, .fold):not(:has(img)),
+html.black .sheet .stamp,
+html.black .page-head h1,
+html.black .masthead {
+  mix-blend-mode: screen;
 }
 .article-prose :where(h2) {
   margin: 1.8em 0 16px;
@@ -1103,7 +1172,7 @@ html.dark .halftone:not(:hover, .colour) img {
   padding: 2px 5px;
   font: 500 0.84em/1 var(--font-mono);
   background: var(--grain), var(--thermal);
-  border: 1px solid rgb(31 31 31 / 0.5);
+  border: 1px solid rgb(var(--line) / 0.5);
 }
 .article-prose :where(:not(pre) > code)::before,
 .article-prose :where(:not(pre) > code)::after {
@@ -1128,7 +1197,7 @@ html.dark .halftone:not(:hover, .colour) img {
 /* A code block: a thermal printout in one ink, torn at both ends; colour under the pointer. */
 .printout {
   margin: 4px -14px 24px;
-  filter: drop-shadow(0 1px 0 rgb(31 31 31 / 0.3)) drop-shadow(0 7px 9px rgb(0 0 0 / 0.18));
+  filter: drop-shadow(0 1px 0 rgb(var(--line) / 0.3)) drop-shadow(0 7px 9px rgb(0 0 0 / 0.18));
 }
 .printout pre {
   margin: 0;
@@ -1148,8 +1217,14 @@ html.dark .halftone:not(:hover, .colour) img {
 @supports (mask-composite: subtract) {
   .printout pre {
     mask-image: linear-gradient(#000, #000), url("./tear-t.svg"), url("./tear-b.svg");
-    mask-size: 100% 100%, 9000px 16px, 9000px 16px;
-    mask-position: 0 0, 0 0, 0 100%;
+    mask-size:
+      100% 100%,
+      9000px 16px,
+      9000px 16px;
+    mask-position:
+      0 0,
+      0 0,
+      0 100%;
     mask-repeat: no-repeat, repeat-x, repeat-x;
     mask-composite: subtract, subtract;
   }
@@ -1165,6 +1240,10 @@ html.dark .halftone:not(:hover, .colour) img {
 .printout:hover span {
   color: var(--shiki-colour) !important;
 }
+/* Shiki prints its light inks inline, so black stock flips the type and keeps the paper. */
+html.black .printout code {
+  filter: invert(1) hue-rotate(180deg);
+}
 
 /* A photo: a colour print with photo corners. */
 /* Tables: the sheet's full width, columns as wide as their content needs. */
@@ -1179,10 +1258,10 @@ html.dark .halftone:not(:hover, .colour) img {
   padding: 8px 10px;
   vertical-align: top;
   text-align: left;
-  border: 1px solid rgb(31 31 31 / 0.28);
+  border: 1px solid rgb(var(--line) / 0.28);
 }
 .article-prose :where(th) {
-  background: rgb(31 31 31 / 0.07);
+  background: rgb(var(--line) / 0.07);
   font-weight: 700;
 }
 /* A picture in a cell is as wide as the cell, not as wide as the sheet. */
@@ -1207,7 +1286,7 @@ html.dark .halftone:not(:hover, .colour) img {
   margin: 0 auto;
   padding: 8px;
   background: var(--thermal);
-  border: 1px solid rgb(31 31 31 / 0.25);
+  border: 1px solid rgb(var(--line) / 0.25);
   box-shadow:
     0 2px 4px rgb(0 0 0 / 0.2),
     0 12px 18px -10px rgb(0 0 0 / 0.35);
@@ -1231,11 +1310,11 @@ html.dark .halftone:not(:hover, .colour) img {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 264px;
   margin: 2px 0 32px;
-  color: #141414;
+  color: var(--ink);
   background: var(--fiber), var(--grain), var(--ticket);
-  border: 1px solid rgb(31 31 31 / 0.3);
+  border: 1px solid rgb(var(--line) / 0.3);
   box-shadow:
-    0 2px 0 rgb(31 31 31 / 0.12),
+    0 2px 0 rgb(var(--line) / 0.12),
     0 16px 24px -14px rgb(0 0 0 / 0.5);
 }
 .tk-b {
@@ -1264,7 +1343,7 @@ html.dark .halftone:not(:hover, .colour) img {
   display: flex;
   align-items: center;
   min-height: 36px;
-  border-bottom: 1px dashed rgb(31 31 31 / 0.25);
+  border-bottom: 1px dashed rgb(var(--line) / 0.25);
 }
 .facts dt {
   color: var(--ink-2);
@@ -1295,7 +1374,7 @@ html.dark .halftone:not(:hover, .colour) img {
   min-width: 0;
   min-height: 200px;
   background: #d2d2d2;
-  border-left: 1px solid rgb(31 31 31 / 0.3);
+  border-left: 1px solid rgb(var(--line) / 0.3);
 }
 html.dark .tk-map {
   background: #1c1c1c;
@@ -1312,7 +1391,7 @@ html.dark .tk-map {
 .tk-skel {
   height: 200px;
   margin: 2px 0 32px;
-  border: 1.5px dashed rgb(31 31 31 / 0.35);
+  border: 1.5px dashed rgb(var(--line) / 0.35);
 }
 
 /* Narrow ticket: one strip of paper, the map printed as a stub under it. */
@@ -1323,7 +1402,7 @@ html.dark .tk-map {
   .tk-map {
     min-height: 180px;
     border-left: 0;
-    border-top: 1px solid rgb(31 31 31 / 0.3);
+    border-top: 1px solid rgb(var(--line) / 0.3);
   }
 }
 
@@ -1376,11 +1455,11 @@ html.dark .on-counter {
 .slip {
   position: relative;
   margin: 0 0 18px;
-  filter: drop-shadow(0 1px 0 rgb(31 31 31 / 0.28)) drop-shadow(0 6px 8px rgb(0 0 0 / 0.16));
+  filter: drop-shadow(0 1px 0 rgb(var(--line) / 0.28)) drop-shadow(0 6px 8px rgb(0 0 0 / 0.16));
 }
 .slip > .tear-b {
   padding: 14px 16px 26px;
-  color: #141414;
+  color: var(--ink);
   background:
     linear-gradient(90deg, rgb(0 0 0 / 0.045), transparent 4%, transparent 96%, rgb(0 0 0 / 0.045)),
     var(--grain), var(--thermal);
@@ -1446,6 +1525,13 @@ html.dark .on-counter {
     );
   mix-blend-mode: lighten;
 }
+html.black .ident.ph img {
+  mix-blend-mode: normal;
+  filter: grayscale(1) contrast(1.3) brightness(0.85);
+}
+html.black .ident.ph::after {
+  display: none;
+}
 .msg {
   margin: 10px 0 12px 52px;
   font: 400 16px/1.55 var(--font-atkinson);
@@ -1474,7 +1560,7 @@ html.dark .on-counter {
   top: -16px;
   bottom: 40px;
   width: 2px;
-  background: repeating-linear-gradient(180deg, rgb(31 31 31 / 0.5) 0 4px, transparent 4px 8px);
+  background: repeating-linear-gradient(180deg, rgb(var(--line) / 0.5) 0 4px, transparent 4px 8px);
 }
 .replies > .slip::before {
   content: "";
@@ -1483,11 +1569,15 @@ html.dark .on-counter {
   top: 34px;
   width: 24px;
   height: 2px;
-  background: repeating-linear-gradient(90deg, rgb(31 31 31 / 0.5) 0 4px, transparent 4px 8px);
+  background: repeating-linear-gradient(90deg, rgb(var(--line) / 0.5) 0 4px, transparent 4px 8px);
 }
 html.dark .replies::before,
 html.dark .replies > .slip::before {
   filter: invert(0.8);
+}
+html.black .replies::before,
+html.black .replies > .slip::before {
+  filter: none;
 }
 
 /* The print reveal: a print rasters in, four lines, as it scrolls into view. Desktop only. */
@@ -1578,7 +1668,7 @@ html.dark .replies > .slip::before {
     margin-top: 28px;
     padding: 24px 0 0;
     border-left: 0;
-    border-top: 1px solid rgb(31 31 31 / 0.5);
+    border-top: 1px solid rgb(var(--line) / 0.5);
   }
   .hello .key {
     display: flex;
@@ -1662,7 +1752,7 @@ html.dark .replies > .slip::before {
   :is(.front > .s1, .front > .s2, .year-grid > .story) {
     padding: 14px 0;
     border: 0;
-    border-top: 1px solid rgb(31 31 31 / 0.5);
+    border-top: 1px solid rgb(var(--line) / 0.5);
     box-shadow: none;
   }
   :is(.front > .s1, .front > .s2, .year-grid > .story) > a {
@@ -1862,9 +1952,9 @@ html.dark .page-head h1 {
 .tag {
   padding: 5px 7px;
   font: 700 13px/1 var(--font-mono);
-  color: #141414;
+  color: var(--ink);
   background: var(--thermal);
-  border: 1.5px solid #141414;
+  border: 1.5px solid var(--ink);
 }
 
 /* The only red block in admin: comments wait. */
@@ -1919,14 +2009,18 @@ html.dark .page-head h1 {
   position: relative;
   margin: 0 0 18px;
   padding: 48px 12px 8px;
-  color: #141414;
+  color: var(--ink);
   background:
     linear-gradient(rgb(30 63 217 / 0.1) 1px, transparent 1px) 0 0 / 24px 24px,
     linear-gradient(90deg, rgb(30 63 217 / 0.1) 1px, transparent 1px) 0 0 / 24px 24px,
     var(--grain),
     var(--thermal);
-  border: 1px solid rgb(31 31 31 / 0.35);
+  border: 1px solid rgb(var(--line) / 0.35);
   box-shadow: 0 14px 22px -14px rgb(0 0 0 / 0.5);
+}
+/* uPlot draws in the light inks, so black stock flips the drawing and keeps the graph paper. */
+html.black .plot canvas {
+  filter: invert(1) hue-rotate(180deg);
 }
 .plot > h2 {
   position: absolute;
@@ -1960,7 +2054,7 @@ html.dark .page-head h1 {
 /* Thermal paper, torn at the foot: ledgers and receipts. */
 .paper {
   margin: 0 0 18px;
-  filter: drop-shadow(0 1px 0 rgb(31 31 31 / 0.28)) drop-shadow(0 9px 10px rgb(0 0 0 / 0.2));
+  filter: drop-shadow(0 1px 0 rgb(var(--line) / 0.28)) drop-shadow(0 9px 10px rgb(0 0 0 / 0.2));
 }
 .paper > .receipt {
   padding: 12px 18px 26px;
@@ -1978,7 +2072,7 @@ html.dark .page-head h1 {
   font: 400 14px/1.3 var(--font-mono);
   color: inherit;
   text-decoration: none;
-  border-bottom: 1px dashed rgb(31 31 31 / 0.25);
+  border-bottom: 1px dashed rgb(var(--line) / 0.25);
 }
 .top-row b {
   min-width: 0;
@@ -2002,7 +2096,7 @@ html.dark .page-head h1 {
 .ledger-head {
   font: 400 13px/1 var(--font-mono);
   color: var(--ink-2);
-  border-bottom: 2px dashed rgb(31 31 31 / 0.45);
+  border-bottom: 2px dashed rgb(var(--line) / 0.45);
 }
 .ledger-head span:nth-child(n + 3) {
   text-align: right;
@@ -2011,7 +2105,7 @@ html.dark .page-head h1 {
   min-height: 72px;
   color: inherit;
   text-decoration: none;
-  border-bottom: 1px dashed rgb(31 31 31 / 0.28);
+  border-bottom: 1px dashed rgb(var(--line) / 0.28);
 }
 .ledger-row:hover .nm {
   text-decoration: underline;
@@ -2105,17 +2199,17 @@ html.dark .page-head h1 {
   padding: 8px 12px;
   font: 400 14px/1.4 var(--font-atkinson);
   color: var(--ink-2);
-  border-left: 3px solid rgb(31 31 31 / 0.45);
+  border-left: 3px solid rgb(var(--line) / 0.45);
 }
 .parent-ctx b {
-  color: #141414;
+  color: var(--ink);
   font-weight: 700;
 }
 /* The moderator's reason: machine text, printed on a strip and stapled under the message. */
 .reason {
   position: relative;
   margin: 2px 0 12px 52px;
-  filter: drop-shadow(0 1px 0 rgb(31 31 31 / 0.25)) drop-shadow(0 3px 4px rgb(0 0 0 / 0.12));
+  filter: drop-shadow(0 1px 0 rgb(var(--line) / 0.25)) drop-shadow(0 3px 4px rgb(0 0 0 / 0.12));
 }
 .reason .staple {
   left: 14px;
@@ -2124,6 +2218,9 @@ html.dark .page-head h1 {
   padding: 8px 12px 14px;
   font: 400 14px/1.35 var(--font-mono);
   background: var(--grain), #fff;
+}
+html.black .reason > div {
+  background: var(--grain), #383838;
 }
 .thread {
   margin: 0 0 12px 52px;
@@ -2143,7 +2240,7 @@ html.dark .page-head h1 {
   gap: 10px;
   margin-top: 10px;
   padding-left: 12px;
-  border-left: 2px dashed rgb(31 31 31 / 0.4);
+  border-left: 2px dashed rgb(var(--line) / 0.4);
   font: 400 14px/1.4 var(--font-atkinson);
 }
 .thread-row .ident {
@@ -2345,7 +2442,7 @@ textarea.ruled.source {
   align-items: center;
   gap: 12px;
   margin: 0 0 14px;
-  filter: drop-shadow(0 1px 0 rgb(31 31 31 / 0.3)) drop-shadow(0 6px 8px rgb(0 0 0 / 0.25));
+  filter: drop-shadow(0 1px 0 rgb(var(--line) / 0.3)) drop-shadow(0 6px 8px rgb(0 0 0 / 0.25));
 }
 .toast > div {
   display: flex;
@@ -2353,7 +2450,7 @@ textarea.ruled.source {
   gap: 12px;
   padding: 9px 14px 16px;
   font: 700 14px/1.3 var(--font-mono);
-  color: #141414;
+  color: var(--ink);
   background: var(--grain), var(--thermal);
 }
 .err-band {

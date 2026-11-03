@@ -16,7 +16,23 @@ const { title, description, image = FallbackImage } = Astro.props;
 ---
 
 <script is:inline>
-  (function(){try{var e=localStorage.getItem("dark-mode"),s=window.matchMedia("(prefers-color-scheme: dark)").matches,d="true"===e||null===e&&s,n=document.documentElement;n.classList.add("js"),d&&n.classList.add("dark")}catch(e){}})();
+  (function () {
+    try {
+      var root = document.documentElement;
+      var theme = localStorage.getItem("theme");
+      var old = localStorage.getItem("dark-mode");
+      // The old on/off night switch was today's dim.
+      if (theme === null && old !== null) {
+        theme = old === "true" ? "dim" : "light";
+        localStorage.setItem("theme", theme);
+        localStorage.removeItem("dark-mode");
+      }
+      theme = theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      root.classList.add("js");
+      if (theme !== "light") root.classList.add("dark");
+      if (theme === "dark") root.classList.add("black");
+    } catch (e) {}
+  })();
 </script>
 
 <!-- Only the body face is worth preloading: the other core files queue behind the stylesheet
