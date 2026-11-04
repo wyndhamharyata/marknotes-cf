@@ -8,8 +8,8 @@ import {
   serializeMdx,
 } from "../../../../lib/editor/mdx-serialize";
 import { slugifyTitle } from "../../../../lib/editor/slugify";
-import { insertAtCursor, replaceInTextarea } from "../../../../lib/editor/textarea";
-import type { ArticleDraft } from "../../../../lib/editor/types";
+import { fitTextarea, insertAtCursor, replaceInTextarea } from "../../../../lib/editor/textarea";
+import type { ArticleDraft, InlineAsset } from "../../../../lib/editor/types";
 import { uploadAsset } from "../../../../lib/editor/upload";
 import type { KopimapShop } from "../../../../lib/kopimap";
 import EditorPane from "./EditorPane";
@@ -45,6 +45,21 @@ const AUTOSAVE_DEBOUNCE_MS = 500;
 const MIN_PANE_RATIO = 0.25;
 const MAX_PANE_RATIO = 0.75;
 
+/** The save stamps `updatedAt`, so only the authored fields say whether a draft was edited. */
+function editedSince(draft: ArticleDraft, initial: ArticleDraft): boolean {
+  const ids = (assets: InlineAsset[]) => assets.map((asset) => asset.id).join();
+  return (
+    draft.title !== initial.title ||
+    draft.description !== initial.description ||
+    draft.body !== initial.body ||
+    (draft.rating ?? 0) !== (initial.rating ?? 0) ||
+    (draft.heroKey ?? "") !== (initial.heroKey ?? "") ||
+    (draft.heroPath ?? "") !== (initial.heroPath ?? "") ||
+    draft.heroFile !== undefined ||
+    ids(draft.inlineAssets) !== ids(initial.inlineAssets)
+  );
+}
+
 export default function MdxEditor({
   proseClass,
   existingSlugs = [],
@@ -61,7 +76,10 @@ export default function MdxEditor({
   const [isWide, setIsWide] = useState(false);
 
   const splitRef = useRef<HTMLDivElement>(null);
+  const notaRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const titleRef = useRef<HTMLTextAreaElement>(null);
+  const descriptionRef = useRef<HTMLTextAreaElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
 
   const editing = article !== undefined;
@@ -76,7 +94,10 @@ export default function MdxEditor({
 
     loadDraft(draftId).then((stored) => {
       if (cancelled) return;
-      const usable = stored && stored.base === base ? stored.draft : null;
+      const usable =
+        stored && stored.base === base && (!article || editedSince(stored.draft, article.initial))
+          ? stored.draft
+          : null;
       // Seeded "Untitled" because image keys embed the slug: untitled cannot upload.
       setDraft(
         usable ??
@@ -98,6 +119,8 @@ export default function MdxEditor({
 
   useEffect(() => {
     if (!draft) return;
+    // Discard puts the committed draft back by reference: there is nothing left to keep.
+    if (article && draft === article.initial) return;
     const timer = setTimeout(() => void saveDraft(draftId, draft, base), AUTOSAVE_DEBOUNCE_MS);
     return () => clearTimeout(timer);
   }, [draft, draftId, base]);
@@ -110,39 +133,121 @@ export default function MdxEditor({
     return () => query.removeEventListener("change", sync);
   }, []);
 
-  // `driver` breaks the echo where moving one pane fires the other's scroll and bounces back.
-  // The draft loads after mount, so this must re-attach once the panes exist.
+  // One scroll for the writing: both boxes take their text's height, so the pane scrolls.
   const panesReady = draft !== null;
-  useEffect(() => {
-    const editor = textareaRef.current;
-    const preview = previewRef.current;
-    if (!isWide || !panesReady || !editor || !preview) return;
 
+  // Kept as a ref so the fitting effect can resync the preview after the page grows.
+  const syncRef = useRef<() => void>(() => {});
+  // Fitting collapses a box to measure it, which clamps the pane to the top; put the view back.
+  // Typing at the end follows the text instead, as it would in a plain textarea.
+  const fitWriting = useCallback(() => {
+    const body = textareaRef.current;
+    const scroller = notaRef.current;
+    const keep = scroller?.scrollTop ?? 0;
+    const atEnd =
+      body !== null && document.activeElement === body && body.selectionEnd === body.value.length;
+
+    fitTextarea(body);
+    fitTextarea(titleRef.current);
+    fitTextarea(descriptionRef.current);
+    if (scroller) scroller.scrollTop = atEnd ? scroller.scrollHeight : keep;
+    syncRef.current();
+  }, []);
+  useEffect(fitWriting, [fitWriting, draft?.body, draft?.title, draft?.description]);
+
+  useEffect(() => {
+    if (!panesReady) return;
+
+    const areas = [textareaRef.current, titleRef.current, descriptionRef.current].filter(
+      (el): el is HTMLTextAreaElement => el !== null
+    );
+    // Only a width change re-wraps the text; the height it then causes must not re-enter.
+    const widths = new WeakMap<Element, number>();
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = Math.round(entry.contentRect.width);
+        if (widths.get(entry.target) === width) continue;
+        widths.set(entry.target, width);
+        fitWriting();
+      }
+    });
+    areas.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [panesReady, fitWriting]);
+
+  // The panes mirror each other: down to the body the two headers run side by side, from there
+  // the textarea alone tracks the prose, so the preview's hero and headline weigh nothing.
+  useEffect(() => {
+    const scroller = notaRef.current;
+    const preview = previewRef.current;
+    const body = textareaRef.current;
+    if (!isWide || !panesReady || !scroller || !preview || !body) return;
+
+    type Measure = ReturnType<typeof measure>;
+
+    function measure() {
+      const pane = scroller!.getBoundingClientRect();
+      const bodyBox = body!.getBoundingClientRect();
+      const previewBox = preview!.getBoundingClientRect();
+      const proseBox = preview!.querySelector("[data-preview-body]")?.getBoundingClientRect();
+
+      return {
+        bodyTop: bodyBox.top - pane.top + scroller!.scrollTop,
+        bodyMax: Math.max(1, bodyBox.height - scroller!.clientHeight),
+        proseTop: proseBox ? proseBox.top - previewBox.top + preview!.scrollTop : 0,
+        proseMax: (proseBox?.height ?? 0) - preview!.clientHeight,
+      };
+    }
+
+    // Both directions of the same map, so scrolling either pane moves the other.
+    const forward = (m: Measure) => {
+      const x = scroller.scrollTop;
+      return x <= m.bodyTop
+        ? m.bodyTop > 0
+          ? (x / m.bodyTop) * m.proseTop
+          : 0
+        : m.proseTop + Math.min(1, (x - m.bodyTop) / m.bodyMax) * m.proseMax;
+    };
+    const backward = (m: Measure) => {
+      const y = preview.scrollTop;
+      return y <= m.proseTop
+        ? m.proseTop > 0
+          ? (y / m.proseTop) * m.bodyTop
+          : 0
+        : m.bodyTop + Math.min(1, (y - m.proseTop) / m.proseMax) * m.bodyMax;
+    };
+
+    const toPreview = () => {
+      preview.scrollTop = forward(measure());
+    };
+    const toEditor = () => {
+      scroller.scrollTop = backward(measure());
+    };
+
+    // `driver` breaks the echo where moving one pane fires the other's scroll and bounces back.
     let driver: EventTarget | null = null;
     let release: ReturnType<typeof setTimeout>;
-
-    const mirror = (from: HTMLElement, to: HTMLElement) => () => {
+    const mirror = (from: EventTarget, sync: () => void) => () => {
       if (driver && driver !== from) return;
       driver = from;
       clearTimeout(release);
       release = setTimeout(() => (driver = null), 120);
-
-      const fromMax = from.scrollHeight - from.clientHeight;
-      const toMax = to.scrollHeight - to.clientHeight;
-      if (fromMax <= 0 || toMax <= 0) return;
-
-      to.scrollTop = (from.scrollTop / fromMax) * toMax;
+      sync();
     };
 
-    const onEditor = mirror(editor, preview);
-    const onPreview = mirror(preview, editor);
+    syncRef.current = toPreview;
+    toPreview();
 
-    editor.addEventListener("scroll", onEditor, { passive: true });
+    const onEditor = mirror(scroller, toPreview);
+    const onPreview = mirror(preview, toEditor);
+
+    scroller.addEventListener("scroll", onEditor, { passive: true });
     preview.addEventListener("scroll", onPreview, { passive: true });
 
     return () => {
       clearTimeout(release);
-      editor.removeEventListener("scroll", onEditor);
+      scroller.removeEventListener("scroll", onEditor);
       preview.removeEventListener("scroll", onPreview);
     };
   }, [isWide, panesReady]);
@@ -448,12 +553,18 @@ export default function MdxEditor({
         </button>
       </div>
 
-      {/* Bounded height is what makes the panes scroll on their own. */}
+      {/* Bounded height is what makes the writing and the preview scroll, not the page. */}
       <div ref={splitRef} class="editor">
-        <div class="nota editor-nota" style={{ ...paneStyle(ratio), ...shown("write") }}>
+        <div
+          ref={notaRef}
+          class="nota editor-nota"
+          style={{ ...paneStyle(ratio), ...shown("write") }}
+        >
           <MetaFields
             title={draft.title}
+            titleRef={titleRef}
             description={draft.description}
+            descriptionRef={descriptionRef}
             meta={metaLine}
             slugError={slugError}
             onTitle={(title) => update({ title })}

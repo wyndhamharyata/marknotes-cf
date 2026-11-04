@@ -74,7 +74,7 @@ export default function PreviewPane({
         {shop && <ShopBlock shop={shop} rating={rating} />}
 
         {body.trim() ? (
-          <div class={proseClass} dangerouslySetInnerHTML={{ __html: html }} />
+          <div class={proseClass} data-preview-body dangerouslySetInnerHTML={{ __html: html }} />
         ) : (
           <p class="plot-empty">Preview appears as you type.</p>
         )}

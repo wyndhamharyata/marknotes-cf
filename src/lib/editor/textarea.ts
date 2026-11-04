@@ -1,3 +1,11 @@
+/** Takes the height of its text, so the pane scrolls instead of the box. */
+export function fitTextarea(textarea: HTMLTextAreaElement | null): void {
+  if (!textarea) return;
+  // Auto first, or a box that grew once never shrinks back.
+  textarea.style.height = "auto";
+  textarea.style.height = `${textarea.scrollHeight}px`;
+}
+
 // execCommand("insertText") rather than `value =`, the only way to keep native undo.
 export function insertAtCursor(textarea: HTMLTextAreaElement, text: string): void {
   textarea.focus();

@@ -1,8 +1,13 @@
+import type { RefObject } from "preact";
 import type { KopimapShop } from "../../../../lib/kopimap";
 
 interface Props {
   title: string;
+  /** Owned by MdxEditor, which fits it to its text. */
+  titleRef: RefObject<HTMLTextAreaElement>;
   description: string;
+  /** Same, for the description box. */
+  descriptionRef: RefObject<HTMLTextAreaElement>;
   /** Filename and dates, worded by the caller since only it knows the mode. */
   meta: string;
   slugError: string | null;
@@ -16,7 +21,9 @@ interface Props {
 
 export default function MetaFields({
   title,
+  titleRef,
   description,
+  descriptionRef,
   meta,
   slugError,
   onTitle,
@@ -29,11 +36,16 @@ export default function MetaFields({
     <div>
       <label class="field">
         <span class="lb">Title</span>
-        <input
-          type="text"
+        <textarea
+          ref={titleRef}
           class="ruled title-line"
+          rows={1}
           value={title}
-          onInput={(event) => onTitle(event.currentTarget.value)}
+          onInput={(event) => onTitle(event.currentTarget.value.replace(/\s*\n\s*/g, " "))}
+          // A title is one line of frontmatter, wrapped for display only.
+          onKeyDown={(event) => {
+            if (event.key === "Enter") event.preventDefault();
+          }}
           // Typing over the seeded "Untitled" should not need a manual select.
           onFocus={(event) => {
             if (event.currentTarget.value === "Untitled") event.currentTarget.select();
@@ -44,6 +56,7 @@ export default function MetaFields({
       <label class="field">
         <span class="lb">Description</span>
         <textarea
+          ref={descriptionRef}
           class="ruled"
           rows={2}
           value={description}

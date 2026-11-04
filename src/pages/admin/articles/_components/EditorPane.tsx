@@ -55,7 +55,7 @@ export default function EditorPane({ body, onBody, onImages, textareaRef }: Prop
   const offScale = !HEADING_OPTIONS.some((option) => option.level === heading);
 
   return (
-    <div class="flex min-h-0 flex-1 flex-col">
+    <div class="flex flex-col">
       <div class="tools">
         <select
           aria-label="Text style"
@@ -151,7 +151,7 @@ export default function EditorPane({ body, onBody, onImages, textareaRef }: Prop
       </div>
 
       <div
-        class="relative flex min-h-0 flex-1 flex-col"
+        class="relative"
         onDragOver={(event) => {
           event.preventDefault();
           setDragging(true);

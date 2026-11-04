@@ -1123,8 +1123,11 @@ html.black .halftone::after {
 html.black .sheet :where(p, li, blockquote, figcaption, dd, dt, td, th):not(:has(img)),
 html.black .sheet :where(h1, h2, h3, h4, h5, h6, .hl, .h1, .tk-name, .nm, .fold):not(:has(img)),
 html.black .sheet .stamp,
-html.black .page-head h1,
 html.black .masthead {
+  mix-blend-mode: screen;
+}
+/* The counter is dark in dim as well, so the headings standing on it lighten rather than multiply. */
+html.dark .page-head h1 {
   mix-blend-mode: screen;
 }
 .article-prose :where(h2) {
@@ -1935,6 +1938,8 @@ html.black .replies > .slip::before {
   margin: 0 0 22px;
 }
 .page-head h1 {
+  /* Takes the row's leftover width, so a long title still leaves the keys beside it. */
+  flex: 1 1 0;
   margin: 0 auto 0 0;
   min-width: 0;
   font: 750 53px/0.88 var(--font-display);
@@ -2044,6 +2049,19 @@ html.black .plot canvas {
   height: 10px;
   margin-right: 6px;
   vertical-align: -1px;
+}
+/* A chart with a legend: title and legend take their own rows instead of overlapping. */
+.plot:has(> .legend) {
+  padding-top: 14px;
+}
+.plot:has(> .legend) > h2 {
+  position: static;
+  margin-bottom: 8px;
+}
+.plot:has(> .legend) > .legend {
+  position: static;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
 }
 .plot-empty {
   padding: 48px 12px;
@@ -2300,8 +2318,23 @@ html.black .reason > div {
 .field > .lb {
   font: 700 14px/1.2 var(--font-atkinson);
 }
+/* Fitted to its text by the editor, which scrolls the pane instead. */
+.field textarea.ruled {
+  overflow: hidden;
+}
 .ruled.title-line {
   font: 600 24px/1.3 var(--font-mono);
+}
+/* A title long enough to wrap: a box with one rule under it, not one rule per line. */
+textarea.ruled.title-line {
+  padding: 6px 2px 5px;
+  background: none;
+  border-bottom: 1.5px solid var(--ink);
+}
+textarea.ruled.title-line:focus {
+  padding-bottom: 3.5px;
+  border-bottom-width: 3px;
+  background: rgb(255 255 255 / 0.35);
 }
 .cupin > i {
   width: 30px;
@@ -2328,6 +2361,22 @@ html.black .reason > div {
   gap: 6px;
   margin: 10px 0 8px;
 }
+/* Where the pane scrolls, the tools ride its top while the body passes under them. */
+@media (min-width: 1024px) {
+  .tools {
+    position: sticky;
+    /* Covers the pane's own top padding, so no line shows above the bar. */
+    top: -18px;
+    z-index: 1;
+    padding-top: 10px;
+    margin-top: 0;
+    /* The same paper as the note, or the bar reads as a flat patch over it. */
+    background-color: var(--nota);
+    background-image:
+      radial-gradient(60% 40% at 20% 30%, rgb(30 63 217 / 0.05), transparent), var(--fiber),
+      var(--grain);
+  }
+}
 .tools .key {
   font: 700 13px/1 var(--font-mono);
 }
@@ -2340,10 +2389,10 @@ html.black .reason > div {
   border: 1px solid #5a5a5a;
 }
 textarea.ruled.source {
-  flex: 1;
   min-height: 55vh;
   font-size: 14px;
-  overflow-y: auto;
+  /* The pane scrolls, not the box: its height is fitted to the text. */
+  overflow: hidden;
 }
 @media (min-width: 1024px) {
   textarea.ruled.source {

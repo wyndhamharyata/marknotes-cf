@@ -37,8 +37,14 @@ import HomeTopArticles from "./_components/HomeTopArticles.astro";
       <div class="contents"><HomeTopArticles server:defer /></div>
     </div>
 
-    <section class="comments" style="width:100%;margin:0">
-      <div class="contents"><HomeRecentComments server:defer /></div>
-    </section>
+    <!-- Scrolls at the left column's height: out of flow, so only the left column sizes the row. 18px matches .paper's bottom margin. -->
+    <div class="relative">
+      <section
+        class="comments lg:absolute lg:inset-x-0 lg:top-0 lg:bottom-[18px] lg:overflow-y-auto"
+        style="width:100%;margin:0"
+      >
+        <div class="contents"><HomeRecentComments server:defer /></div>
+      </section>
+    </div>
   </div>
 </BaseAdminLayout>
