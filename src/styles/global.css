@@ -1127,9 +1127,6 @@ html.black .masthead {
   mix-blend-mode: screen;
 }
 /* The counter is dark in dim as well, so the headings standing on it lighten rather than multiply. */
-html.dark .page-head h1 {
-  mix-blend-mode: screen;
-}
 .article-prose :where(h2) {
   margin: 1.8em 0 16px;
   padding-top: 12px;
@@ -1902,7 +1899,9 @@ html.black .replies > .slip::before {
 .admin-main {
   width: min(1240px, 100% - 2 * var(--gutter));
   margin: 22px auto 0;
-  padding-bottom: 120px;
+  /* Exactly the dock's cover (18px gap + its 64px height): any larger and a page that fits
+     gets a scrollbar that reveals nothing. */
+  padding-bottom: 82px;
 }
 .admin-main.narrow {
   width: min(1040px, 100% - 2 * var(--gutter));
@@ -1938,10 +1937,10 @@ html.black .replies > .slip::before {
   margin: 0 0 22px;
 }
 .page-head h1 {
-  /* Takes the row's leftover width, so a long title still leaves the keys beside it. */
+  /* Takes the row's leftover width, so a long title still leaves the keys beside it. The default
+     min-width keeps one unbreakable word from sliding under them; the key wraps instead. */
   flex: 1 1 0;
-  margin: 0 auto 0 0;
-  min-width: 0;
+  margin: 0;
   font: 750 53px/0.88 var(--font-display);
   text-transform: uppercase;
   color: var(--ink);
@@ -1953,6 +1952,8 @@ html.black .replies > .slip::before {
 }
 html.dark .page-head h1 {
   color: #d4d4d4;
+  /* The counter is dark in dim as well, so the heading lightens rather than multiplies. */
+  mix-blend-mode: screen;
 }
 .tag {
   padding: 5px 7px;
@@ -2056,7 +2057,8 @@ html.black .plot canvas {
 }
 .plot:has(> .legend) > h2 {
   position: static;
-  margin-bottom: 8px;
+  /* The plots without a legend keep the heading at the 16px of their absolute rule. */
+  margin: 0 0 8px 4px;
 }
 .plot:has(> .legend) > .legend {
   position: static;
@@ -2334,7 +2336,8 @@ textarea.ruled.title-line {
 textarea.ruled.title-line:focus {
   padding-bottom: 3.5px;
   border-bottom-width: 3px;
-  background: rgb(255 255 255 / 0.35);
+  /* Only the ruled lines go; each theme keeps its own focus wash. */
+  background-image: none;
 }
 .cupin > i {
   width: 30px;
@@ -2370,11 +2373,16 @@ textarea.ruled.title-line:focus {
     z-index: 1;
     padding-top: 10px;
     margin-top: 0;
+    /* Same swap at the foot, so stuck text does not run into the keys. */
+    padding-bottom: 8px;
+    margin-bottom: 0;
     /* The same paper as the note, or the bar reads as a flat patch over it. */
     background-color: var(--nota);
-    background-image:
-      radial-gradient(60% 40% at 20% 30%, rgb(30 63 217 / 0.05), transparent), var(--fiber),
-      var(--grain);
+    background-image: var(--fiber), var(--grain);
+  }
+  /* Keeps the caret clear of the stuck bar when the browser reveals it. */
+  .editor-nota {
+    scroll-padding-top: 84px;
   }
 }
 .tools .key {
@@ -2403,11 +2411,16 @@ textarea.ruled.source {
   position: absolute;
   inset: 8px;
   display: grid;
-  place-items: center;
+  /* The overlay is as tall as a long article, so the label rides the viewport, not its centre. */
+  place-items: start center;
   pointer-events: none;
   font: 700 16px/1 var(--font-atkinson);
   background: rgb(255 255 255 / 0.6);
   border: 2px dashed #141414;
+}
+.drop > span {
+  position: sticky;
+  top: 45vh;
 }
 /* Photos to choose a hero from: a contact sheet, film with sprocket holes. */
 .contact {
@@ -2664,10 +2677,6 @@ textarea.ruled.source {
   }
   .editor-nota {
     padding: 14px 12px 16px;
-  }
-  .legend {
-    position: static;
-    margin: -8px 4px 8px;
   }
 }
 

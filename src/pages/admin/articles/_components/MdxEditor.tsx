@@ -8,8 +8,10 @@ import {
   serializeMdx,
 } from "../../../../lib/editor/mdx-serialize";
 import { slugifyTitle } from "../../../../lib/editor/slugify";
+import { mapScroll } from "../../../../lib/editor/pane-map";
+import { editedSince } from "../../../../lib/editor/draft-diff";
 import { fitTextarea, insertAtCursor, replaceInTextarea } from "../../../../lib/editor/textarea";
-import type { ArticleDraft, InlineAsset } from "../../../../lib/editor/types";
+import type { ArticleDraft } from "../../../../lib/editor/types";
 import { uploadAsset } from "../../../../lib/editor/upload";
 import type { KopimapShop } from "../../../../lib/kopimap";
 import EditorPane from "./EditorPane";
@@ -44,21 +46,6 @@ type Status =
 const AUTOSAVE_DEBOUNCE_MS = 500;
 const MIN_PANE_RATIO = 0.25;
 const MAX_PANE_RATIO = 0.75;
-
-/** The save stamps `updatedAt`, so only the authored fields say whether a draft was edited. */
-function editedSince(draft: ArticleDraft, initial: ArticleDraft): boolean {
-  const ids = (assets: InlineAsset[]) => assets.map((asset) => asset.id).join();
-  return (
-    draft.title !== initial.title ||
-    draft.description !== initial.description ||
-    draft.body !== initial.body ||
-    (draft.rating ?? 0) !== (initial.rating ?? 0) ||
-    (draft.heroKey ?? "") !== (initial.heroKey ?? "") ||
-    (draft.heroPath ?? "") !== (initial.heroPath ?? "") ||
-    draft.heroFile !== undefined ||
-    ids(draft.inlineAssets) !== ids(initial.inlineAssets)
-  );
-}
 
 export default function MdxEditor({
   proseClass,
@@ -134,6 +121,7 @@ export default function MdxEditor({
   }, []);
 
   // One scroll for the writing: both boxes take their text's height, so the pane scrolls.
+  // The draft loads after mount, so everything below re-attaches once the panes exist.
   const panesReady = draft !== null;
 
   // Kept as a ref so the fitting effect can resync the preview after the page grows.
@@ -144,6 +132,8 @@ export default function MdxEditor({
     const body = textareaRef.current;
     const scroller = notaRef.current;
     const keep = scroller?.scrollTop ?? 0;
+    // Below 1024px the page is the scroller, and the same collapse clamps it.
+    const pageY = window.scrollY;
     const atEnd =
       body !== null && document.activeElement === body && body.selectionEnd === body.value.length;
 
@@ -151,6 +141,7 @@ export default function MdxEditor({
     fitTextarea(titleRef.current);
     fitTextarea(descriptionRef.current);
     if (scroller) scroller.scrollTop = atEnd ? scroller.scrollHeight : keep;
+    window.scrollTo(window.scrollX, pageY);
     syncRef.current();
   }, []);
   useEffect(fitWriting, [fitWriting, draft?.body, draft?.title, draft?.description]);
@@ -172,8 +163,13 @@ export default function MdxEditor({
       }
     });
     areas.forEach((el) => observer.observe(el));
+    // A swapped-in face re-wraps at the same width, so it needs its own cue.
+    document.fonts.addEventListener("loadingdone", fitWriting);
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      document.fonts.removeEventListener("loadingdone", fitWriting);
+    };
   }, [panesReady, fitWriting]);
 
   // The panes mirror each other: down to the body the two headers run side by side, from there
@@ -184,45 +180,34 @@ export default function MdxEditor({
     const body = textareaRef.current;
     if (!isWide || !panesReady || !scroller || !preview || !body) return;
 
-    type Measure = ReturnType<typeof measure>;
+    const ranges = () => {
+      const pane = scroller.getBoundingClientRect();
+      const bodyBox = body.getBoundingClientRect();
+      const previewBox = preview.getBoundingClientRect();
+      const proseBox = preview.querySelector("[data-preview-body]")?.getBoundingClientRect();
 
-    function measure() {
-      const pane = scroller!.getBoundingClientRect();
-      const bodyBox = body!.getBoundingClientRect();
-      const previewBox = preview!.getBoundingClientRect();
-      const proseBox = preview!.querySelector("[data-preview-body]")?.getBoundingClientRect();
+      const bodyTop = bodyBox.top - pane.top + scroller.scrollTop;
+      const proseTop = proseBox ? proseBox.top - previewBox.top + preview.scrollTop : 0;
 
       return {
-        bodyTop: bodyBox.top - pane.top + scroller!.scrollTop,
-        bodyMax: Math.max(1, bodyBox.height - scroller!.clientHeight),
-        proseTop: proseBox ? proseBox.top - previewBox.top + preview!.scrollTop : 0,
-        proseMax: (proseBox?.height ?? 0) - preview!.clientHeight,
+        body: {
+          top: bodyTop,
+          max: scroller.scrollHeight - scroller.clientHeight - bodyTop,
+        },
+        prose: {
+          top: proseTop,
+          max: preview.scrollHeight - preview.clientHeight - proseTop,
+        },
       };
-    }
-
-    // Both directions of the same map, so scrolling either pane moves the other.
-    const forward = (m: Measure) => {
-      const x = scroller.scrollTop;
-      return x <= m.bodyTop
-        ? m.bodyTop > 0
-          ? (x / m.bodyTop) * m.proseTop
-          : 0
-        : m.proseTop + Math.min(1, (x - m.bodyTop) / m.bodyMax) * m.proseMax;
-    };
-    const backward = (m: Measure) => {
-      const y = preview.scrollTop;
-      return y <= m.proseTop
-        ? m.proseTop > 0
-          ? (y / m.proseTop) * m.bodyTop
-          : 0
-        : m.bodyTop + Math.min(1, (y - m.proseTop) / m.proseMax) * m.bodyMax;
     };
 
     const toPreview = () => {
-      preview.scrollTop = forward(measure());
+      const r = ranges();
+      preview.scrollTop = mapScroll(scroller.scrollTop, r.body, r.prose);
     };
     const toEditor = () => {
-      scroller.scrollTop = backward(measure());
+      const r = ranges();
+      scroller.scrollTop = mapScroll(preview.scrollTop, r.prose, r.body);
     };
 
     // `driver` breaks the echo where moving one pane fires the other's scroll and bounces back.
@@ -236,17 +221,24 @@ export default function MdxEditor({
       sync();
     };
 
-    syncRef.current = toPreview;
-    toPreview();
-
     const onEditor = mirror(scroller, toPreview);
     const onPreview = mirror(preview, toEditor);
+    // A direct sync claims the driver too, or its echo drags the note pane back.
+    syncRef.current = onEditor;
 
+    onEditor();
     scroller.addEventListener("scroll", onEditor, { passive: true });
     preview.addEventListener("scroll", onPreview, { passive: true });
 
+    // The preview renders 200ms behind and its images land later; a height change needs a resync.
+    const sheet = preview.firstElementChild;
+    const observer = sheet ? new ResizeObserver(onEditor) : null;
+    if (sheet && observer) observer.observe(sheet);
+
     return () => {
       clearTimeout(release);
+      observer?.disconnect();
+      syncRef.current = () => {};
       scroller.removeEventListener("scroll", onEditor);
       preview.removeEventListener("scroll", onPreview);
     };
@@ -444,10 +436,11 @@ export default function MdxEditor({
 
   const discardLocal = useCallback(async () => {
     if (!article) return;
-    await clearDraft(article.slug);
+    // Reset first: the re-render cancels a pending autosave before the store is cleared.
     setDraft(article.initial);
     setRestored(false);
-  }, [article]);
+    await clearDraft(draftId);
+  }, [article, draftId]);
 
   const startResize = useCallback((event: PointerEvent) => {
     const container = splitRef.current;

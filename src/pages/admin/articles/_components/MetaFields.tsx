@@ -40,11 +40,12 @@ export default function MetaFields({
           ref={titleRef}
           class="ruled title-line"
           rows={1}
+          aria-multiline="false"
           value={title}
           onInput={(event) => onTitle(event.currentTarget.value.replace(/\s*\n\s*/g, " "))}
-          // A title is one line of frontmatter, wrapped for display only.
+          // A title is one line of frontmatter, wrapped for display only. Let IME Enter through.
           onKeyDown={(event) => {
-            if (event.key === "Enter") event.preventDefault();
+            if (event.key === "Enter" && !event.isComposing) event.preventDefault();
           }}
           // Typing over the seeded "Untitled" should not need a manual select.
           onFocus={(event) => {

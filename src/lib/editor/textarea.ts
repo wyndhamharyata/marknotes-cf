@@ -3,7 +3,9 @@ export function fitTextarea(textarea: HTMLTextAreaElement | null): void {
   if (!textarea) return;
   // Auto first, or a box that grew once never shrinks back.
   textarea.style.height = "auto";
-  textarea.style.height = `${textarea.scrollHeight}px`;
+  // scrollHeight leaves the border out; border-box height has to include it.
+  const border = textarea.offsetHeight - textarea.clientHeight;
+  textarea.style.height = `${textarea.scrollHeight + border}px`;
 }
 
 // execCommand("insertText") rather than `value =`, the only way to keep native undo.

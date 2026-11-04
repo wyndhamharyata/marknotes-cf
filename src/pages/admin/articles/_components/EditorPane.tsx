@@ -191,7 +191,11 @@ export default function EditorPane({ body, onBody, onImages, textareaRef }: Prop
           }}
         />
 
-        {dragging && <div class="drop">Drop to upload</div>}
+        {dragging && (
+          <div class="drop">
+            <span>Drop to upload</span>
+          </div>
+        )}
       </div>
     </div>
   );

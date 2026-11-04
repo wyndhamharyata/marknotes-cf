@@ -9,6 +9,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:generate": "drizzle-kit generate",
+    "check:editor": "node scripts/check-editor.mjs",
     "r2:cors": "wrangler r2 bucket cors set marknotes-cf-production-imagestagingbucketbucket-wotheafa --file r2-cors.json",
     "preview": "astro preview",
     "db:pull": "node --env-file-if-exists=.env scripts/db-pull.mjs"

@@ -38,26 +38,5 @@ const { title, description, image, dockProp, width } = Astro.props;
     <script>
       import "../scripts/theme";
     </script>
-    <script is:inline>
-      // The dock floats over the page, so the page reserves room for it only once the content
-      // is long enough to scroll under it; otherwise that reserve is a scrollbar to nowhere.
-      (function () {
-        function fit() {
-          var main = document.querySelector(".admin-main");
-          var dock = document.querySelector(".dock");
-          if (!main || !dock) return;
-          // Measure with the reserve off, then keep it only if the page still overflows.
-          main.style.paddingBottom = "0px";
-          main.style.paddingBottom =
-            document.documentElement.scrollHeight > window.innerHeight
-              ? dock.offsetHeight + 24 + "px"
-              : "0px";
-        }
-        fit();
-        window.addEventListener("load", fit);
-        window.addEventListener("resize", fit);
-        document.addEventListener("htmx:afterSettle", fit);
-      })();
-    </script>
   </body>
 </html>
