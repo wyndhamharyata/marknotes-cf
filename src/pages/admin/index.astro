@@ -37,8 +37,7 @@ import HomeTopArticles from "./_components/HomeTopArticles.astro";
       <div class="contents"><HomeTopArticles server:defer /></div>
     </div>
 
-    <!-- The section is out of flow, so only the left column sizes the row; 18px is .paper's
-         bottom margin. The bleed keeps the slips' shadows from being cut off at the sides. -->
+    <!-- 18px is .paper's bottom margin, so the pane ends with the card. -->
     <div class="relative">
       <section
         class="comments lg:absolute lg:-inset-x-3 lg:top-0 lg:bottom-[18px] lg:overflow-y-auto lg:px-3"

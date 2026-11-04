@@ -1,4 +1,3 @@
-/** Takes the height of its text, so the pane scrolls instead of the box. */
 export function fitTextarea(textarea: HTMLTextAreaElement | null): void {
   if (!textarea) return;
   // Auto first, or a box that grew once never shrinks back.
@@ -295,7 +294,6 @@ export function imageFilesFrom(transfer: DataTransfer | null): File[] {
   return Array.from(transfer.files).filter((file) => file.type.startsWith("image/"));
 }
 
-/** A GFM table to type into: header row, alignment row, two empty rows to fill. */
 export function insertTable(textarea: HTMLTextAreaElement, columns = 3): void {
   const row = (fill: (index: number) => string) =>
     `| ${Array.from({ length: columns }, (_, index) => fill(index)).join(" | ")} |`;

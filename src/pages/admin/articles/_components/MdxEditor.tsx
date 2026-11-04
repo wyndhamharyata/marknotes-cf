@@ -25,7 +25,6 @@ interface Props {
   existingSlugs?: string[];
   /** New article only: frontmatter prefilled from the URL, such as petakopi's `coffeeId`. */
   extraFrontmatter?: string[];
-  /** The Kopimap shop this article reviews, fetched by the page from its `coffeeId`. */
   shop?: KopimapShop;
   article?: {
     slug: string;
@@ -120,14 +119,12 @@ export default function MdxEditor({
     return () => query.removeEventListener("change", sync);
   }, []);
 
-  // One scroll for the writing: both boxes take their text's height, so the pane scrolls.
   // The draft loads after mount, so everything below re-attaches once the panes exist.
   const panesReady = draft !== null;
 
   // Kept as a ref so the fitting effect can resync the preview after the page grows.
   const syncRef = useRef<() => void>(() => {});
-  // Fitting collapses a box to measure it, which clamps the pane to the top; put the view back.
-  // Typing at the end follows the text instead, as it would in a plain textarea.
+  // Fitting's collapse clamps the scroll; typing at the end follows the text instead.
   const fitWriting = useCallback(() => {
     const body = textareaRef.current;
     const scroller = notaRef.current;
@@ -172,8 +169,7 @@ export default function MdxEditor({
     };
   }, [panesReady, fitWriting]);
 
-  // The panes mirror each other: down to the body the two headers run side by side, from there
-  // the textarea alone tracks the prose, so the preview's hero and headline weigh nothing.
+  // The preview's hero and headline are outside the map; only the prose tracks the body.
   useEffect(() => {
     const scroller = notaRef.current;
     const preview = previewRef.current;

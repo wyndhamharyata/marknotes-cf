@@ -1,9 +1,6 @@
 import type { ArticleDraft } from "./types";
 
-/**
- * The store stamps `updatedAt` on every save, so only the authored fields say whether a draft
- * holds work the committed article does not.
- */
+// The store stamps updatedAt on every save, so it says nothing about unsaved work.
 export function editedSince(draft: ArticleDraft, initial: ArticleDraft): boolean {
   return (
     draft.title !== initial.title ||

@@ -4,8 +4,7 @@ import type { CommentNode } from "./types";
 import { AUTHOR_ALIAS } from "../../../../lib/comments/author";
 import { formatDate } from "../../../../lib/date";
 
-// The strip holds ten torn edges, 900px each. Neighbours advance by 7 (which shares
-// no factor with 10), so no two slips in a thread ever show the same edge.
+// Ten 900px edges; neighbours advance by 7, which shares no factor with 10, so no slip repeats.
 const tearSlice = (tear: number) => `${-(tear % 10) * 900}px`;
 
 interface CommentItemProps {

@@ -1,7 +1,6 @@
 import type { ShikiTransformer, ThemeRegistration } from "shiki";
 
-// A code block is printed in one ink: keywords bold, comments in ink-2. github-light rides
-// along in --shiki-colour and shows under the pointer.
+// One ink; github-light rides in --shiki-colour and shows under the pointer.
 export const inkTheme: ThemeRegistration = {
   name: "ink",
   type: "light",

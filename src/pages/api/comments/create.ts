@@ -25,8 +25,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
   const trimmedMessage = replyBody.trim();
 
-  // Profanity is now rejected in assertValidRequest, so all comments reaching here are clean.
-  // My own comments skip the AI moderation queue.
+  // Everything reaching here is clean, and my own comments skip the AI queue.
   const moderationStatus = isAuthor ? ModerationStatus.OK : ModerationStatus.UNVERIFIED;
 
   const newId = await getDoStub().createCommentWithModeration(

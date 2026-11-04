@@ -1,8 +1,4 @@
-// EFF's large wordlist, the 7,776 words the old Go site picked aliases from.
-// https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt
-// Lists are CC BY 3.0 US, EFF.
-// Generated from word_list_eff_large.go; the order is the dice-roll order (11111..66666).
-// Source: github.com/wyndhamharyata/go-diceware, ts/src/wordlist.ts.
+// EFF's large wordlist (CC BY 3.0 US) in dice-roll order, as go-diceware generates it.
 export const EFF_LARGE_WORDS: readonly string[] = [
   "abacus",
   "abdomen",

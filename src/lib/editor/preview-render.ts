@@ -50,9 +50,7 @@ export async function renderPreview(body: string, assets: InlineAsset[]): Promis
 
   const instance = new Marked({ gfm: true, async: false });
 
-  // Shiki is async and marked's `code` renderer is not, so every fence is
-  // highlighted up front. marked's own walker, because list items keep their
-  // children under `items`, which a `token.tokens` recursion misses.
+  // Shiki is async and marked's code renderer is not, so fences highlight up front; list children live under items.
   const fences = new Map<string, { lang?: string; text: string }>();
   instance.walkTokens(instance.lexer(prepared), (token: Token) => {
     if (token.type === "code") {

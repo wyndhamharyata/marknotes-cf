@@ -1,7 +1,6 @@
 import type uPlot from "uplot";
 
-// Plotted in ink on graph paper; the paper and its grid are the container's background, and
-// the inks hold at night, so nothing here reads the theme.
+// The inks hold at night, so nothing here reads the theme.
 export const INK = "#141414";
 export const BIRO = "#1E3FD9";
 export const SIGNAL = "#FF5A1F";
@@ -14,7 +13,6 @@ export function axes(yValues: uPlot.Axis["values"]): uPlot.Axis[] {
   return [axis, { ...axis, values: yValues }];
 }
 
-/** Today's point: an orange square at the end of the first series. */
 export const lastPoint: uPlot.Plugin = {
   hooks: {
     draw: [

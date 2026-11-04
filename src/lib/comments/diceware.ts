@@ -1,5 +1,4 @@
-// TypeScript port of github.com/sethvargo/go-diceware/diceware.
-// MIT, Seth Vargo. Source: github.com/wyndhamharyata/go-diceware, ts/src/index.ts.
+// Port of github.com/sethvargo/go-diceware (MIT), as go-diceware's ts/src/index.ts.
 
 import type { AstroCookies } from "astro";
 import { EFF_LARGE_WORDS } from "./diceware-words";

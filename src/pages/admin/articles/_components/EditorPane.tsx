@@ -17,7 +17,6 @@ interface Props {
   body: string;
   onBody: (value: string) => void;
   onImages: (files: File[], textarea: HTMLTextAreaElement) => void;
-  /** Owned by MdxEditor so it can drive scroll sync against the preview. */
   textareaRef: RefObject<HTMLTextAreaElement>;
 }
 

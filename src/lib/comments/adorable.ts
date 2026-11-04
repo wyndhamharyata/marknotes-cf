@@ -1,7 +1,4 @@
-// TypeScript port of github.com/ipsn/go-adorable.
-// MIT, Péter Szilágyi. The face parts and the PRNG are the original's, so a
-// seed picks the same eyes, nose, mouth and background the old Go site picked.
-// Source: github.com/wyndhamharyata/go-adorable, ts/src/index.ts.
+// Port of github.com/ipsn/go-adorable (MIT): a seed picks the same face the Go site did.
 
 import { sha3_256 } from "@noble/hashes/sha3.js";
 import { hmac } from "@noble/hashes/hmac.js";

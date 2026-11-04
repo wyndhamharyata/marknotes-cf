@@ -43,7 +43,10 @@ function buildKey({ kind, slug, filename }: PresignRequest): string {
 
 // RFC 3986: the browser must PUT the exact same path, so encode every segment but the slashes.
 const encode = (value: string) =>
-  encodeURIComponent(value).replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
+  encodeURIComponent(value).replace(
+    /[!'()*]/g,
+    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`
+  );
 
 const hex = (bytes: ArrayBuffer) =>
   [...new Uint8Array(bytes)].map((b) => b.toString(16).padStart(2, "0")).join("");
@@ -63,14 +66,7 @@ async function hmac(key: ArrayBuffer | Uint8Array, data: string) {
   return crypto.subtle.sign("HMAC", cryptoKey, new TextEncoder().encode(data));
 }
 
-/**
- * A presigned PUT URL for R2, signed with SigV4.
- *
- * This used to be `@aws-sdk/client-s3`. The SDK's node-only helpers are replaced by sentinels in
- * its browser build, and Vite resolved that build for the server bundle too, so presigning threw
- * "emitWarningIfUnsupportedVersion is not a function". Signing here is a few lines and bundles as
- * nothing, which also keeps the worker small.
- */
+// Signed by hand: the S3 SDK's browser build replaced the node helpers Vite needed, so presigning threw.
 export async function generatePresignedPutURL(
   request: PresignRequest,
   config: PresignedURLConfig
@@ -107,12 +103,7 @@ export async function generatePresignedPutURL(
     "UNSIGNED-PAYLOAD",
   ].join("\n");
 
-  const stringToSign = [
-    ALGORITHM,
-    amzDate,
-    scope,
-    await sha256Hex(canonicalRequest),
-  ].join("\n");
+  const stringToSign = [ALGORITHM, amzDate, scope, await sha256Hex(canonicalRequest)].join("\n");
 
   const dateKey = await hmac(new TextEncoder().encode(`AWS4${config.secretAccessKey}`), dateStamp);
   const regionKey = await hmac(dateKey, REGION);

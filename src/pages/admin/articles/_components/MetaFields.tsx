@@ -3,17 +3,14 @@ import type { KopimapShop } from "../../../../lib/kopimap";
 
 interface Props {
   title: string;
-  /** Owned by MdxEditor, which fits it to its text. */
   titleRef: RefObject<HTMLTextAreaElement>;
   description: string;
-  /** Same, for the description box. */
   descriptionRef: RefObject<HTMLTextAreaElement>;
   /** Filename and dates, worded by the caller since only it knows the mode. */
   meta: string;
   slugError: string | null;
   onTitle: (value: string) => void;
   onDescription: (value: string) => void;
-  /** Coffee reviews only: the Kopimap shop this article reviews. */
   shop?: KopimapShop;
   rating?: number;
   onRating: (value: number) => void;
@@ -43,7 +40,7 @@ export default function MetaFields({
           aria-multiline="false"
           value={title}
           onInput={(event) => onTitle(event.currentTarget.value.replace(/\s*\n\s*/g, " "))}
-          // A title is one line of frontmatter, wrapped for display only. Let IME Enter through.
+          // Frontmatter titles are single-line; IME keeps its Enter.
           onKeyDown={(event) => {
             if (event.key === "Enter" && !event.isComposing) event.preventDefault();
           }}

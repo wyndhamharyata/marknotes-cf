@@ -5,10 +5,8 @@ import type { KopimapShop } from "../../../../lib/kopimap";
 interface Props {
   file?: File;
   uploadedKey?: string;
-  /** Hero an earlier publish committed, resolved by the page. */
   committedUrl?: string;
   onSelect: (file: File | undefined) => void;
-  /** Coffee reviews only: the shop's Kopimap photos, offered as heroes. */
   photos?: KopimapShop["photos"];
 }
 

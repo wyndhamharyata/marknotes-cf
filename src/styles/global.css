@@ -13,10 +13,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* ==========================================================================
-   Koran: Kopimap's Nota language on Marknotes. The Nota pieces are copied from
-   petakopi client/src/index.css, not shared; change both when one changes.
-   ========================================================================== */
+/* Nota styles copied from petakopi client/src/index.css: change both. */
 :root {
   --ink: #141414;
   --ink-2: #4d4d4d;
@@ -77,7 +74,6 @@ html.black {
   --counter: #0c0c0c;
 }
 
-/* Every edge is cut square. */
 *,
 *::before,
 *::after {
@@ -331,8 +327,7 @@ button:focus-visible {
     var(--grain), var(--thermal);
   color: var(--ink);
 }
-/* A torn edge is a seeded fracture subtracted from the paper, not a sawtooth.
-   --tear-x slides the 9000px tear along so stacked slips do not share an edge. */
+/* --tear-x slides the 9000px tear so stacked slips do not share an edge. */
 .tear-b {
   --tear-x: 0px;
   mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 14px 100%;
@@ -451,8 +446,7 @@ html.black .stamp-alert {
   border: 1px solid #4f4f4f;
 }
 
-/* The pink carbon nota: what you write, in blue ballpoint on ruled lines. Kopimap calls .ruled .line,
-   which here is taken by Shiki's code lines. */
+/* Kopimap's .line is Shiki's here, so the writing keeps .ruled. */
 .nota {
   position: relative;
   color: var(--ink);
@@ -641,9 +635,7 @@ html.dark .crop > i {
   border-color: #f6f6f6;
 }
 
-/* ==========================================================================
-   Marknotes objects
-   ========================================================================== */
+/* Marknotes objects */
 /* The till at the top: the site's keys, the current section latched. */
 .top-till {
   z-index: 30;
@@ -1089,9 +1081,7 @@ html.black .halftone::after {
   line-height: 1.65;
 }
 
-/* ---------- Printed ink ----------
-   Type is a film of warm ink squeezed into the stock, not black paint: it multiplies into
-   the sheet, gains weight through the variable axis, and the press leaves it uneven. */
+/* Printed ink: type multiplies into the stock rather than painting on it. */
 .sheet {
   color: var(--ink-print);
   font-weight: 450;
@@ -1182,8 +1172,7 @@ html.black .masthead {
   border-top-width: 1.5px;
 }
 
-/* A YouTube iframe carries width="560"; on a phone or in the editor's preview that would
-   push the sheet wide. Fill the column and keep the player's 16:9 shape. */
+/* A YouTube iframe carries width="560", which would push the sheet wide. */
 .article-prose iframe {
   display: block;
   width: 100%;
@@ -1893,14 +1882,11 @@ html.black .replies > .slip::before {
   }
 }
 
-/* ==========================================================================
-   Admin: the back of the counter
-   ========================================================================== */
+/* Admin */
 .admin-main {
   width: min(1240px, 100% - 2 * var(--gutter));
   margin: 22px auto 0;
-  /* Exactly the dock's cover (18px gap + its 64px height): any larger and a page that fits
-     gets a scrollbar that reveals nothing. */
+  /* The dock's cover: 18px gap + 64px height. More and a fitting page scrolls for nothing. */
   padding-bottom: 82px;
 }
 .admin-main.narrow {
@@ -1937,8 +1923,7 @@ html.black .replies > .slip::before {
   margin: 0 0 22px;
 }
 .page-head h1 {
-  /* Takes the row's leftover width, so a long title still leaves the keys beside it. The default
-     min-width keeps one unbreakable word from sliding under them; the key wraps instead. */
+  /* The title takes the spare width; a long word wraps the key rather than sliding under it. */
   flex: 1 1 0;
   margin: 0;
   font: 750 53px/0.88 var(--font-display);

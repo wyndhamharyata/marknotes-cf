@@ -36,8 +36,7 @@ const { title, description, pubDate, updatedDate, heroImage, slug, coffeeId, rat
       <a href="#comments">Comments ↓</a>
     </p>
     {
-      // Own wrapper: under hx-boost the island marker comment is lost, and Astro's swap
-      // then deletes every earlier sibling, which here is the title.
+      // Under hx-boost a lost island marker makes Astro's swap delete earlier siblings.
       coffeeId && (
         <div class="contents">
           <ShopIsland server:defer coffeeId={coffeeId} rating={rating}>

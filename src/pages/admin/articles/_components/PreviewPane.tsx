@@ -12,11 +12,8 @@ interface Props {
   proseClass: string;
   title: string;
   pubDate: string;
-  /** The hero picker, rendered where the real article puts its hero image. */
   hero: ComponentChildren;
-  /** Owned by MdxEditor so it can drive scroll sync against the textarea. */
   scrollRef: RefObject<HTMLDivElement>;
-  /** The pane's share of the split, set by MdxEditor's divider. */
   style?: Record<string, string>;
   shop?: KopimapShop;
   rating?: number;
@@ -25,7 +22,7 @@ interface Props {
 /** Long enough to skip a burst of keystrokes, short enough to feel live. */
 const RENDER_DEBOUNCE_MS = 200;
 
-/** Mirrors BlogPost.astro: the sheet with its hero, headline, dateline, ticket and prose. */
+// Mirrors BlogPost.astro.
 export default function PreviewPane({
   body,
   assets,

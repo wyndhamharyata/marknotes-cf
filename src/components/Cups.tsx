@@ -1,4 +1,3 @@
-// The rating as Kopimap prints it: a stamp card of five cups, then the score.
 export default function Cups({ score }: { score: number }) {
   return (
     <>

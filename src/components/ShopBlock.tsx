@@ -10,8 +10,7 @@ interface Props {
   rating?: number;
 }
 
-// Kopimap's ticket for the shop, stapled to the review. Shared by the editor preview and the
-// article, so the author sees what readers get.
+// Shared with the editor preview, so the author sees what readers get.
 export default function ShopBlock({ shop, rating = 0 }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
 
