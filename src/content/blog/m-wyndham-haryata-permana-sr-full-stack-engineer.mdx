@@ -2,17 +2,19 @@
 title: "M. Wyndham Haryata Permana - Sr. Full Stack Engineer"
 description: "Portfolio and resume showcasing 10 years of experience across Android, Backend, and Full Stack development with Go, Kotlin, Rails, and more."
 pubDate: "Aug 26 2023"
-updatedDate: "Oct 31 2026"
+updatedDate: "Nov 05 2026"
 heroImage: "../../assets/hero-m-wyndham-haryata-permana-sr-full-stack-engineer.png"
 ---
 
 import BlogImage from "../../pages/articles/_components/BlogImage.astro";
 import kelingImage from "./hero-images/building-keling-ios-alarm-app-with-alarmkit-and-liquid-glass-aeaa4899.png";
 import img_a27f4f0d from "./content-images/m-wyndham-haryata-permana-sr-full-stack-engineer/a27f4f0d-marknotes-collage-16x10.webp";
-import GithubContributionGraph from "../../pages/articles/_components/github-contribution-graph/GithubContributionGraph.astro"
+import GithubContributionGraph from "../../pages/articles/_components/github-contribution-graph/GithubContributionGraph.astro";
 import kopimapImage from "../../assets/resume/kopimap.webp";
 import gouiImage from "../../assets/resume/goui.webp";
 import onlymuseImage from "../../assets/resume/onlymuse.webp";
+import readerHeroLibrary from "../../assets/resume/reader-hero-library.webp";
+import readerHeroReader from "../../assets/resume/reader-hero-reader.webp";
 import warahanImage from "../../assets/resume/warahan.webp";
 
 ### Open to Collaboration, Work, Relocation and Opportunity
@@ -20,6 +22,7 @@ import warahanImage from "../../assets/resume/warahan.webp";
 | Jakarta - Singapore - New South Wales | +6288-228-664-820 | [business@mwyndham.dev](mailto:business@mwyndham.dev) | [LinkedIn ](http://www.linkedin.com/in/mwyndham)| [mwyndham.medium.com](http://mwyndham.medium.com) | [github.com/wyndhamharyata](http://github.com/wyndhamharyata) |
 
 ---
+
 > **10 Years, Numerous Apps, 4+ Open Source projects, 100+ Stars,** and **1M+** cumulative downloads later, I bring the best of Software Engineering to every platform.
 
 ---
@@ -31,10 +34,13 @@ import warahanImage from "../../assets/resume/warahan.webp";
 - SQL Enjoyer (PostgreSQL, SQLite, BigQuery, Redshift).
 - Infrastructure work including VPS, Serverless (Fly.io, Vercel, CF Workers), Cloudflare, GCP, AWS, Docker, Terraform, SST, Pulumi, and many more.
 - Terminal Andy, Enjoy Ghostty, Use Neovim BTW
----
-<GithubContributionGraph username="wyndhamharyata" months="-12" year="2026"/>
 
 ---
+
+<GithubContributionGraph username="wyndhamharyata" months="-12" year="2026" />
+
+---
+
 ## Works
 
 ### [Kopimap](https://kopimap.mwyndham.dev)
@@ -54,6 +60,15 @@ A parametric equalizer for a single browser tab (Chrome Web Store extension) or 
 <BlogImage src={onlymuseImage} alt="onlymuse" />
 
 A native Mac client for Apple Music without the iTunes parts, written in Odin. It draws its own window with Metal, its own text with CoreText, and its own UI, while Music.app plays every song so playback stays lossless. A small Swift helper drives Music.app and also plays YouTube Music songs, matched to their Apple Music versions.
+
+### [Reader Hero](https://reader-hero.mwyndham.dev)
+
+<div class="my-6 flex flex-wrap justify-center gap-4">
+  <BlogImage src={readerHeroLibrary} alt="Reader Hero library" />
+  <BlogImage src={readerHeroReader} alt="Reader Hero reading view" />
+</div>
+
+An offline-first PDF and EPUB reader that runs in the browser. It takes a PDF's text layer, or an EPUB's chapters, and reflows them into a phone-first e-book with font, theme and line controls, a table of contents, saved reading position, per-book AI summaries and series grouping, and one tap back to the original pages. React + Vite with Effect, pdf.js, fflate and IndexedDB; the Hono worker only serves files, so no document leaves the device and the installed app reads with no network.
 
 ### [Warahan](https://warahan.online) (WIP)
 
