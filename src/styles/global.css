@@ -1589,8 +1589,9 @@ html.black .ident.ph img {
 html.black .ident.ph::after {
   display: none;
 }
+/* A comment slip's blocks sit 12px apart, on the 52px edge: the avatar plus the row's gap. */
 .msg {
-  margin: 10px 0 12px 52px;
+  margin: 12px 0 12px 52px;
   font: 400 16px/1.55 var(--font-atkinson);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -1924,6 +1925,8 @@ html.black .replies > .slip::before {
     margin-top: 28px;
   }
   .msg,
+  .on,
+  .thread,
   .acts {
     margin-left: 0;
   }
@@ -1958,6 +1961,16 @@ html.black .replies > .slip::before {
   /* The dock's cover: 18px gap + 64px height. More and a fitting page scrolls for nothing. */
   padding-bottom: 82px;
 }
+/* A dashboard that fills the window: its .admin-fill child takes what the rest leave. */
+@media (min-width: 1024px) {
+  .admin-main:has(> .admin-fill) {
+    display: flex;
+    flex-direction: column;
+  }
+  .admin-fill {
+    flex: 1;
+  }
+}
 .admin-main.narrow {
   width: min(1040px, 100% - 2 * var(--gutter));
 }
@@ -1987,9 +2000,11 @@ html.black .replies > .slip::before {
 .page-head {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  /* The keys hang from the title's top, so a title that wraps grows downward without moving them. */
+  align-items: flex-start;
   gap: 12px;
-  margin: 0 0 22px;
+  /* Admin panels sit 18px apart every way: under the head, between columns, stacked. */
+  margin: 0 0 18px;
 }
 .page-head h1 {
   /* The title takes the spare width; a long word wraps the key rather than sliding under it. */
@@ -2218,10 +2233,23 @@ html.black .plot canvas {
 }
 
 /* An article's page: the sheet and its numbers side by side. */
+/* A scrolling pane whose scrollbar is always 12px, so content beside it can line up with
+   the page edge; the browser's own varies, from 0 (macOS overlay) to 15px.
+   shortcut: Firefox ignores ::-webkit-scrollbar and keeps its own width; style it with
+   scrollbar-width if the pane must line up there too. */
+.pane-scroll::-webkit-scrollbar {
+  width: 12px;
+}
+.pane-scroll::-webkit-scrollbar-thumb {
+  /* Mid grey: the pane sits on the counter, light by day and dark at night. */
+  background: rgb(128 128 128 / 0.5);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
 .detail {
   display: grid;
   grid-template-columns: minmax(0, 700px) minmax(0, 1fr);
-  gap: 40px;
+  gap: 18px;
   align-items: start;
 }
 .detail .sheet.article {
@@ -2248,7 +2276,7 @@ html.black .plot canvas {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 0 0 22px;
+  margin: 0 0 18px;
 }
 .filters .led {
   background: color-mix(in srgb, var(--led) 35%, #404040);
@@ -2311,8 +2339,8 @@ html.black .reason > div {
 .thread-row {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 12px;
+  margin-top: 12px;
   padding-left: 12px;
   border-left: 2px dashed rgb(var(--line) / 0.4);
   font: 400 14px/1.4 var(--font-atkinson);

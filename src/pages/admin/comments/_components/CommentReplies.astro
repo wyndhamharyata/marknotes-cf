@@ -27,10 +27,13 @@ const { comment } = Astro.props;
       <div class="thread-row">
         <Avatar seed={child.alias} />
         <div class="min-w-0">
-          <b>{child.alias}</b>{" "}
-          <span class={getModerationStampClass(child.moderationStatus)}>
-            {getModerationLabel(child.moderationStatus)}
-          </span>
+          {/* As tall as the avatar, so the two share a centre; name and stamp 12px apart, as on the card. */}
+          <div class="flex min-h-7 items-center gap-3">
+            <b>{child.alias}</b>
+            <span class={getModerationStampClass(child.moderationStatus)}>
+              {getModerationLabel(child.moderationStatus)}
+            </span>
+          </div>
           <p class="m-0">{child.message}</p>
         </div>
       </div>

@@ -24,8 +24,9 @@ import HomeTopArticles from "./_components/HomeTopArticles.astro";
     </HomeKpiStrip>
   </div>
 
-  <div class="grid grid-cols-1 gap-x-10 lg:grid-cols-[minmax(0,1fr)_440px]">
-    <div>
+  <!-- admin-fill: on desktop the grid takes the height down to the dock. -->
+  <div class="admin-fill grid grid-cols-1 gap-x-[18px] lg:grid-cols-[minmax(0,1fr)_440px]">
+    <div class="lg:flex lg:flex-col">
       <section class="plot">
         <h2>Pageviews — last 30 days</h2>
         <div class="contents">
@@ -37,11 +38,12 @@ import HomeTopArticles from "./_components/HomeTopArticles.astro";
       <div class="contents"><HomeTopArticles server:defer /></div>
     </div>
 
-    <!-- 18px is .paper's bottom margin, so the pane ends with the card. -->
+    <!-- 18px is .paper's bottom margin, so the pane ends with the card. The pane reaches 12px past
+         the column on the right for its 12px scrollbar, so the cards end on the readouts' edge. -->
     <div class="relative">
       <section
-        class="comments lg:absolute lg:-inset-x-3 lg:top-0 lg:bottom-[18px] lg:overflow-y-auto lg:px-3"
-        style="width:100%;margin:0"
+        class="comments pane-scroll lg:absolute lg:-inset-x-3 lg:top-0 lg:bottom-[18px] lg:overflow-y-auto lg:pl-3"
+        style="width:auto;margin:0"
       >
         <div class="contents"><HomeRecentComments server:defer /></div>
       </section>

@@ -18,28 +18,35 @@ const enriched = articles.map((a) => {
 
 const top = enriched
   .filter((a) => a.pageviews7d > 0)
-  .sort((a, b) => b.pageviews7d - a.pageviews7d)
-  .slice(0, 5);
+  .sort((a, b) => b.pageviews7d - a.pageviews7d);
 
 const fmt = new Intl.NumberFormat();
 ---
 
-<section class="paper">
-  <div class="receipt tear-b">
+<!-- Stretches to the foot of the column on desktop, level with the comments. -->
+<section class="paper lg:flex lg:flex-1 lg:flex-col">
+  <div class="receipt tear-b lg:flex lg:flex-1 lg:flex-col">
     <h2 class="fold">Top articles<span class="ct">7 days</span></h2>
     {
       top.length === 0 ? (
         <p class="plot-empty">No analytics yet.</p>
       ) : (
-        top.map((a) => (
-          <a class="top-row" href={`/admin/articles/${a.slug}`}>
-            <b>{a.title}</b>
-            <i class="leader" />
-            <span class="d">
-              {fmt.format(a.pageviews7d)} · {fmt.format(a.visits7d)}
-            </span>
-          </a>
-        ))
+        // Desktop: the rows fill the paper and scroll in it. Absolute, so they never set its height.
+        // The scroller reaches 16px into the paper's 18px padding: its 12px bar plus 4px clear of
+        // the numbers, which keep ending on the rule's edge.
+        <div class="relative lg:min-h-40 lg:flex-1">
+          <div class="pane-scroll lg:absolute lg:inset-y-0 lg:left-0 lg:-right-4 lg:overflow-y-auto lg:pr-1">
+            {top.map((a) => (
+              <a class="top-row" href={`/admin/articles/${a.slug}`}>
+                <b>{a.title}</b>
+                <i class="leader" />
+                <span class="d">
+                  {fmt.format(a.pageviews7d)} · {fmt.format(a.visits7d)}
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
       )
     }
   </div>
