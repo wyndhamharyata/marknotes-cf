@@ -1,7 +1,8 @@
 .contribution-graph {
   width: 100%;
   overflow-x: auto;
-  --empty-cell-bg: rgb(20 20 20 / 0.08);
+  /* --line flips to chalk on black stock, so every level stays visible there. */
+  --empty-cell-bg: rgb(var(--line) / 0.08);
 }
 
 .contribution-graph .height-full {
@@ -38,15 +39,15 @@
 }
 
 .contribution-graph [data-level="1"] {
-  background-color: rgb(20 20 20 / 0.3);
+  background-color: rgb(var(--line) / 0.3);
 }
 
 .contribution-graph [data-level="2"] {
-  background-color: rgb(20 20 20 / 0.5);
+  background-color: rgb(var(--line) / 0.5);
 }
 
 .contribution-graph [data-level="3"] {
-  background-color: rgb(20 20 20 / 0.75);
+  background-color: rgb(var(--line) / 0.75);
 }
 
 .contribution-graph [data-level="4"] {
@@ -61,4 +62,29 @@
 .contribution-graph tool-tip,
 .contribution-graph .sr-only {
   display: none;
+}
+
+/* The article's table rules would box every cell and pad the labels, which set each row's
+   height: 18px rows under 10px cells. */
+.contribution-graph td,
+.contribution-graph th {
+  padding: 0;
+  border: 0;
+}
+
+/* Room for "Mon", "Wed" and "Fri"; GitHub's inline 28px clips them. */
+.contribution-graph tr > :first-child {
+  width: 34px !important;
+}
+
+/* A phone keeps the cells a usable size and scrolls the year sideways. Right to left, so it
+   opens on the latest weeks without script. */
+@media (max-width: 767px) {
+  .contribution-graph {
+    direction: rtl;
+  }
+  .contribution-graph table {
+    direction: ltr;
+    min-width: 760px;
+  }
 }
