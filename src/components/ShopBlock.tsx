@@ -1,8 +1,5 @@
-import { useEffect, useRef } from "preact/hooks";
 import type { KopimapShop } from "../lib/kopimap";
 import Cups from "./Cups";
-// Static: a dynamically imported stylesheet 404s in the Cloudflare build.
-import "maplibre-gl/dist/maplibre-gl.css";
 
 interface Props {
   shop: KopimapShop;
@@ -12,43 +9,6 @@ interface Props {
 
 // Shared with the editor preview, so the author sees what readers get.
 export default function ShopBlock({ shop, rating = 0 }: Props) {
-  const mapRef = useRef<HTMLDivElement>(null);
-
-  // MapLibre is heavy, so it loads only once the block scrolls into view.
-  useEffect(() => {
-    const container = mapRef.current;
-    if (!container) return;
-
-    let map: { remove: () => void } | undefined;
-    const observer = new IntersectionObserver(async ([entry]) => {
-      if (!entry.isIntersecting) return;
-      observer.disconnect();
-
-      const { Map, Marker } = await import("maplibre-gl");
-      const dark = document.documentElement.classList.contains("dark");
-      const created = new Map({
-        container,
-        style: `https://resource.mwyndham.dev/sono/kopimap_print_${dark ? "dark" : "light"}.json`,
-        center: [shop.lng, shop.lat],
-        zoom: 15,
-        interactive: false,
-        attributionControl: { compact: true },
-      });
-      // The reviewed shop's chop, selected: Kopimap's crop marks around it.
-      const mark = document.createElement("div");
-      mark.className = "crop";
-      mark.innerHTML = '<i></i><i></i><i></i><i></i><span class="map-stamp"></span>';
-      new Marker({ element: mark }).setLngLat([shop.lng, shop.lat]).addTo(created);
-      map = created;
-    });
-    observer.observe(container);
-
-    return () => {
-      observer.disconnect();
-      map?.remove();
-    };
-  }, [shop.lat, shop.lng]);
-
   const [open, close] = shop.open_hours.split("-");
   const minutes = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
   // Kopimap's hours are local to Solo, whatever the reader's time zone.
@@ -143,7 +103,57 @@ export default function ShopBlock({ shop, rating = 0 }: Props) {
           )}
         </div>
       </div>
-      <div ref={mapRef} class="tk-map" />
+      <div class="tk-map" aria-hidden="true">
+        <MockMap seed={shop.id} />
+        {/* The reviewed shop's chop, selected: Kopimap's crop marks around it. */}
+        <span class="crop">
+          <i />
+          <i />
+          <i />
+          <i />
+          <span class="map-stamp" />
+        </span>
+      </div>
     </section>
+  );
+}
+
+// A printed street plan, not the real one: Open in Kopimap and Directions carry the place.
+// Laid out from the shop's id, so each ticket differs and the same shop always looks the same.
+function MockMap({ seed }: { seed: string }) {
+  let h = 7;
+  for (const c of seed) h = (Math.imul(h, 31) + c.charCodeAt(0)) | 0;
+  const rand = () => {
+    h = (Math.imul(h ^ (h >>> 15), 2246822507) + 0x9e3779b9) | 0;
+    return ((h >>> 0) % 10000) / 10000;
+  };
+  const angle = rand() * 30 - 15;
+  const sx = 40 + rand() * 14;
+  const sy = 30 + rand() * 12;
+  const blocks = [];
+  const streets = [];
+  // Drawn past the edges, so the turned grid still fills the frame.
+  for (let x = -200; x < 500; x += sx) streets.push(`M${x} -200V400`);
+  for (let y = -200; y < 400; y += sy) streets.push(`M-200 ${y}H500`);
+  for (let x = -200; x < 500; x += sx) {
+    for (let y = -200; y < 400; y += sy) {
+      const park = rand() < 0.08;
+      const w = park ? sx - 8 : (sx - 10) * (0.45 + rand() * 0.5);
+      const hh = park ? sy - 8 : (sy - 10) * (0.45 + rand() * 0.5);
+      blocks.push(
+        <rect key={`${x},${y}`} class={park ? "park" : "bldg"} x={x + 4 + rand() * (sx - 8 - w)} y={y + 4 + rand() * (sy - 8 - hh)} width={w} height={hh} />,
+      );
+    }
+  }
+  const road = `M-200 ${100 + (rand() - 0.5) * 80}L500 ${100 + (rand() - 0.5) * 120}`;
+  return (
+    <svg class="tk-plan" viewBox="0 0 300 200" preserveAspectRatio="xMidYMid slice">
+      <g transform={`rotate(${angle} 150 100)`}>
+        <path class="minor" d={streets.join("")} />
+        {blocks}
+        <path class="casing" d={road} />
+        <path class="major" d={road} />
+      </g>
+    </svg>
   );
 }
